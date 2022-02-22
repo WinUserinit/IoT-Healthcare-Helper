@@ -1,0 +1,30 @@
+<?xml version="1.0" ?>
+<sequansd>
+    <!-- Connection configuration -->
+    <server>
+        <ip>0.0.0.0</ip>
+        <port>7772</port>
+        <maxClients>8</maxClients>
+    </server>
+
+    <!-- Define the log file name -->
+    <debug>
+        <logfilter>finer:*</logfilter>
+        <logfile>SequansdLog.txt</logfile>
+    </debug>
+
+	<!-- Enable dynamic allocation of event buffers -->
+	<event>
+		<useMemPool>0</useMemPool>
+	</event>
+
+    <!-- Define the firmware repository, for firmware from host mode -->
+    <ffh>
+        <repository>Firmwares</repository>
+    </ffh>
+
+    <!-- Startup script -->
+    <script>
+        <cli>showVersion</cli>
+    </script>
+</sequansd>

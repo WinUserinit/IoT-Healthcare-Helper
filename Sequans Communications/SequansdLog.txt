@@ -1,0 +1,4073 @@
+13:03 28.468 >| THSP/Manager    info >|  0. register          wks serviceQty=11 kind=PRIVATE
+13:03 28.468 >| THSP/Manager    info >|  9. register          bfh serviceQty= 3 kind=PRIVATE
+13:03 28.468 >| THSP/Manager    info >|  1. register          dbg serviceQty=10 kind=PUBLIC
+13:03 28.468 >| THSP/Manager    info >|  2. register          evt serviceQty= 9 kind=PUBLIC
+13:03 28.470 >| THSP/Manager    info >|  3. register          cnx serviceQty= 7 kind=PUBLIC
+13:03 28.470 >| THSP/Manager    info >|  4. register          dcm serviceQty= 4 kind=PUBLIC
+13:03 28.470 >| THSP/Manager    info >| 10. register         rftb serviceQty= 6 kind=PUBLIC
+13:03 28.470 >| THSP/Manager    info >|  5. register           ue serviceQty=194 kind=PUBLIC
+13:03 28.470 >| THSP/Manager    info >| 11. register      plaInfo serviceQty= 4 kind=PUBLIC
+13:03 28.470 >| THSP/Manager    info >| 13. register     usimInfo serviceQty= 2 kind=PUBLIC
+13:03 28.470 >| THSP/Manager    info >| 14. register          has serviceQty= 5 kind=PUBLIC
+13:03 28.470 >| THSP/Manager    info >| 15. register          mts serviceQty=79 kind=PUBLIC
+13:03 28.470 >| THSP/Manager    info >| 16. register          arc serviceQty= 4 kind=PUBLIC
+13:03 28.470 >| THSP/Manager    info >| 17. register          pla serviceQty= 3 kind=PUBLIC
+13:03 28.470 >| THSP/Manager    info >| 12. register       plaDbg serviceQty= 5 kind=PUBLIC
+13:03 28.474 >| THSP/Manager    info >| 20. register         mpdn serviceQty=14 kind=PUBLIC
+13:03 28.474 >| THSP/Manager    info >| 22. register          ims serviceQty=16 kind=PUBLIC
+13:03 28.474 >| THSP/Manager    info >| 24. register          sms serviceQty=13 kind=PUBLIC
+13:03 28.474 >| THSP/Manager    info >| 25. register          stk serviceQty=18 kind=PUBLIC
+13:03 28.474 >| THSP/Manager    info >| 26. register        embms serviceQty=16 kind=PUBLIC
+13:03 28.474 >| THSP/Manager    info >| 27. register          dat serviceQty= 5 kind=PUBLIC
+13:03 28.474 >| THSP/Manager    info >| 29. register      smsDual serviceQty=19 kind=PUBLIC
+13:03 28.474 >| THSP/Manager    info >| 32. register          drf serviceQty= 3 kind=PUBLIC
+13:03 28.474 >| THSP/Manager    info >| 30. register       dualRx serviceQty= 3 kind=PUBLIC
+13:03 28.474 >| THSP/Manager    info >| 33. register        volte serviceQty= 5 kind=PUBLIC
+13:03 28.474 >| THSP/Manager    info >| 37. register          lem serviceQty= 5 kind=PUBLIC
+13:03 28.474 >| THSP/Manager    info >| 38. register          lpp serviceQty= 6 kind=PUBLIC
+13:03 28.474 >| THSP/Manager    info >|  6. register     internal serviceQty=11 kind=LOCAL
+13:03 28.474 >| THSP/Manager    info >|  7. register   deviceInfo serviceQty=30 kind=LOCAL
+13:03 28.474 >| THSP/Manager    info >| 21. register          atf serviceQty=13 kind=LOCAL
+13:03 28.474 >| THSP/Manager    info >|  8. register          upg serviceQty= 5 kind=LOCAL
+13:03 28.474 >| THSP/Manager    info >| 23. register   imsService serviceQty=26 kind=LOCAL
+13:03 28.474 >| THSP/Manager    info >| 28. register         prov serviceQty=15 kind=LOCAL
+13:03 28.474 >| THSP/Manager    info >| 31. register         imsd serviceQty=11 kind=LOCAL
+13:03 28.474 >| THSP/Manager    info >| 34. register          bsp serviceQty= 5 kind=LOCAL
+13:03 28.474 >| THSP/Manager    info >| 35. register          dmc serviceQty=58 kind=LOCAL
+13:03 28.474 >| ATF/Dev        audit >| ------------------------------------------
+13:03 28.474 >| ATF/Dev        audit >| vst=''
+13:03 28.474 >| ATF/Dev        audit >| ------------------------------------------
+13:03 28.474 >| ATF/SPY         info >| [0x10CA1000] link '+CLAC'
+13:03 28.474 >| ATF/SPY         info >| [0x10CA1000] link 'ATE1'
+13:03 28.474 >| ATF/SPY         info >| [0x10CA1000] link 'ATE0'
+13:03 28.474 >| ATF/SPY         info >| [0x10CA1000] link 'ATV0'
+13:03 28.474 >| ATF/SPY         info >| [0x10CA1000] link 'ATV1'
+13:03 28.474 >| ATF/SPY         info >| [0x10CA1000] link '+SMART'
+13:03 28.474 >| ATF/SPY         info >| [0x10CA1000] link '+CMEE'
+13:03 28.474 >| ATF/SPY         info >| [0x10CA1000] link '+IPR'
+13:03 28.474 >| ATF/SPY         info >| [0x10CA1000] link '^RESET'
+13:03 28.474 >| ATF/SPY         info >| [0x10CA1000] link '+SMDTH'
+13:03 28.474 >| SQND/Itf        info >| Version 4.2.2.0-33928
+13:03 28.474 >| ATF/SPY         info >| start...
+13:03 28.474 >| HPS/SPY        audit >| new AsyncContext name='AtAsync' maxcmds=0
+13:03 28.492 >| SDB/SPY         info >| RDB server IP: 0.0.0.0
+13:03 28.492 >| SDB/SPY         info >| waiting for connect 0.0.0.0@8882
+13:03 28.512 >| ATF/SPY         info >| started
+13:03 28.512 >| DC/Itf         audit >| start...
+13:03 28.512 >| HPS/SPY        audit >| new AsyncContext name='dc' maxcmds=-1
+13:03 28.512 >| ATF/Dev        audit >| listen for at commands...
+13:03 28.520 >| RATP/SPY       audit >| Waiting for client connection...
+13:03 28.552 >| HPS/SPY        audit >| new AsyncContext name='dcNtf' maxcmds=-1
+13:03 28.590 >| HPS/SPY        audit >| new AsyncContext name='thspNtf' maxcmds=0
+13:03 28.628 >| HPS/SPY        audit >| new AsyncContext name='thspEvtNtf' maxcmds=64
+13:03 28.660 >| NIL/           audit >| Start...
+13:03 28.660 >| DC/Itf         audit >| started
+13:03 28.660 >| SQND/manager   audit >| start...
+13:03 28.660 >| HPS/SPY        audit >| new AsyncContext name='sqndManager:destroy' maxcmds=0
+13:03 28.690 >| SQND/manager   audit >| started
+13:03 28.704 >| DCS/UDP         info >| Waiting for connect...
+13:03 28.706 >| DCS/SPY         info >| Waiting for connect...
+13:03 29.202 >| SQND/dhcp       fine >| IP Address table changed
+13:03 29.230 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+13:03 29.234 >| SQND/dhcp       fine >| Disabled
+13:03 29.234 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+13:03 29.234 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+13:03 29.234 >| SQND/dhcp       fine >| Missing MAC
+13:03 29.234 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+13:03 29.234 >| SQND/dhcp       fine >| Missing MAC
+13:03 29.234 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+13:03 29.240 >| SQND/dhcp       fine >| Disabled
+13:03 29.240 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+13:03 29.240 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+13:03 29.296 >| SQND/dhcp       fine >| Static IP
+13:03 29.296 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+13:03 29.296 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+13:03 29.300 >| SQND/dhcp       fine >| Disabled
+13:03 29.300 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF disabled
+13:03 29.300 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+13:03 29.304 >| SQND/dhcp       fine >| Disabled
+13:03 29.304 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+13:03 29.304 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+13:03 29.304 >| SQND/dhcp       fine >| Missing MAC
+13:03 33.680 >| SQND/dhcp       fine >| IP Address table changed
+13:03 33.694 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+13:03 33.696 >| SQND/dhcp       fine >| Disabled
+13:03 33.696 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+13:03 33.696 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+13:03 33.696 >| SQND/dhcp       fine >| Missing MAC
+13:03 33.696 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+13:03 33.696 >| SQND/dhcp       fine >| Missing MAC
+13:03 33.696 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+13:03 33.702 >| SQND/dhcp       fine >| Disabled
+13:03 33.702 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+13:03 33.702 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+13:03 33.702 >| SQND/dhcp       fine >| Static IP
+13:03 33.702 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+13:03 33.702 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+13:03 33.710 >| SQND/dhcp       fine >| Disabled
+13:03 33.710 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF disabled
+13:03 33.710 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+13:03 33.712 >| SQND/dhcp       fine >| Disabled
+13:03 33.712 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+13:03 33.712 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+13:03 33.712 >| SQND/dhcp       fine >| Missing MAC
+13:03 33.818 >| SQND/dhcp       fine >| IP Address table changed
+13:03 33.836 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+13:03 33.836 >| SQND/dhcp       fine >| Disabled
+13:03 33.836 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF disabled
+13:03 33.836 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+13:03 33.836 >| SQND/dhcp       fine >| Disabled
+13:03 33.836 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+13:03 33.836 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+13:03 33.836 >| SQND/dhcp       fine >| Missing MAC
+13:03 33.836 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+13:03 33.836 >| SQND/dhcp       fine >| Missing MAC
+13:03 33.836 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+13:03 33.852 >| SQND/dhcp       fine >| Disabled
+13:03 33.852 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+13:03 33.852 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+13:03 33.856 >| SQND/dhcp       fine >| Static IP
+13:03 33.856 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+13:03 33.856 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+13:03 33.860 >| SQND/dhcp       fine >| Disabled
+13:03 33.860 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+13:03 33.860 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+13:03 33.862 >| SQND/dhcp       fine >| Disabled
+13:03 33.862 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+13:03 33.862 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+13:03 33.862 >| SQND/dhcp       fine >| Missing MAC
+13:03 40.186 >| SQND/dhcp       fine >| IP Address table changed
+13:03 40.204 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+13:03 40.210 >| SQND/dhcp       fine >| Disabled
+13:03 40.210 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+13:03 40.210 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+13:03 40.210 >| SQND/dhcp       fine >| Missing MAC
+13:03 40.210 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+13:03 40.210 >| SQND/dhcp       fine >| Missing MAC
+13:03 40.210 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+13:03 40.216 >| SQND/dhcp       fine >| Disabled
+13:03 40.216 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+13:03 40.216 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+13:03 40.222 >| SQND/dhcp       fine >| Static IP
+13:03 40.222 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+13:03 40.222 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+13:03 40.230 >| SQND/dhcp       fine >| Disabled
+13:03 40.230 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+13:03 40.230 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+13:03 40.238 >| SQND/dhcp       fine >| Disabled
+13:03 40.238 >| SQND/dhcp       info >| D2:31:A0:BE:B7:1A disabled
+13:03 40.238 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+13:03 40.242 >| SQND/dhcp       fine >| Disabled
+13:03 40.242 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+13:03 40.242 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+13:03 40.242 >| SQND/dhcp       fine >| Missing MAC
+13:03 41.680 >| SQND/dhcp       fine >| IP Address table changed
+13:03 41.736 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+13:03 41.742 >| SQND/dhcp       fine >| Disabled
+13:03 41.742 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+13:03 41.742 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+13:03 41.742 >| SQND/dhcp       fine >| Missing MAC
+13:03 41.744 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+13:03 41.744 >| SQND/dhcp       fine >| Missing MAC
+13:03 41.744 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+13:03 41.748 >| SQND/dhcp       fine >| Disabled
+13:03 41.748 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+13:03 41.748 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+13:03 41.756 >| SQND/dhcp       fine >| Static IP
+13:03 41.756 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+13:03 41.756 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+13:03 41.762 >| SQND/dhcp       fine >| Disabled
+13:03 41.762 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+13:03 41.762 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+13:03 41.768 >| SQND/dhcp       fine >| Disabled
+13:03 41.768 >| SQND/dhcp       info >| D2:31:A0:BE:B7:1A disabled
+13:03 41.768 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+13:03 41.778 >| SQND/dhcp       fine >| Disabled
+13:03 41.778 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+13:03 41.778 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+13:03 41.778 >| SQND/dhcp       fine >| Missing MAC
+13:03 42.050 >| SQND/dhcp       fine >| IP Address table changed
+13:03 42.074 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+13:03 42.080 >| SQND/dhcp       fine >| Disabled
+13:03 42.080 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+13:03 42.080 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+13:03 42.080 >| SQND/dhcp       fine >| Missing MAC
+13:03 42.080 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+13:03 42.080 >| SQND/dhcp       fine >| Missing MAC
+13:03 42.080 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+13:03 42.086 >| SQND/dhcp       fine >| Disabled
+13:03 42.086 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+13:03 42.086 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+13:03 42.092 >| SQND/dhcp       fine >| Static IP
+13:03 42.092 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+13:03 42.092 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+13:03 42.098 >| SQND/dhcp       fine >| Disabled
+13:03 42.098 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+13:03 42.098 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+13:03 42.108 >| SQND/dhcp       fine >| Disabled
+13:03 42.108 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+13:03 42.108 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+13:03 42.108 >| SQND/dhcp       fine >| Missing MAC
+13:03 45.580 >| SQND/dhcp       fine >| IP Address table changed
+13:03 45.610 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+13:03 45.624 >| SQND/dhcp       fine >| Disabled
+13:03 45.624 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+13:03 45.624 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+13:03 45.624 >| SQND/dhcp       fine >| Missing MAC
+13:03 45.624 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+13:03 45.624 >| SQND/dhcp       fine >| Missing MAC
+13:03 45.624 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+13:03 45.632 >| SQND/dhcp       fine >| Disabled
+13:03 45.632 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+13:03 45.632 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+13:03 45.646 >| SQND/dhcp       fine >| Static IP
+13:03 45.646 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+13:03 45.646 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+13:03 45.654 >| SQND/dhcp       fine >| Disabled
+13:03 45.654 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+13:03 45.654 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+13:03 45.692 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+13:03 45.692 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+13:03 45.714 >| SQND/dhcp       fine >| Disabled
+13:03 45.714 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+13:03 45.714 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+13:03 45.714 >| SQND/dhcp       fine >| Missing MAC
+13:03 48.736 >| SQND/dhcp       fine >| IP Address table changed
+13:03 48.752 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+13:03 48.758 >| SQND/dhcp       fine >| Disabled
+13:03 48.758 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+13:03 48.758 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+13:03 48.758 >| SQND/dhcp       fine >| Missing MAC
+13:03 48.758 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+13:03 48.758 >| SQND/dhcp       fine >| Missing MAC
+13:03 48.758 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+13:03 48.766 >| SQND/dhcp       fine >| Disabled
+13:03 48.766 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+13:03 48.766 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+13:03 48.772 >| SQND/dhcp       fine >| Static IP
+13:03 48.772 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+13:03 48.772 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+13:03 48.778 >| SQND/dhcp       fine >| Disabled
+13:03 48.778 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+13:03 48.778 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+13:03 48.788 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+13:03 48.788 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+13:03 48.796 >| SQND/dhcp       fine >| Disabled
+13:03 48.796 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+13:03 48.796 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+13:03 48.796 >| SQND/dhcp       fine >| Missing MAC
+13:05 26.182 >| SQND/dhcp       fine >| IP Address table changed
+13:05 26.204 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+13:05 26.210 >| SQND/dhcp       fine >| Disabled
+13:05 26.210 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+13:05 26.210 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+13:05 26.210 >| SQND/dhcp       fine >| Missing MAC
+13:05 26.210 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+13:05 26.210 >| SQND/dhcp       fine >| Missing MAC
+13:05 26.210 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+13:05 26.210 >| SQND/dhcp       fine >| Disabled
+13:05 26.210 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+13:05 26.210 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+13:05 26.222 >| SQND/dhcp       fine >| Static IP
+13:05 26.222 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+13:05 26.222 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+13:05 26.226 >| SQND/dhcp       fine >| Disabled
+13:05 26.226 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+13:05 26.226 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+13:05 26.226 >| SQND/dhcp       fine >| Disabled
+13:05 26.226 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+13:05 26.226 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+13:05 26.240 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+13:05 26.240 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+13:05 26.246 >| SQND/dhcp       fine >| Disabled
+13:05 26.246 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+13:05 26.246 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+13:05 26.246 >| SQND/dhcp       fine >| Missing MAC
+14:02 32.674 >| SQND/dhcp       fine >| IP Address table changed
+14:02 32.694 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+14:02 32.698 >| SQND/dhcp       fine >| Disabled
+14:02 32.698 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+14:02 32.698 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+14:02 32.698 >| SQND/dhcp       fine >| Missing MAC
+14:02 32.698 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+14:02 32.698 >| SQND/dhcp       fine >| Missing MAC
+14:02 32.698 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+14:02 32.702 >| SQND/dhcp       fine >| Disabled
+14:02 32.702 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+14:02 32.702 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+14:02 32.704 >| SQND/dhcp       fine >| Static IP
+14:02 32.704 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+14:02 32.704 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+14:02 32.708 >| SQND/dhcp       fine >| Disabled
+14:02 32.708 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+14:02 32.708 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+14:02 32.712 >| SQND/dhcp       fine >| Disabled
+14:02 32.712 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+14:02 32.712 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+14:02 32.716 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+14:02 32.716 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+14:02 32.720 >| SQND/dhcp       fine >| Disabled
+14:02 32.720 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+14:02 32.720 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+14:02 32.720 >| SQND/dhcp       fine >| Missing MAC
+14:27 48.676 >| SQND/dhcp       fine >| IP Address table changed
+14:27 48.704 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+14:27 48.710 >| SQND/dhcp       fine >| Disabled
+14:27 48.710 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+14:27 48.710 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+14:27 48.710 >| SQND/dhcp       fine >| Missing MAC
+14:27 48.710 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+14:27 48.710 >| SQND/dhcp       fine >| Missing MAC
+14:27 48.710 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+14:27 48.714 >| SQND/dhcp       fine >| Disabled
+14:27 48.714 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+14:27 48.714 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+14:27 48.714 >| SQND/dhcp       fine >| Static IP
+14:27 48.714 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+14:27 48.714 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+14:27 48.714 >| SQND/dhcp       fine >| Disabled
+14:27 48.714 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+14:27 48.714 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+14:27 48.730 >| SQND/dhcp       fine >| Disabled
+14:27 48.730 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+14:27 48.730 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+14:27 48.732 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+14:27 48.732 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+14:27 48.732 >| SQND/dhcp       fine >| Disabled
+14:27 48.732 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+14:27 48.732 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+14:27 48.732 >| SQND/dhcp       fine >| Missing MAC
+14:28 27.780 >| SQND/dhcp       fine >| IP Address table changed
+14:28 27.848 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+14:28 27.854 >| SQND/dhcp       fine >| Disabled
+14:28 27.854 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+14:28 27.854 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+14:28 27.856 >| SQND/dhcp       fine >| Missing MAC
+14:28 27.856 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+14:28 27.856 >| SQND/dhcp       fine >| Missing MAC
+14:28 27.856 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+14:28 27.860 >| SQND/dhcp       fine >| Disabled
+14:28 27.860 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+14:28 27.860 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+14:28 27.870 >| SQND/dhcp       fine >| Static IP
+14:28 27.872 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+14:28 27.872 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+14:28 27.874 >| SQND/dhcp       fine >| Disabled
+14:28 27.874 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+14:28 27.874 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+14:28 27.874 >| SQND/dhcp       fine >| Disabled
+14:28 27.874 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+14:28 27.874 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+14:28 27.890 >| SQND/dhcp       fine >| Disabled
+14:28 27.890 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF disabled
+14:28 27.890 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+14:28 27.890 >| SQND/dhcp       fine >| Disabled
+14:28 27.890 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+14:28 27.890 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+14:28 27.890 >| SQND/dhcp       fine >| Missing MAC
+14:28 28.834 >| SQND/dhcp       fine >| IP Address table changed
+14:28 28.874 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+14:28 28.874 >| SQND/dhcp       fine >| Disabled
+14:28 28.874 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+14:28 28.874 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+14:28 28.874 >| SQND/dhcp       fine >| Missing MAC
+14:28 28.874 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+14:28 28.874 >| SQND/dhcp       fine >| Missing MAC
+14:28 28.874 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+14:28 28.874 >| SQND/dhcp       fine >| Disabled
+14:28 28.874 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+14:28 28.874 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+14:28 28.890 >| SQND/dhcp       fine >| Static IP
+14:28 28.890 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+14:28 28.890 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+14:28 28.890 >| SQND/dhcp       fine >| Disabled
+14:28 28.890 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+14:28 28.890 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+14:28 28.900 >| SQND/dhcp       fine >| Disabled
+14:28 28.900 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+14:28 28.900 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+14:28 28.900 >| SQND/dhcp       fine >| Disabled
+14:28 28.900 >| SQND/dhcp       info >| 06:E2:7E:F3:C5:55 disabled
+14:28 28.900 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+14:28 28.900 >| SQND/dhcp       fine >| Disabled
+14:28 28.900 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+14:28 28.900 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+14:28 28.900 >| SQND/dhcp       fine >| Missing MAC
+14:28 35.006 >| SQND/dhcp       fine >| IP Address table changed
+14:28 35.056 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+14:28 35.066 >| SQND/dhcp       fine >| Disabled
+14:28 35.066 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+14:28 35.066 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+14:28 35.066 >| SQND/dhcp       fine >| Missing MAC
+14:28 35.066 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+14:28 35.066 >| SQND/dhcp       fine >| Missing MAC
+14:28 35.066 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+14:28 35.076 >| SQND/dhcp       fine >| Disabled
+14:28 35.076 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+14:28 35.076 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+14:28 35.084 >| SQND/dhcp       fine >| Static IP
+14:28 35.084 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+14:28 35.084 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+14:28 35.098 >| SQND/dhcp       fine >| Disabled
+14:28 35.098 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+14:28 35.098 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+14:28 35.106 >| SQND/dhcp       fine >| Disabled
+14:28 35.106 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+14:28 35.106 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+14:28 35.116 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+14:28 35.116 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+14:28 35.126 >| SQND/dhcp       fine >| Disabled
+14:28 35.126 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+14:28 35.126 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+14:28 35.126 >| SQND/dhcp       fine >| Missing MAC
+14:28 38.188 >| SQND/dhcp       fine >| IP Address table changed
+14:28 38.230 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+14:28 38.240 >| SQND/dhcp       fine >| Disabled
+14:28 38.240 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+14:28 38.240 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+14:28 38.240 >| SQND/dhcp       fine >| Missing MAC
+14:28 38.240 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+14:28 38.240 >| SQND/dhcp       fine >| Missing MAC
+14:28 38.240 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+14:28 38.250 >| SQND/dhcp       fine >| Disabled
+14:28 38.250 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+14:28 38.250 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+14:28 38.256 >| SQND/dhcp       fine >| Static IP
+14:28 38.256 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+14:28 38.256 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+14:28 38.268 >| SQND/dhcp       fine >| Disabled
+14:28 38.268 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+14:28 38.268 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+14:28 38.274 >| SQND/dhcp       fine >| Disabled
+14:28 38.274 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+14:28 38.274 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+14:28 38.280 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+14:28 38.280 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+14:28 38.288 >| SQND/dhcp       fine >| Disabled
+14:28 38.288 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+14:28 38.288 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+14:28 38.288 >| SQND/dhcp       fine >| Missing MAC
+14:28 52.698 >| SQND/dhcp       fine >| IP Address table changed
+14:28 52.756 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+14:28 52.770 >| SQND/dhcp       fine >| Disabled
+14:28 52.770 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+14:28 52.770 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+14:28 52.770 >| SQND/dhcp       fine >| Missing MAC
+14:28 52.770 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+14:28 52.770 >| SQND/dhcp       fine >| Missing MAC
+14:28 52.770 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+14:28 52.778 >| SQND/dhcp       fine >| Disabled
+14:28 52.778 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+14:28 52.778 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+14:28 52.786 >| SQND/dhcp       fine >| Static IP
+14:28 52.786 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+14:28 52.786 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+14:28 52.790 >| SQND/dhcp       fine >| Disabled
+14:28 52.790 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+14:28 52.790 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+14:28 52.790 >| SQND/dhcp       fine >| Disabled
+14:28 52.790 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+14:28 52.790 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+14:28 52.790 >| SQND/dhcp       fine >| Disabled
+14:28 52.790 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF disabled
+14:28 52.790 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+14:28 52.806 >| SQND/dhcp       fine >| Disabled
+14:28 52.806 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+14:28 52.806 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+14:28 52.806 >| SQND/dhcp       fine >| Missing MAC
+14:28 53.776 >| SQND/dhcp       fine >| IP Address table changed
+14:28 53.802 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+14:28 53.808 >| SQND/dhcp       fine >| Disabled
+14:28 53.808 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+14:28 53.808 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+14:28 53.808 >| SQND/dhcp       fine >| Missing MAC
+14:28 53.808 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+14:28 53.808 >| SQND/dhcp       fine >| Missing MAC
+14:28 53.808 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+14:28 53.816 >| SQND/dhcp       fine >| Disabled
+14:28 53.816 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+14:28 53.816 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+14:28 53.822 >| SQND/dhcp       fine >| Static IP
+14:28 53.822 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+14:28 53.822 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+14:28 53.830 >| SQND/dhcp       fine >| Disabled
+14:28 53.830 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+14:28 53.830 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+14:28 53.842 >| SQND/dhcp       fine >| Disabled
+14:28 53.842 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+14:28 53.842 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+14:28 53.842 >| SQND/dhcp       fine >| Disabled
+14:28 53.842 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+14:28 53.842 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+14:28 53.842 >| SQND/dhcp       fine >| Missing MAC
+14:28 55.030 >| SQND/dhcp       fine >| IP Address table changed
+14:28 55.054 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+14:28 55.066 >| SQND/dhcp       fine >| Disabled
+14:28 55.066 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+14:28 55.066 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+14:28 55.066 >| SQND/dhcp       fine >| Missing MAC
+14:28 55.066 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+14:28 55.066 >| SQND/dhcp       fine >| Missing MAC
+14:28 55.066 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+14:28 55.072 >| SQND/dhcp       fine >| Disabled
+14:28 55.072 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+14:28 55.072 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+14:28 55.080 >| SQND/dhcp       fine >| Static IP
+14:28 55.080 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+14:28 55.080 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+14:28 55.084 >| SQND/dhcp       fine >| Disabled
+14:28 55.084 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+14:28 55.084 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+14:28 55.090 >| SQND/dhcp       fine >| Disabled
+14:28 55.090 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+14:28 55.090 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+14:28 55.090 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+14:28 55.090 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+14:28 55.108 >| SQND/dhcp       fine >| Disabled
+14:28 55.108 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+14:28 55.108 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+14:28 55.108 >| SQND/dhcp       fine >| Missing MAC
+14:28 58.186 >| SQND/dhcp       fine >| IP Address table changed
+14:28 58.224 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+14:28 58.234 >| SQND/dhcp       fine >| Disabled
+14:28 58.234 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+14:28 58.234 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+14:28 58.234 >| SQND/dhcp       fine >| Missing MAC
+14:28 58.234 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+14:28 58.234 >| SQND/dhcp       fine >| Missing MAC
+14:28 58.234 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+14:28 58.242 >| SQND/dhcp       fine >| Disabled
+14:28 58.242 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+14:28 58.242 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+14:28 58.248 >| SQND/dhcp       fine >| Static IP
+14:28 58.248 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+14:28 58.248 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+14:28 58.258 >| SQND/dhcp       fine >| Disabled
+14:28 58.258 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+14:28 58.258 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+14:28 58.268 >| SQND/dhcp       fine >| Disabled
+14:28 58.268 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+14:28 58.268 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+14:28 58.278 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+14:28 58.278 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+14:28 58.286 >| SQND/dhcp       fine >| Disabled
+14:28 58.286 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+14:28 58.286 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+14:28 58.286 >| SQND/dhcp       fine >| Missing MAC
+14:29  9.182 >| SQND/dhcp       fine >| IP Address table changed
+14:29  9.208 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+14:29  9.220 >| SQND/dhcp       fine >| Disabled
+14:29  9.220 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+14:29  9.220 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+14:29  9.220 >| SQND/dhcp       fine >| Missing MAC
+14:29  9.220 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+14:29  9.220 >| SQND/dhcp       fine >| Missing MAC
+14:29  9.220 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+14:29  9.222 >| SQND/dhcp       fine >| Disabled
+14:29  9.222 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+14:29  9.222 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+14:29  9.222 >| SQND/dhcp       fine >| Static IP
+14:29  9.222 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+14:29  9.222 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+14:29  9.222 >| SQND/dhcp       fine >| Disabled
+14:29  9.222 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+14:29  9.222 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+14:29  9.240 >| SQND/dhcp       fine >| Disabled
+14:29  9.240 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+14:29  9.240 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+14:29  9.240 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+14:29  9.240 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+14:29  9.240 >| SQND/dhcp       fine >| Disabled
+14:29  9.240 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+14:29  9.240 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+14:29  9.240 >| SQND/dhcp       fine >| Missing MAC
+14:29 21.186 >| SQND/dhcp       fine >| IP Address table changed
+14:29 21.220 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+14:29 21.224 >| SQND/dhcp       fine >| Disabled
+14:29 21.224 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+14:29 21.224 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+14:29 21.224 >| SQND/dhcp       fine >| Missing MAC
+14:29 21.224 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+14:29 21.224 >| SQND/dhcp       fine >| Missing MAC
+14:29 21.224 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+14:29 21.228 >| SQND/dhcp       fine >| Disabled
+14:29 21.228 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+14:29 21.228 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+14:29 21.228 >| SQND/dhcp       fine >| Static IP
+14:29 21.228 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+14:29 21.228 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+14:29 21.228 >| SQND/dhcp       fine >| Disabled
+14:29 21.228 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+14:29 21.228 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+14:29 21.246 >| SQND/dhcp       fine >| Disabled
+14:29 21.246 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+14:29 21.246 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+14:29 21.246 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+14:29 21.246 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+14:29 21.246 >| SQND/dhcp       fine >| Disabled
+14:29 21.246 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+14:29 21.246 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+14:29 21.246 >| SQND/dhcp       fine >| Missing MAC
+14:29 36.690 >| SQND/dhcp       fine >| IP Address table changed
+14:29 36.716 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+14:29 36.726 >| SQND/dhcp       fine >| Disabled
+14:29 36.726 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+14:29 36.726 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+14:29 36.726 >| SQND/dhcp       fine >| Missing MAC
+14:29 36.726 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+14:29 36.726 >| SQND/dhcp       fine >| Missing MAC
+14:29 36.726 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+14:29 36.726 >| SQND/dhcp       fine >| Disabled
+14:29 36.726 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+14:29 36.726 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+14:29 36.726 >| SQND/dhcp       fine >| Static IP
+14:29 36.726 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+14:29 36.726 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+14:29 36.726 >| SQND/dhcp       fine >| Disabled
+14:29 36.726 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+14:29 36.726 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+14:29 36.744 >| SQND/dhcp       fine >| Disabled
+14:29 36.744 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+14:29 36.744 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+14:29 36.744 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+14:29 36.744 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+14:29 36.744 >| SQND/dhcp       fine >| Disabled
+14:29 36.744 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+14:29 36.744 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+14:29 36.744 >| SQND/dhcp       fine >| Missing MAC
+14:29 51.686 >| SQND/dhcp       fine >| IP Address table changed
+14:29 51.710 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+14:29 51.718 >| SQND/dhcp       fine >| Disabled
+14:29 51.718 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+14:29 51.718 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+14:29 51.718 >| SQND/dhcp       fine >| Missing MAC
+14:29 51.718 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+14:29 51.718 >| SQND/dhcp       fine >| Missing MAC
+14:29 51.718 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+14:29 51.722 >| SQND/dhcp       fine >| Disabled
+14:29 51.722 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+14:29 51.722 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+14:29 51.722 >| SQND/dhcp       fine >| Static IP
+14:29 51.722 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+14:29 51.722 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+14:29 51.722 >| SQND/dhcp       fine >| Disabled
+14:29 51.722 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+14:29 51.722 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+14:29 51.722 >| SQND/dhcp       fine >| Disabled
+14:29 51.722 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+14:29 51.722 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+14:29 51.742 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+14:29 51.742 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+14:29 51.742 >| SQND/dhcp       fine >| Disabled
+14:29 51.742 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+14:29 51.742 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+14:29 51.742 >| SQND/dhcp       fine >| Missing MAC
+14:31 17.680 >| SQND/dhcp       fine >| IP Address table changed
+14:31 17.704 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+14:31 17.714 >| SQND/dhcp       fine >| Disabled
+14:31 17.714 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+14:31 17.714 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+14:31 17.714 >| SQND/dhcp       fine >| Missing MAC
+14:31 17.714 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+14:31 17.714 >| SQND/dhcp       fine >| Missing MAC
+14:31 17.714 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+14:31 17.718 >| SQND/dhcp       fine >| Disabled
+14:31 17.718 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+14:31 17.718 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+14:31 17.718 >| SQND/dhcp       fine >| Static IP
+14:31 17.718 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+14:31 17.718 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+14:31 17.718 >| SQND/dhcp       fine >| Disabled
+14:31 17.718 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+14:31 17.718 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+14:31 17.734 >| SQND/dhcp       fine >| Disabled
+14:31 17.734 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+14:31 17.734 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+14:31 17.736 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+14:31 17.736 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+14:31 17.736 >| SQND/dhcp       fine >| Disabled
+14:31 17.736 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+14:31 17.736 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+14:31 17.736 >| SQND/dhcp       fine >| Missing MAC
+14:31 29.686 >| SQND/dhcp       fine >| IP Address table changed
+14:31 29.714 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+14:31 29.726 >| SQND/dhcp       fine >| Disabled
+14:31 29.726 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+14:31 29.726 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+14:31 29.726 >| SQND/dhcp       fine >| Missing MAC
+14:31 29.726 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+14:31 29.726 >| SQND/dhcp       fine >| Missing MAC
+14:31 29.726 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+14:31 29.732 >| SQND/dhcp       fine >| Disabled
+14:31 29.732 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+14:31 29.732 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+14:31 29.732 >| SQND/dhcp       fine >| Static IP
+14:31 29.732 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+14:31 29.732 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+14:31 29.732 >| SQND/dhcp       fine >| Disabled
+14:31 29.732 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+14:31 29.732 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+14:31 29.732 >| SQND/dhcp       fine >| Disabled
+14:31 29.732 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+14:31 29.732 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+14:31 29.752 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+14:31 29.752 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+14:31 29.752 >| SQND/dhcp       fine >| Disabled
+14:31 29.752 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+14:31 29.752 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+14:31 29.752 >| SQND/dhcp       fine >| Missing MAC
+14:31 44.684 >| SQND/dhcp       fine >| IP Address table changed
+14:31 44.708 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+14:31 44.710 >| SQND/dhcp       fine >| Disabled
+14:31 44.710 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+14:31 44.710 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+14:31 44.710 >| SQND/dhcp       fine >| Missing MAC
+14:31 44.710 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+14:31 44.710 >| SQND/dhcp       fine >| Missing MAC
+14:31 44.710 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+14:31 44.710 >| SQND/dhcp       fine >| Disabled
+14:31 44.710 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+14:31 44.710 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+14:31 44.710 >| SQND/dhcp       fine >| Static IP
+14:31 44.710 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+14:31 44.710 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+14:31 44.730 >| SQND/dhcp       fine >| Disabled
+14:31 44.730 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+14:31 44.730 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+14:31 44.734 >| SQND/dhcp       fine >| Disabled
+14:31 44.734 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+14:31 44.734 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+14:31 44.740 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+14:31 44.740 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+14:31 44.740 >| SQND/dhcp       fine >| Disabled
+14:31 44.740 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+14:31 44.740 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+14:31 44.740 >| SQND/dhcp       fine >| Missing MAC
+14:32 19.684 >| SQND/dhcp       fine >| IP Address table changed
+14:32 19.720 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+14:32 19.728 >| SQND/dhcp       fine >| Disabled
+14:32 19.728 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+14:32 19.728 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+14:32 19.728 >| SQND/dhcp       fine >| Missing MAC
+14:32 19.728 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+14:32 19.728 >| SQND/dhcp       fine >| Missing MAC
+14:32 19.728 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+14:32 19.732 >| SQND/dhcp       fine >| Disabled
+14:32 19.732 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+14:32 19.732 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+14:32 19.738 >| SQND/dhcp       fine >| Static IP
+14:32 19.738 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+14:32 19.738 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+14:32 19.742 >| SQND/dhcp       fine >| Disabled
+14:32 19.742 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+14:32 19.742 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+14:32 19.748 >| SQND/dhcp       fine >| Disabled
+14:32 19.748 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+14:32 19.748 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+14:32 33.262 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+14:32 33.262 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+14:32 33.264 >| SQND/dhcp       fine >| Disabled
+14:32 33.264 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+14:32 33.264 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+14:32 33.264 >| SQND/dhcp       fine >| Missing MAC
+14:33 35.020 >| SQND/dhcp       fine >| IP Address table changed
+14:33 35.090 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+14:33 35.096 >| SQND/dhcp       fine >| Disabled
+14:33 35.096 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+14:33 35.096 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+14:33 35.096 >| SQND/dhcp       fine >| Missing MAC
+14:33 35.096 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+14:33 35.096 >| SQND/dhcp       fine >| Missing MAC
+14:33 35.096 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+14:33 35.104 >| SQND/dhcp       fine >| Disabled
+14:33 35.104 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+14:33 35.104 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+14:33 35.110 >| SQND/dhcp       fine >| Static IP
+14:33 35.110 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+14:33 35.110 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+14:33 35.114 >| SQND/dhcp       fine >| Disabled
+14:33 35.114 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+14:33 35.114 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+14:33 35.116 >| SQND/dhcp       fine >| Disabled
+14:33 35.116 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+14:33 35.116 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+14:33 35.122 >| SQND/dhcp       fine >| Disabled
+14:33 35.122 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF disabled
+14:33 35.122 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+14:33 35.122 >| SQND/dhcp       fine >| Disabled
+14:33 35.122 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+14:33 35.122 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+14:33 35.122 >| SQND/dhcp       fine >| Missing MAC
+14:33 36.088 >| SQND/dhcp       fine >| IP Address table changed
+14:33 36.132 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+14:33 36.132 >| SQND/dhcp       fine >| Disabled
+14:33 36.132 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+14:33 36.132 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+14:33 36.132 >| SQND/dhcp       fine >| Missing MAC
+14:33 36.132 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+14:33 36.132 >| SQND/dhcp       fine >| Missing MAC
+14:33 36.132 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+14:33 36.148 >| SQND/dhcp       fine >| Disabled
+14:33 36.148 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+14:33 36.148 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+14:33 36.150 >| SQND/dhcp       fine >| Static IP
+14:33 36.150 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+14:33 36.150 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+14:33 36.150 >| SQND/dhcp       fine >| Disabled
+14:33 36.150 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+14:33 36.150 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+14:33 36.150 >| SQND/dhcp       fine >| Disabled
+14:33 36.150 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+14:33 36.150 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+14:33 36.166 >| SQND/dhcp       fine >| Disabled
+14:33 36.166 >| SQND/dhcp       info >| 2E:C2:41:15:00:FF disabled
+14:33 36.166 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+14:33 36.166 >| SQND/dhcp       fine >| Disabled
+14:33 36.166 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+14:33 36.166 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+14:33 36.166 >| SQND/dhcp       fine >| Missing MAC
+14:33 45.186 >| SQND/dhcp       fine >| IP Address table changed
+14:33 45.216 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+14:33 45.218 >| SQND/dhcp       fine >| Disabled
+14:33 45.218 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+14:33 45.218 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+14:33 45.218 >| SQND/dhcp       fine >| Missing MAC
+14:33 45.218 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+14:33 45.218 >| SQND/dhcp       fine >| Missing MAC
+14:33 45.218 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+14:33 45.218 >| SQND/dhcp       fine >| Disabled
+14:33 45.218 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+14:33 45.218 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+14:33 45.218 >| SQND/dhcp       fine >| Static IP
+14:33 45.218 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+14:33 45.218 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+14:33 45.234 >| SQND/dhcp       fine >| Disabled
+14:33 45.234 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+14:33 45.234 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+14:33 45.234 >| SQND/dhcp       fine >| Disabled
+14:33 45.234 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+14:33 45.234 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+14:33 45.234 >| SQND/dhcp       fine >| Disabled
+14:33 45.234 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF disabled
+14:33 45.234 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+14:33 45.250 >| SQND/dhcp       fine >| Disabled
+14:33 45.250 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+14:33 45.250 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+14:33 45.250 >| SQND/dhcp       fine >| Missing MAC
+14:34 53.216 >| SQND/dhcp       fine >| IP Address table changed
+14:34 53.274 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+14:34 53.290 >| SQND/dhcp       fine >| Disabled
+14:34 53.290 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+14:34 53.290 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+14:34 53.290 >| SQND/dhcp       fine >| Missing MAC
+14:34 53.290 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+14:34 53.290 >| SQND/dhcp       fine >| Missing MAC
+14:34 53.290 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+14:34 53.296 >| SQND/dhcp       fine >| Disabled
+14:34 53.296 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+14:34 53.296 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+14:34 53.298 >| SQND/dhcp       fine >| Static IP
+14:34 53.298 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+14:34 53.298 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+14:34 53.298 >| SQND/dhcp       fine >| Disabled
+14:34 53.298 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+14:34 53.298 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+14:34 53.314 >| SQND/dhcp       fine >| Disabled
+14:34 53.314 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+14:34 53.314 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+14:34 53.790 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+14:34 53.790 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+14:34 53.812 >| SQND/dhcp       fine >| Disabled
+14:34 53.812 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+14:34 53.812 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+14:34 53.812 >| SQND/dhcp       fine >| Missing MAC
+14:34 56.352 >| SQND/dhcp       fine >| IP Address table changed
+14:34 56.406 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+14:34 56.410 >| SQND/dhcp       fine >| Disabled
+14:34 56.410 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+14:34 56.410 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+14:34 56.410 >| SQND/dhcp       fine >| Missing MAC
+14:34 56.410 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+14:34 56.410 >| SQND/dhcp       fine >| Missing MAC
+14:34 56.410 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+14:34 56.410 >| SQND/dhcp       fine >| Disabled
+14:34 56.410 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+14:34 56.410 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+14:34 56.426 >| SQND/dhcp       fine >| Static IP
+14:34 56.426 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+14:34 56.426 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+14:34 56.436 >| SQND/dhcp       fine >| Disabled
+14:34 56.436 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+14:34 56.436 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+14:34 56.442 >| SQND/dhcp       fine >| Disabled
+14:34 56.442 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+14:34 56.442 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+[1;31m14:34 56.494 >| SQND/dhcp    WARNING >| [0mProblem with DHCP
+14:34 56.494 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF disabled
+14:34 56.494 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+14:34 56.502 >| SQND/dhcp       fine >| Disabled
+14:34 56.502 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+14:34 56.502 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+14:34 56.502 >| SQND/dhcp       fine >| Missing MAC
+14:34 59.516 >| SQND/dhcp       fine >| IP Address table changed
+14:34 59.570 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+14:34 59.586 >| SQND/dhcp       fine >| Disabled
+14:34 59.586 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+14:34 59.586 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+14:34 59.586 >| SQND/dhcp       fine >| Missing MAC
+14:34 59.586 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+14:34 59.586 >| SQND/dhcp       fine >| Missing MAC
+14:34 59.586 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+14:34 59.598 >| SQND/dhcp       fine >| Disabled
+14:34 59.598 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+14:34 59.598 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+14:34 59.608 >| SQND/dhcp       fine >| Static IP
+14:34 59.608 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+14:34 59.608 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+14:34 59.618 >| SQND/dhcp       fine >| Disabled
+14:34 59.618 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+14:34 59.618 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+14:34 59.628 >| SQND/dhcp       fine >| Disabled
+14:34 59.628 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+14:34 59.628 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+14:34 59.632 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+14:34 59.632 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+14:34 59.648 >| SQND/dhcp       fine >| Disabled
+14:34 59.648 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+14:34 59.648 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+14:34 59.648 >| SQND/dhcp       fine >| Missing MAC
+14:35  2.688 >| SQND/dhcp       fine >| IP Address table changed
+14:35  2.706 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+14:35  2.718 >| SQND/dhcp       fine >| Disabled
+14:35  2.718 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+14:35  2.718 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+14:35  2.718 >| SQND/dhcp       fine >| Missing MAC
+14:35  2.718 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+14:35  2.718 >| SQND/dhcp       fine >| Missing MAC
+14:35  2.718 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+14:35  2.722 >| SQND/dhcp       fine >| Disabled
+14:35  2.722 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+14:35  2.722 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+14:35  2.726 >| SQND/dhcp       fine >| Static IP
+14:35  2.728 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+14:35  2.728 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+14:35  2.732 >| SQND/dhcp       fine >| Disabled
+14:35  2.732 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+14:35  2.732 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+14:35  2.738 >| SQND/dhcp       fine >| Disabled
+14:35  2.738 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+14:35  2.738 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+14:35  2.744 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+14:35  2.744 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+14:35  2.748 >| SQND/dhcp       fine >| Disabled
+14:35  2.748 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+14:35  2.748 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+14:35  2.748 >| SQND/dhcp       fine >| Missing MAC
+14:35 28.176 >| SQND/dhcp       fine >| IP Address table changed
+14:35 28.206 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+14:35 28.218 >| SQND/dhcp       fine >| Disabled
+14:35 28.218 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+14:35 28.218 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+14:35 28.218 >| SQND/dhcp       fine >| Missing MAC
+14:35 28.218 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+14:35 28.218 >| SQND/dhcp       fine >| Missing MAC
+14:35 28.218 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+14:35 28.220 >| SQND/dhcp       fine >| Disabled
+14:35 28.220 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+14:35 28.220 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+14:35 28.220 >| SQND/dhcp       fine >| Static IP
+14:35 28.220 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+14:35 28.220 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+14:35 28.232 >| SQND/dhcp       fine >| Disabled
+14:35 28.232 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+14:35 28.232 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+14:35 28.234 >| SQND/dhcp       fine >| Disabled
+14:35 28.234 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+14:35 28.234 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+14:35 28.234 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+14:35 28.234 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+14:35 28.234 >| SQND/dhcp       fine >| Disabled
+14:35 28.234 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+14:35 28.234 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+14:35 28.234 >| SQND/dhcp       fine >| Missing MAC
+14:35 59.186 >| SQND/dhcp       fine >| IP Address table changed
+14:35 59.204 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+14:35 59.212 >| SQND/dhcp       fine >| Disabled
+14:35 59.212 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+14:35 59.212 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+14:35 59.212 >| SQND/dhcp       fine >| Missing MAC
+14:35 59.212 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+14:35 59.212 >| SQND/dhcp       fine >| Missing MAC
+14:35 59.212 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+14:35 59.214 >| SQND/dhcp       fine >| Disabled
+14:35 59.214 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+14:35 59.214 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+14:35 59.214 >| SQND/dhcp       fine >| Static IP
+14:35 59.214 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+14:35 59.214 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+14:35 59.228 >| SQND/dhcp       fine >| Disabled
+14:35 59.228 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+14:35 59.228 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+14:35 59.230 >| SQND/dhcp       fine >| Disabled
+14:35 59.230 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+14:35 59.230 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+14:35 59.230 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+14:35 59.230 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+14:35 59.230 >| SQND/dhcp       fine >| Disabled
+14:35 59.230 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+14:35 59.230 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+14:35 59.230 >| SQND/dhcp       fine >| Missing MAC
+14:36 21.684 >| SQND/dhcp       fine >| IP Address table changed
+14:36 21.714 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+14:36 21.724 >| SQND/dhcp       fine >| Disabled
+14:36 21.724 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+14:36 21.724 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+14:36 21.724 >| SQND/dhcp       fine >| Missing MAC
+14:36 21.724 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+14:36 21.724 >| SQND/dhcp       fine >| Missing MAC
+14:36 21.724 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+14:36 21.724 >| SQND/dhcp       fine >| Disabled
+14:36 21.724 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+14:36 21.724 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+14:36 21.724 >| SQND/dhcp       fine >| Static IP
+14:36 21.724 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+14:36 21.724 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+14:36 21.740 >| SQND/dhcp       fine >| Disabled
+14:36 21.740 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+14:36 21.740 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+14:36 21.746 >| SQND/dhcp       fine >| Disabled
+14:36 21.746 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+14:36 21.746 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+14:36 21.748 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+14:36 21.748 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+14:36 21.748 >| SQND/dhcp       fine >| Disabled
+14:36 21.748 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+14:36 21.748 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+14:36 21.748 >| SQND/dhcp       fine >| Missing MAC
+14:36 31.186 >| SQND/dhcp       fine >| IP Address table changed
+14:36 31.214 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+14:36 31.222 >| SQND/dhcp       fine >| Disabled
+14:36 31.222 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+14:36 31.222 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+14:36 31.222 >| SQND/dhcp       fine >| Missing MAC
+14:36 31.222 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+14:36 31.222 >| SQND/dhcp       fine >| Missing MAC
+14:36 31.222 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+14:36 31.222 >| SQND/dhcp       fine >| Disabled
+14:36 31.222 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+14:36 31.222 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+14:36 31.222 >| SQND/dhcp       fine >| Static IP
+14:36 31.222 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+14:36 31.222 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+14:36 31.234 >| SQND/dhcp       fine >| Disabled
+14:36 31.234 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+14:36 31.234 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+14:36 31.234 >| SQND/dhcp       fine >| Disabled
+14:36 31.234 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+14:36 31.234 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+14:36 31.234 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+14:36 31.234 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+14:36 31.250 >| SQND/dhcp       fine >| Disabled
+14:36 31.250 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+14:36 31.250 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+14:36 31.250 >| SQND/dhcp       fine >| Missing MAC
+14:36 36.678 >| SQND/dhcp       fine >| IP Address table changed
+14:36 36.706 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+14:36 36.714 >| SQND/dhcp       fine >| Disabled
+14:36 36.714 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+14:36 36.714 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+14:36 36.714 >| SQND/dhcp       fine >| Missing MAC
+14:36 36.714 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+14:36 36.714 >| SQND/dhcp       fine >| Missing MAC
+14:36 36.714 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+14:36 36.714 >| SQND/dhcp       fine >| Disabled
+14:36 36.714 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+14:36 36.714 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+14:36 36.714 >| SQND/dhcp       fine >| Static IP
+14:36 36.714 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+14:36 36.714 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+14:36 36.714 >| SQND/dhcp       fine >| Disabled
+14:36 36.714 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+14:36 36.714 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+14:36 36.732 >| SQND/dhcp       fine >| Disabled
+14:36 36.732 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+14:36 36.732 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+14:36 36.732 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+14:36 36.732 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+14:36 36.732 >| SQND/dhcp       fine >| Disabled
+14:36 36.732 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+14:36 36.732 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+14:36 36.732 >| SQND/dhcp       fine >| Missing MAC
+14:36 45.176 >| SQND/dhcp       fine >| IP Address table changed
+14:36 45.204 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+14:36 45.212 >| SQND/dhcp       fine >| Disabled
+14:36 45.212 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+14:36 45.212 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+14:36 45.212 >| SQND/dhcp       fine >| Missing MAC
+14:36 45.212 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+14:36 45.212 >| SQND/dhcp       fine >| Missing MAC
+14:36 45.212 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+14:36 45.214 >| SQND/dhcp       fine >| Disabled
+14:36 45.214 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+14:36 45.214 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+14:36 45.214 >| SQND/dhcp       fine >| Static IP
+14:36 45.214 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+14:36 45.214 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+14:36 45.214 >| SQND/dhcp       fine >| Disabled
+14:36 45.214 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+14:36 45.214 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+14:36 45.228 >| SQND/dhcp       fine >| Disabled
+14:36 45.228 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+14:36 45.228 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+14:36 45.228 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+14:36 45.228 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+14:36 45.242 >| SQND/dhcp       fine >| Disabled
+14:36 45.242 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+14:36 45.242 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+14:36 45.242 >| SQND/dhcp       fine >| Missing MAC
+14:37 17.676 >| SQND/dhcp       fine >| IP Address table changed
+14:37 17.702 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+14:37 17.714 >| SQND/dhcp       fine >| Disabled
+14:37 17.714 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+14:37 17.714 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+14:37 17.714 >| SQND/dhcp       fine >| Missing MAC
+14:37 17.714 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+14:37 17.714 >| SQND/dhcp       fine >| Missing MAC
+14:37 17.714 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+14:37 17.714 >| SQND/dhcp       fine >| Disabled
+14:37 17.714 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+14:37 17.714 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+14:37 17.714 >| SQND/dhcp       fine >| Static IP
+14:37 17.714 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+14:37 17.714 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+14:37 17.714 >| SQND/dhcp       fine >| Disabled
+14:37 17.714 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+14:37 17.714 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+14:37 17.730 >| SQND/dhcp       fine >| Disabled
+14:37 17.730 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+14:37 17.730 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+14:37 17.730 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+14:37 17.730 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+14:37 17.730 >| SQND/dhcp       fine >| Disabled
+14:37 17.730 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+14:37 17.730 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+14:37 17.730 >| SQND/dhcp       fine >| Missing MAC
+14:37 26.118 >| SQND/dhcp       fine >| IP Address table changed
+14:37 26.174 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+14:37 26.184 >| SQND/dhcp       fine >| Disabled
+14:37 26.184 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+14:37 26.184 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+14:37 26.184 >| SQND/dhcp       fine >| Missing MAC
+14:37 26.184 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+14:37 26.184 >| SQND/dhcp       fine >| Missing MAC
+14:37 26.184 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+14:37 26.188 >| SQND/dhcp       fine >| Disabled
+14:37 26.188 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+14:37 26.188 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+14:37 26.198 >| SQND/dhcp       fine >| Static IP
+14:37 26.198 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+14:37 26.198 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+14:37 26.204 >| SQND/dhcp       fine >| Disabled
+14:37 26.204 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+14:37 26.204 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+14:37 26.208 >| SQND/dhcp       fine >| Disabled
+14:37 26.208 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+14:37 26.208 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+14:37 26.212 >| SQND/dhcp       fine >| Disabled
+14:37 26.212 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF disabled
+14:37 26.212 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+14:37 26.212 >| SQND/dhcp       fine >| Disabled
+14:37 26.212 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+14:37 26.212 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+14:37 26.212 >| SQND/dhcp       fine >| Missing MAC
+14:37 27.168 >| SQND/dhcp       fine >| IP Address table changed
+14:37 27.206 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+14:37 27.208 >| SQND/dhcp       fine >| Disabled
+14:37 27.208 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+14:37 27.208 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+14:37 27.208 >| SQND/dhcp       fine >| Missing MAC
+14:37 27.208 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+14:37 27.208 >| SQND/dhcp       fine >| Missing MAC
+14:37 27.208 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+14:37 27.208 >| SQND/dhcp       fine >| Disabled
+14:37 27.208 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+14:37 27.208 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+14:37 27.224 >| SQND/dhcp       fine >| Static IP
+14:37 27.224 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+14:37 27.224 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+14:37 27.224 >| SQND/dhcp       fine >| Disabled
+14:37 27.224 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+14:37 27.224 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+14:37 27.224 >| SQND/dhcp       fine >| Disabled
+14:37 27.224 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+14:37 27.224 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+14:37 27.224 >| SQND/dhcp       fine >| Disabled
+14:37 27.224 >| SQND/dhcp       info >| BA:58:4E:50:75:83 disabled
+14:37 27.224 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+14:37 27.240 >| SQND/dhcp       fine >| Disabled
+14:37 27.240 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+14:37 27.240 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+14:37 27.240 >| SQND/dhcp       fine >| Missing MAC
+14:37 36.180 >| SQND/dhcp       fine >| IP Address table changed
+14:37 36.204 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+14:37 36.214 >| SQND/dhcp       fine >| Disabled
+14:37 36.214 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+14:37 36.214 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+14:37 36.214 >| SQND/dhcp       fine >| Missing MAC
+14:37 36.214 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+14:37 36.214 >| SQND/dhcp       fine >| Missing MAC
+14:37 36.214 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+14:37 36.214 >| SQND/dhcp       fine >| Disabled
+14:37 36.214 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+14:37 36.214 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+14:37 36.230 >| SQND/dhcp       fine >| Static IP
+14:37 36.230 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+14:37 36.230 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+14:37 36.230 >| SQND/dhcp       fine >| Disabled
+14:37 36.230 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+14:37 36.230 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+14:37 36.230 >| SQND/dhcp       fine >| Disabled
+14:37 36.230 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+14:37 36.230 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+14:37 36.230 >| SQND/dhcp       fine >| Disabled
+14:37 36.230 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF disabled
+14:37 36.230 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+14:37 36.246 >| SQND/dhcp       fine >| Disabled
+14:37 36.246 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+14:37 36.246 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+14:37 36.246 >| SQND/dhcp       fine >| Missing MAC
+14:38 38.586 >| SQND/dhcp       fine >| IP Address table changed
+14:38 38.634 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+14:38 38.638 >| SQND/dhcp       fine >| Disabled
+14:38 38.638 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+14:38 38.638 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+14:38 38.638 >| SQND/dhcp       fine >| Missing MAC
+14:38 38.638 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+14:38 38.638 >| SQND/dhcp       fine >| Missing MAC
+14:38 38.638 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+14:38 38.646 >| SQND/dhcp       fine >| Disabled
+14:38 38.646 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+14:38 38.646 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+14:38 38.650 >| SQND/dhcp       fine >| Static IP
+14:38 38.650 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+14:38 38.650 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+14:38 38.650 >| SQND/dhcp       fine >| Disabled
+14:38 38.650 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+14:38 38.650 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+14:38 38.650 >| SQND/dhcp       fine >| Disabled
+14:38 38.650 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+14:38 38.650 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+14:38 38.650 >| SQND/dhcp       fine >| Disabled
+14:38 38.650 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF disabled
+14:38 38.650 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+14:38 38.670 >| SQND/dhcp       fine >| Disabled
+14:38 38.670 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+14:38 38.670 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+14:38 38.670 >| SQND/dhcp       fine >| Missing MAC
+14:38 44.680 >| SQND/dhcp       fine >| IP Address table changed
+14:38 44.706 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+14:38 44.716 >| SQND/dhcp       fine >| Disabled
+14:38 44.716 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+14:38 44.716 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+14:38 44.716 >| SQND/dhcp       fine >| Missing MAC
+14:38 44.716 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+14:38 44.716 >| SQND/dhcp       fine >| Missing MAC
+14:38 44.716 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+14:38 44.732 >| SQND/dhcp       fine >| Disabled
+14:38 44.732 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+14:38 44.732 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+14:38 44.732 >| SQND/dhcp       fine >| Static IP
+14:38 44.732 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+14:38 44.732 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+14:38 44.732 >| SQND/dhcp       fine >| Disabled
+14:38 44.732 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+14:38 44.732 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+14:38 44.732 >| SQND/dhcp       fine >| Disabled
+14:38 44.732 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+14:38 44.732 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+14:38 44.748 >| SQND/dhcp       fine >| Disabled
+14:38 44.748 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF disabled
+14:38 44.748 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+14:38 44.758 >| SQND/dhcp       fine >| Disabled
+14:38 44.758 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+14:38 44.758 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+14:38 44.758 >| SQND/dhcp       fine >| Missing MAC
+14:39 39.638 >| SQND/dhcp       fine >| IP Address table changed
+14:39 39.682 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+14:39 39.682 >| SQND/dhcp       fine >| Disabled
+14:39 39.682 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+14:39 39.682 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+14:39 39.682 >| SQND/dhcp       fine >| Missing MAC
+14:39 39.682 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+14:39 39.682 >| SQND/dhcp       fine >| Missing MAC
+14:39 39.682 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+14:39 39.696 >| SQND/dhcp       fine >| Disabled
+14:39 39.696 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+14:39 39.696 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+14:39 39.700 >| SQND/dhcp       fine >| Static IP
+14:39 39.700 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+14:39 39.700 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+14:39 39.700 >| SQND/dhcp       fine >| Disabled
+14:39 39.700 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+14:39 39.700 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+14:39 39.710 >| SQND/dhcp       fine >| Disabled
+14:39 39.710 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+14:39 39.710 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+14:39 39.714 >| SQND/dhcp       fine >| Disabled
+14:39 39.714 >| SQND/dhcp       info >| 42:46:41:4F:EA:5C disabled
+14:39 39.714 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+14:39 39.714 >| SQND/dhcp       fine >| Disabled
+14:39 39.714 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+14:39 39.714 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+14:39 39.714 >| SQND/dhcp       fine >| Missing MAC
+14:39 45.676 >| SQND/dhcp       fine >| IP Address table changed
+14:39 45.712 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+14:39 45.720 >| SQND/dhcp       fine >| Disabled
+14:39 45.720 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+14:39 45.720 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+14:39 45.720 >| SQND/dhcp       fine >| Missing MAC
+14:39 45.720 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+14:39 45.720 >| SQND/dhcp       fine >| Missing MAC
+14:39 45.720 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+14:39 45.726 >| SQND/dhcp       fine >| Disabled
+14:39 45.726 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+14:39 45.726 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+14:39 45.730 >| SQND/dhcp       fine >| Static IP
+14:39 45.730 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+14:39 45.730 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+14:39 45.736 >| SQND/dhcp       fine >| Disabled
+14:39 45.736 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+14:39 45.736 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+14:39 45.740 >| SQND/dhcp       fine >| Disabled
+14:39 45.740 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+14:39 45.740 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+14:39 45.746 >| SQND/dhcp       fine >| Disabled
+14:39 45.746 >| SQND/dhcp       info >| 42:46:41:4F:EA:5C disabled
+14:39 45.746 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+14:39 45.752 >| SQND/dhcp       fine >| Disabled
+14:39 45.752 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+14:39 45.752 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+14:39 45.752 >| SQND/dhcp       fine >| Missing MAC
+15:35 40.598 >| SQND/dhcp       fine >| IP Address table changed
+15:35 40.626 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+15:35 40.632 >| SQND/dhcp       fine >| Disabled
+15:35 40.632 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+15:35 40.632 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+15:35 40.632 >| SQND/dhcp       fine >| Missing MAC
+15:35 40.632 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+15:35 40.632 >| SQND/dhcp       fine >| Missing MAC
+15:35 40.632 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+15:35 40.650 >| SQND/dhcp       fine >| Disabled
+15:35 40.650 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+15:35 40.650 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+15:35 40.658 >| SQND/dhcp       fine >| No DNS
+15:35 40.658 >| SQND/dhcp       info >| 0A:00:27:00:00:0F disabled
+15:35 40.658 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+15:35 40.664 >| SQND/dhcp       fine >| Disabled
+15:35 40.664 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+15:35 40.664 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+15:35 40.664 >| SQND/dhcp       fine >| Disabled
+15:35 40.664 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+15:35 40.664 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+15:35 40.664 >| SQND/dhcp       fine >| Disabled
+15:35 40.664 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+15:35 40.664 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+15:35 40.664 >| SQND/dhcp       fine >| Missing MAC
+15:35 41.482 >| SQND/dhcp       fine >| IP Address table changed
+15:35 41.526 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+15:35 41.540 >| SQND/dhcp       fine >| Disabled
+15:35 41.540 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+15:35 41.540 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+15:35 41.540 >| SQND/dhcp       fine >| Missing MAC
+15:35 41.540 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+15:35 41.540 >| SQND/dhcp       fine >| Missing MAC
+15:35 41.540 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+15:35 41.548 >| SQND/dhcp       fine >| Disabled
+15:35 41.548 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+15:35 41.548 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+15:35 41.556 >| SQND/dhcp       fine >| Static IP
+15:35 41.556 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+15:35 41.556 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+15:35 41.572 >| SQND/dhcp       fine >| Disabled
+15:35 41.572 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+15:35 41.572 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+15:35 41.580 >| SQND/dhcp       fine >| Disabled
+15:35 41.580 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+15:35 41.580 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+15:35 41.586 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+15:35 41.586 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+15:35 41.586 >| SQND/dhcp       fine >| Disabled
+15:35 41.586 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+15:35 41.586 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+15:35 41.586 >| SQND/dhcp       fine >| Missing MAC
+15:35 44.696 >| SQND/dhcp       fine >| IP Address table changed
+15:35 44.722 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+15:35 44.728 >| SQND/dhcp       fine >| Disabled
+15:35 44.728 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+15:35 44.728 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+15:35 44.728 >| SQND/dhcp       fine >| Missing MAC
+15:35 44.728 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+15:35 44.728 >| SQND/dhcp       fine >| Missing MAC
+15:35 44.728 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+15:35 44.734 >| SQND/dhcp       fine >| Disabled
+15:35 44.734 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+15:35 44.734 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+15:35 44.738 >| SQND/dhcp       fine >| Static IP
+15:35 44.738 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+15:35 44.738 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+15:35 44.742 >| SQND/dhcp       fine >| Disabled
+15:35 44.742 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+15:35 44.742 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+15:35 44.748 >| SQND/dhcp       fine >| Disabled
+15:35 44.748 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+15:35 44.748 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+15:35 44.752 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+15:35 44.752 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+15:35 44.754 >| SQND/dhcp       fine >| Disabled
+15:35 44.754 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+15:35 44.754 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+15:35 44.754 >| SQND/dhcp       fine >| Missing MAC
+15:36  3.178 >| SQND/dhcp       fine >| IP Address table changed
+15:36  3.208 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+15:36  3.222 >| SQND/dhcp       fine >| Disabled
+15:36  3.222 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+15:36  3.222 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+15:36  3.222 >| SQND/dhcp       fine >| Missing MAC
+15:36  3.222 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+15:36  3.222 >| SQND/dhcp       fine >| Missing MAC
+15:36  3.222 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+15:36  3.226 >| SQND/dhcp       fine >| Disabled
+15:36  3.226 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+15:36  3.226 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+15:36  3.226 >| SQND/dhcp       fine >| Static IP
+15:36  3.226 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+15:36  3.226 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+15:36  3.226 >| SQND/dhcp       fine >| Disabled
+15:36  3.226 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+15:36  3.226 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+15:36  3.242 >| SQND/dhcp       fine >| Disabled
+15:36  3.242 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+15:36  3.242 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+15:36  3.244 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+15:36  3.244 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+15:36  3.244 >| SQND/dhcp       fine >| Disabled
+15:36  3.244 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+15:36  3.244 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+15:36  3.244 >| SQND/dhcp       fine >| Missing MAC
+15:36 14.078 >| SQND/dhcp       fine >| IP Address table changed
+15:36 14.118 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+15:36 14.124 >| SQND/dhcp       fine >| Disabled
+15:36 14.124 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+15:36 14.124 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+15:36 14.124 >| SQND/dhcp       fine >| Missing MAC
+15:36 14.124 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+15:36 14.124 >| SQND/dhcp       fine >| Missing MAC
+15:36 14.124 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+15:36 14.130 >| SQND/dhcp       fine >| Disabled
+15:36 14.130 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+15:36 14.130 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+15:36 14.134 >| SQND/dhcp       fine >| Static IP
+15:36 14.134 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+15:36 14.134 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+15:36 14.142 >| SQND/dhcp       fine >| Disabled
+15:36 14.142 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+15:36 14.142 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+15:36 14.144 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+15:36 14.144 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+15:36 14.150 >| SQND/dhcp       fine >| Disabled
+15:36 14.150 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+15:36 14.150 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+15:36 14.150 >| SQND/dhcp       fine >| Missing MAC
+15:36 15.106 >| SQND/dhcp       fine >| IP Address table changed
+15:36 15.142 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+15:36 15.148 >| SQND/dhcp       fine >| Disabled
+15:36 15.148 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+15:36 15.148 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+15:36 15.148 >| SQND/dhcp       fine >| Missing MAC
+15:36 15.148 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+15:36 15.148 >| SQND/dhcp       fine >| Missing MAC
+15:36 15.148 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+15:36 15.152 >| SQND/dhcp       fine >| Disabled
+15:36 15.152 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+15:36 15.152 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+15:36 15.152 >| SQND/dhcp       fine >| Static IP
+15:36 15.152 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+15:36 15.152 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+15:36 15.162 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+15:36 15.162 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+15:36 15.162 >| SQND/dhcp       fine >| Disabled
+15:36 15.162 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+15:36 15.162 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+15:36 15.162 >| SQND/dhcp       fine >| Missing MAC
+15:36 16.136 >| SQND/dhcp       fine >| IP Address table changed
+15:36 16.174 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+15:36 16.180 >| SQND/dhcp       fine >| Disabled
+15:36 16.180 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+15:36 16.180 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+15:36 16.180 >| SQND/dhcp       fine >| Missing MAC
+15:36 16.180 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+15:36 16.180 >| SQND/dhcp       fine >| Missing MAC
+15:36 16.180 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+15:36 16.186 >| SQND/dhcp       fine >| Disabled
+15:36 16.186 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+15:36 16.186 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+15:36 16.190 >| SQND/dhcp       fine >| Static IP
+15:36 16.190 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+15:36 16.190 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+15:36 16.192 >| SQND/dhcp       fine >| Disabled
+15:36 16.192 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+15:36 16.192 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+15:36 16.192 >| SQND/dhcp       fine >| Missing MAC
+15:36 27.176 >| SQND/dhcp       fine >| IP Address table changed
+15:36 27.212 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+15:36 27.222 >| SQND/dhcp       fine >| Disabled
+15:36 27.222 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+15:36 27.222 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+15:36 27.222 >| SQND/dhcp       fine >| Missing MAC
+15:36 27.222 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+15:36 27.222 >| SQND/dhcp       fine >| Missing MAC
+15:36 27.222 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+15:36 27.228 >| SQND/dhcp       fine >| Disabled
+15:36 27.228 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+15:36 27.228 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+15:36 27.228 >| SQND/dhcp       fine >| Static IP
+15:36 27.228 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+15:36 27.228 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+15:36 27.228 >| SQND/dhcp       fine >| Disabled
+15:36 27.228 >| SQND/dhcp       info >| 62:CE:0D:4D:7A:4B disabled
+15:36 27.228 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+15:36 27.244 >| SQND/dhcp       fine >| Disabled
+15:36 27.244 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+15:36 27.244 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+15:36 27.248 >| SQND/dhcp       fine >| Disabled
+15:36 27.248 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+15:36 27.248 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+15:36 27.248 >| SQND/dhcp       fine >| Missing MAC
+15:38 13.190 >| SQND/dhcp       fine >| IP Address table changed
+15:38 13.228 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+15:38 13.232 >| SQND/dhcp       fine >| Disabled
+15:38 13.232 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+15:38 13.232 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+15:38 13.232 >| SQND/dhcp       fine >| Missing MAC
+15:38 13.232 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+15:38 13.232 >| SQND/dhcp       fine >| Missing MAC
+15:38 13.232 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+15:38 13.232 >| SQND/dhcp       fine >| Disabled
+15:38 13.232 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+15:38 13.232 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+15:38 13.248 >| SQND/dhcp       fine >| Static IP
+15:38 13.248 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+15:38 13.248 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+15:38 13.248 >| SQND/dhcp       fine >| Disabled
+15:38 13.248 >| SQND/dhcp       info >| 62:CE:0D:4D:7A:4B disabled
+15:38 13.248 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+15:38 13.260 >| SQND/dhcp       fine >| Disabled
+15:38 13.260 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+15:38 13.260 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+15:38 13.264 >| SQND/dhcp       fine >| Disabled
+15:38 13.264 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+15:38 13.264 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+15:38 13.264 >| SQND/dhcp       fine >| Disabled
+15:38 13.264 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+15:38 13.264 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+15:38 13.264 >| SQND/dhcp       fine >| Missing MAC
+15:38 25.862 >| SQND/dhcp       fine >| IP Address table changed
+15:38 25.906 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+15:38 25.906 >| SQND/dhcp       fine >| Disabled
+15:38 25.906 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+15:38 25.906 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+15:38 25.906 >| SQND/dhcp       fine >| Missing MAC
+15:38 25.906 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+15:38 25.906 >| SQND/dhcp       fine >| Missing MAC
+15:38 25.906 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+15:38 25.906 >| SQND/dhcp       fine >| Disabled
+15:38 25.906 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+15:38 25.906 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+15:38 25.906 >| SQND/dhcp       fine >| Static IP
+15:38 25.906 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+15:38 25.906 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+15:38 25.922 >| SQND/dhcp       fine >| Disabled
+15:38 25.924 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+15:38 25.924 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+15:38 25.926 >| SQND/dhcp       fine >| Disabled
+15:38 25.926 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+15:38 25.926 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+15:38 25.926 >| SQND/dhcp       fine >| Disabled
+15:38 25.926 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF disabled
+15:38 25.926 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+15:38 25.926 >| SQND/dhcp       fine >| Disabled
+15:38 25.926 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+15:38 25.926 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+15:38 25.926 >| SQND/dhcp       fine >| Missing MAC
+15:38 26.088 >| SQND/dhcp       fine >| IP Address table changed
+15:38 26.138 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+15:38 26.148 >| SQND/dhcp       fine >| Disabled
+15:38 26.148 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+15:38 26.148 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+15:38 26.148 >| SQND/dhcp       fine >| Missing MAC
+15:38 26.148 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+15:38 26.148 >| SQND/dhcp       fine >| Missing MAC
+15:38 26.148 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+15:38 26.154 >| SQND/dhcp       fine >| Disabled
+15:38 26.154 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+15:38 26.154 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+15:38 26.166 >| SQND/dhcp       fine >| Static IP
+15:38 26.166 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+15:38 26.166 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+15:38 26.170 >| SQND/dhcp       fine >| Disabled
+15:38 26.170 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+15:38 26.170 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+15:38 26.176 >| SQND/dhcp       fine >| Disabled
+15:38 26.176 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+15:38 26.176 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+15:38 26.182 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+15:38 26.182 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+15:38 26.188 >| SQND/dhcp       fine >| Disabled
+15:38 26.188 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+15:38 26.188 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+15:38 26.188 >| SQND/dhcp       fine >| Missing MAC
+15:38 29.214 >| SQND/dhcp       fine >| IP Address table changed
+15:38 29.234 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+15:38 29.240 >| SQND/dhcp       fine >| Disabled
+15:38 29.240 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+15:38 29.240 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+15:38 29.240 >| SQND/dhcp       fine >| Missing MAC
+15:38 29.240 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+15:38 29.240 >| SQND/dhcp       fine >| Missing MAC
+15:38 29.240 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+15:38 29.246 >| SQND/dhcp       fine >| Disabled
+15:38 29.246 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+15:38 29.246 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+15:38 29.254 >| SQND/dhcp       fine >| Static IP
+15:38 29.254 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+15:38 29.254 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+15:38 29.258 >| SQND/dhcp       fine >| Disabled
+15:38 29.258 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+15:38 29.258 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+15:38 29.264 >| SQND/dhcp       fine >| Disabled
+15:38 29.264 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+15:38 29.264 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+15:38 29.270 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+15:38 29.270 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+15:38 29.274 >| SQND/dhcp       fine >| Disabled
+15:38 29.274 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+15:38 29.274 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+15:38 29.274 >| SQND/dhcp       fine >| Missing MAC
+15:51 18.522 >| SQND/dhcp       fine >| IP Address table changed
+15:51 18.590 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+15:51 18.596 >| SQND/dhcp       fine >| Disabled
+15:51 18.596 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+15:51 18.596 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+15:51 18.596 >| SQND/dhcp       fine >| Missing MAC
+15:51 18.596 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+15:51 18.596 >| SQND/dhcp       fine >| Missing MAC
+15:51 18.596 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+15:51 18.604 >| SQND/dhcp       fine >| Disabled
+15:51 18.604 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+15:51 18.604 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+15:51 18.610 >| SQND/dhcp       fine >| Static IP
+15:51 18.610 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+15:51 18.610 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+15:51 18.616 >| SQND/dhcp       fine >| Disabled
+15:51 18.616 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+15:51 18.616 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+15:51 18.618 >| SQND/dhcp       fine >| Disabled
+15:51 18.618 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+15:51 18.626 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+15:51 18.630 >| SQND/dhcp       fine >| Disabled
+15:51 18.630 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF disabled
+15:51 18.630 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+15:51 18.632 >| SQND/dhcp       fine >| Disabled
+15:51 18.632 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+15:51 18.632 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+15:51 18.632 >| SQND/dhcp       fine >| Missing MAC
+15:51 19.576 >| SQND/dhcp       fine >| IP Address table changed
+15:51 19.620 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+15:51 19.622 >| SQND/dhcp       fine >| Disabled
+15:51 19.622 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+15:51 19.622 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+15:51 19.622 >| SQND/dhcp       fine >| Missing MAC
+15:51 19.622 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+15:51 19.622 >| SQND/dhcp       fine >| Missing MAC
+15:51 19.622 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+15:51 19.622 >| SQND/dhcp       fine >| Disabled
+15:51 19.622 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+15:51 19.622 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+15:51 19.622 >| SQND/dhcp       fine >| Static IP
+15:51 19.622 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+15:51 19.622 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+15:51 19.638 >| SQND/dhcp       fine >| Disabled
+15:51 19.638 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+15:51 19.638 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+15:51 19.638 >| SQND/dhcp       fine >| Disabled
+15:51 19.638 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+15:51 19.638 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+15:51 19.638 >| SQND/dhcp       fine >| Disabled
+15:51 19.638 >| SQND/dhcp       info >| DE:7E:C4:9F:6A:1A disabled
+15:51 19.638 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+15:51 19.652 >| SQND/dhcp       fine >| Disabled
+15:51 19.652 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+15:51 19.652 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+15:51 19.652 >| SQND/dhcp       fine >| Missing MAC
+15:51 23.216 >| SQND/dhcp       fine >| IP Address table changed
+15:51 23.256 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+15:51 23.264 >| SQND/dhcp       fine >| Disabled
+15:51 23.264 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+15:51 23.264 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+15:51 23.264 >| SQND/dhcp       fine >| Missing MAC
+15:51 23.264 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+15:51 23.264 >| SQND/dhcp       fine >| Missing MAC
+15:51 23.264 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+15:51 23.270 >| SQND/dhcp       fine >| Disabled
+15:51 23.270 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+15:51 23.270 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+15:51 23.276 >| SQND/dhcp       fine >| Static IP
+15:51 23.276 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+15:51 23.276 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+15:51 23.282 >| SQND/dhcp       fine >| Disabled
+15:51 23.282 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+15:51 23.282 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+15:51 23.286 >| SQND/dhcp       fine >| Disabled
+15:51 23.286 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+15:51 23.286 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+15:51 36.892 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+15:51 36.892 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+15:51 36.908 >| SQND/dhcp       fine >| Disabled
+15:51 36.908 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+15:51 36.908 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+15:51 36.908 >| SQND/dhcp       fine >| Missing MAC
+15:51 37.912 >| SQND/dhcp       fine >| IP Address table changed
+15:51 37.954 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+15:51 37.958 >| SQND/dhcp       fine >| Disabled
+15:51 37.958 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+15:51 37.958 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+15:51 37.958 >| SQND/dhcp       fine >| Missing MAC
+15:51 37.958 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+15:51 37.958 >| SQND/dhcp       fine >| Missing MAC
+15:51 37.958 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+15:51 37.958 >| SQND/dhcp       fine >| Disabled
+15:51 37.958 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+15:51 37.958 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+15:51 37.958 >| SQND/dhcp       fine >| Static IP
+15:51 37.958 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+15:51 37.958 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+15:51 37.958 >| SQND/dhcp       fine >| Disabled
+15:51 37.958 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+15:51 37.958 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+15:51 37.974 >| SQND/dhcp       fine >| Disabled
+15:51 37.974 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+15:51 37.974 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+15:51 37.974 >| SQND/dhcp       fine >| Disabled
+15:51 37.974 >| SQND/dhcp       info >| 4E:EC:D8:72:AF:70 disabled
+15:51 37.974 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+15:51 37.974 >| SQND/dhcp       fine >| Disabled
+15:51 37.974 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+15:51 37.974 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+15:51 37.974 >| SQND/dhcp       fine >| Missing MAC
+15:51 44.186 >| SQND/dhcp       fine >| IP Address table changed
+15:51 44.222 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+15:51 44.222 >| SQND/dhcp       fine >| Disabled
+15:51 44.222 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+15:51 44.222 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+15:51 44.222 >| SQND/dhcp       fine >| Missing MAC
+15:51 44.222 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+15:51 44.222 >| SQND/dhcp       fine >| Missing MAC
+15:51 44.222 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+15:51 44.222 >| SQND/dhcp       fine >| Disabled
+15:51 44.222 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+15:51 44.222 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+15:51 44.238 >| SQND/dhcp       fine >| Static IP
+15:51 44.238 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+15:51 44.238 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+15:51 44.238 >| SQND/dhcp       fine >| Disabled
+15:51 44.238 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+15:51 44.238 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+15:51 44.238 >| SQND/dhcp       fine >| Disabled
+15:51 44.238 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+15:51 44.238 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+15:51 44.238 >| SQND/dhcp       fine >| Disabled
+15:51 44.238 >| SQND/dhcp       info >| 4E:EC:D8:72:AF:70 disabled
+15:51 44.238 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+15:51 44.254 >| SQND/dhcp       fine >| Disabled
+15:51 44.254 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+15:51 44.254 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+15:51 44.254 >| SQND/dhcp       fine >| Missing MAC
+15:53 42.326 >| SQND/dhcp       fine >| IP Address table changed
+15:53 42.368 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+15:53 42.368 >| SQND/dhcp       fine >| Disabled
+15:53 42.368 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+15:53 42.368 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+15:53 42.368 >| SQND/dhcp       fine >| Missing MAC
+15:53 42.368 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+15:53 42.368 >| SQND/dhcp       fine >| Missing MAC
+15:53 42.368 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+15:53 42.368 >| SQND/dhcp       fine >| Disabled
+15:53 42.368 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+15:53 42.368 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+15:53 42.368 >| SQND/dhcp       fine >| Static IP
+15:53 42.368 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+15:53 42.368 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+15:53 42.384 >| SQND/dhcp       fine >| Disabled
+15:53 42.384 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+15:53 42.384 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+15:53 42.384 >| SQND/dhcp       fine >| Disabled
+15:53 42.384 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+15:53 42.384 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+15:53 42.384 >| SQND/dhcp       fine >| Disabled
+15:53 42.384 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF disabled
+15:53 42.384 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+15:53 42.400 >| SQND/dhcp       fine >| Disabled
+15:53 42.400 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+15:53 42.400 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+15:53 42.400 >| SQND/dhcp       fine >| Missing MAC
+15:53 48.682 >| SQND/dhcp       fine >| IP Address table changed
+15:53 48.720 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+15:53 48.726 >| SQND/dhcp       fine >| Disabled
+15:53 48.726 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+15:53 48.726 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+15:53 48.726 >| SQND/dhcp       fine >| Missing MAC
+15:53 48.726 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+15:53 48.726 >| SQND/dhcp       fine >| Missing MAC
+15:53 48.726 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+15:53 48.726 >| SQND/dhcp       fine >| Disabled
+15:53 48.726 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+15:53 48.726 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+15:53 48.726 >| SQND/dhcp       fine >| Static IP
+15:53 48.726 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+15:53 48.726 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+15:53 48.726 >| SQND/dhcp       fine >| Disabled
+15:53 48.726 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+15:53 48.726 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+15:53 48.742 >| SQND/dhcp       fine >| Disabled
+15:53 48.742 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+15:53 48.742 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+15:53 48.742 >| SQND/dhcp       fine >| Disabled
+15:53 48.742 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF disabled
+15:53 48.742 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+15:53 48.754 >| SQND/dhcp       fine >| Disabled
+15:53 48.754 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+15:53 48.754 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+15:53 48.754 >| SQND/dhcp       fine >| Missing MAC
+15:54 43.444 >| SQND/dhcp       fine >| IP Address table changed
+15:54 43.482 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+15:54 43.490 >| SQND/dhcp       fine >| Disabled
+15:54 43.490 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+15:54 43.490 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+15:54 43.490 >| SQND/dhcp       fine >| Missing MAC
+15:54 43.490 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+15:54 43.490 >| SQND/dhcp       fine >| Missing MAC
+15:54 43.490 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+15:54 43.490 >| SQND/dhcp       fine >| Disabled
+15:54 43.490 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+15:54 43.490 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+15:54 43.490 >| SQND/dhcp       fine >| Static IP
+15:54 43.490 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+15:54 43.490 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+15:54 43.490 >| SQND/dhcp       fine >| Disabled
+15:54 43.490 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+15:54 43.490 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+15:54 43.506 >| SQND/dhcp       fine >| Disabled
+15:54 43.506 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+15:54 43.506 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+15:54 43.514 >| SQND/dhcp       fine >| Disabled
+15:54 43.514 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+15:54 43.514 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+15:54 43.514 >| SQND/dhcp       fine >| Missing MAC
+15:54 49.678 >| SQND/dhcp       fine >| IP Address table changed
+15:54 49.718 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+15:54 49.722 >| SQND/dhcp       fine >| Disabled
+15:54 49.722 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+15:54 49.722 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+15:54 49.722 >| SQND/dhcp       fine >| Missing MAC
+15:54 49.722 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+15:54 49.722 >| SQND/dhcp       fine >| Missing MAC
+15:54 49.722 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+15:54 49.722 >| SQND/dhcp       fine >| Disabled
+15:54 49.722 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+15:54 49.722 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+15:54 49.722 >| SQND/dhcp       fine >| Static IP
+15:54 49.722 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+15:54 49.722 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+15:54 49.722 >| SQND/dhcp       fine >| Disabled
+15:54 49.722 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+15:54 49.722 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+15:54 49.738 >| SQND/dhcp       fine >| Disabled
+15:54 49.738 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+15:54 49.738 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+15:54 49.738 >| SQND/dhcp       fine >| Disabled
+15:54 49.738 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF disabled
+15:54 49.738 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+15:54 49.752 >| SQND/dhcp       fine >| Disabled
+15:54 49.752 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+15:54 49.752 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+15:54 49.752 >| SQND/dhcp       fine >| Missing MAC
+15:55 44.516 >| SQND/dhcp       fine >| IP Address table changed
+15:55 44.554 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+15:55 44.566 >| SQND/dhcp       fine >| Disabled
+15:55 44.568 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+15:55 44.568 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+15:55 44.568 >| SQND/dhcp       fine >| Missing MAC
+15:55 44.568 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+15:55 44.568 >| SQND/dhcp       fine >| Missing MAC
+15:55 44.568 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+15:55 44.576 >| SQND/dhcp       fine >| Disabled
+15:55 44.576 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+15:55 44.576 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+15:55 44.580 >| SQND/dhcp       fine >| Static IP
+15:55 44.580 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+15:55 44.580 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+15:55 44.584 >| SQND/dhcp       fine >| Disabled
+15:55 44.584 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+15:55 44.584 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+15:55 44.584 >| SQND/dhcp       fine >| Disabled
+15:55 44.584 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+15:55 44.584 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+15:55 44.584 >| SQND/dhcp       fine >| Disabled
+15:55 44.584 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+15:55 44.584 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+15:55 44.584 >| SQND/dhcp       fine >| Missing MAC
+15:55 50.680 >| SQND/dhcp       fine >| IP Address table changed
+15:55 50.718 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+15:55 50.728 >| SQND/dhcp       fine >| Disabled
+15:55 50.728 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+15:55 50.728 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+15:55 50.728 >| SQND/dhcp       fine >| Missing MAC
+15:55 50.728 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+15:55 50.728 >| SQND/dhcp       fine >| Missing MAC
+15:55 50.728 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+15:55 50.728 >| SQND/dhcp       fine >| Disabled
+15:55 50.728 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+15:55 50.728 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+15:55 50.744 >| SQND/dhcp       fine >| Static IP
+15:55 50.744 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+15:55 50.744 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+15:55 50.762 >| SQND/dhcp       fine >| Disabled
+15:55 50.762 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+15:55 50.762 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+15:55 50.766 >| SQND/dhcp       fine >| Disabled
+15:55 50.766 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+15:55 50.766 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+15:55 50.772 >| SQND/dhcp       fine >| Disabled
+15:55 50.772 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF disabled
+15:55 50.772 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+15:55 50.772 >| SQND/dhcp       fine >| Disabled
+15:55 50.772 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+15:55 50.772 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+15:55 50.772 >| SQND/dhcp       fine >| Missing MAC
+15:56 45.574 >| SQND/dhcp       fine >| IP Address table changed
+15:56 45.618 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+15:56 45.618 >| SQND/dhcp       fine >| Disabled
+15:56 45.618 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+15:56 45.618 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+15:56 45.618 >| SQND/dhcp       fine >| Missing MAC
+15:56 45.618 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+15:56 45.618 >| SQND/dhcp       fine >| Missing MAC
+15:56 45.618 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+15:56 45.618 >| SQND/dhcp       fine >| Disabled
+15:56 45.618 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+15:56 45.618 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+15:56 45.618 >| SQND/dhcp       fine >| Static IP
+15:56 45.618 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+15:56 45.618 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+15:56 45.634 >| SQND/dhcp       fine >| Disabled
+15:56 45.634 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+15:56 45.634 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+15:56 45.634 >| SQND/dhcp       fine >| Disabled
+15:56 45.634 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+15:56 45.634 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+15:56 45.634 >| SQND/dhcp       fine >| Disabled
+15:56 45.634 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF disabled
+15:56 45.634 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+15:56 45.650 >| SQND/dhcp       fine >| Disabled
+15:56 45.650 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+15:56 45.650 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+15:56 45.650 >| SQND/dhcp       fine >| Missing MAC
+15:56 51.682 >| SQND/dhcp       fine >| IP Address table changed
+15:56 51.720 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+15:56 51.724 >| SQND/dhcp       fine >| Disabled
+15:56 51.724 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+15:56 51.724 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+15:56 51.724 >| SQND/dhcp       fine >| Missing MAC
+15:56 51.724 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+15:56 51.724 >| SQND/dhcp       fine >| Missing MAC
+15:56 51.724 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+15:56 51.724 >| SQND/dhcp       fine >| Disabled
+15:56 51.724 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+15:56 51.724 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+15:56 51.740 >| SQND/dhcp       fine >| Static IP
+15:56 51.740 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+15:56 51.740 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+15:56 51.744 >| SQND/dhcp       fine >| Disabled
+15:56 51.744 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+15:56 51.744 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+15:56 51.750 >| SQND/dhcp       fine >| Disabled
+15:56 51.750 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+15:56 51.750 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+15:56 51.752 >| SQND/dhcp       fine >| Disabled
+15:56 51.752 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF disabled
+15:56 51.752 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+15:56 51.752 >| SQND/dhcp       fine >| Disabled
+15:56 51.752 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+15:56 51.752 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+15:56 51.752 >| SQND/dhcp       fine >| Missing MAC
+15:57  6.180 >| SQND/dhcp       fine >| IP Address table changed
+15:57  6.222 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+15:57  6.226 >| SQND/dhcp       fine >| Disabled
+15:57  6.226 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+15:57  6.226 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+15:57  6.226 >| SQND/dhcp       fine >| Missing MAC
+15:57  6.226 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+15:57  6.226 >| SQND/dhcp       fine >| Missing MAC
+15:57  6.226 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+15:57  6.226 >| SQND/dhcp       fine >| Disabled
+15:57  6.226 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+15:57  6.226 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+15:57  6.244 >| SQND/dhcp       fine >| Static IP
+15:57  6.244 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+15:57  6.244 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+15:57  6.256 >| SQND/dhcp       fine >| Disabled
+15:57  6.256 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+15:57  6.256 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+15:57  6.256 >| SQND/dhcp       fine >| Disabled
+15:57  6.256 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+15:57  6.256 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+15:57  6.256 >| SQND/dhcp       fine >| No DNS
+15:57  6.256 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF disabled
+15:57  6.256 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+15:57  6.272 >| SQND/dhcp       fine >| Disabled
+15:57  6.272 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+15:57  6.272 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+15:57  6.272 >| SQND/dhcp       fine >| Missing MAC
+15:57 11.870 >| SQND/dhcp       fine >| IP Address table changed
+15:57 11.906 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+15:57 11.916 >| SQND/dhcp       fine >| Disabled
+15:57 11.916 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+15:57 11.916 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+15:57 11.916 >| SQND/dhcp       fine >| Missing MAC
+15:57 11.916 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+15:57 11.916 >| SQND/dhcp       fine >| Missing MAC
+15:57 11.916 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+15:57 11.926 >| SQND/dhcp       fine >| Disabled
+15:57 11.926 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+15:57 11.926 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+15:57 11.930 >| SQND/dhcp       fine >| Static IP
+15:57 11.930 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+15:57 11.930 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+15:57 11.930 >| SQND/dhcp       fine >| Disabled
+15:57 11.930 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+15:57 11.930 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+15:57 11.946 >| SQND/dhcp       fine >| Disabled
+15:57 11.946 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+15:57 11.946 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+15:57 11.960 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+15:57 11.960 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+15:57 11.972 >| SQND/dhcp       fine >| Disabled
+15:57 11.972 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+15:57 11.972 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+15:57 11.972 >| SQND/dhcp       fine >| Missing MAC
+15:57 15.188 >| SQND/dhcp       fine >| IP Address table changed
+15:57 15.218 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+15:57 15.224 >| SQND/dhcp       fine >| Disabled
+15:57 15.224 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+15:57 15.224 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+15:57 15.224 >| SQND/dhcp       fine >| Missing MAC
+15:57 15.224 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+15:57 15.224 >| SQND/dhcp       fine >| Missing MAC
+15:57 15.224 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+15:57 15.228 >| SQND/dhcp       fine >| Disabled
+15:57 15.228 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+15:57 15.228 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+15:57 15.232 >| SQND/dhcp       fine >| Static IP
+15:57 15.232 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+15:57 15.232 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+15:57 15.236 >| SQND/dhcp       fine >| Disabled
+15:57 15.236 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+15:57 15.236 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+15:57 15.242 >| SQND/dhcp       fine >| Disabled
+15:57 15.242 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+15:57 15.242 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+15:57 15.246 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+15:57 15.246 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+15:57 15.250 >| SQND/dhcp       fine >| Disabled
+15:57 15.250 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+15:57 15.250 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+15:57 15.250 >| SQND/dhcp       fine >| Missing MAC
+15:57 35.688 >| SQND/dhcp       fine >| IP Address table changed
+15:57 35.724 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+15:57 35.734 >| SQND/dhcp       fine >| Disabled
+15:57 35.734 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+15:57 35.734 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+15:57 35.734 >| SQND/dhcp       fine >| Missing MAC
+15:57 35.734 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+15:57 35.734 >| SQND/dhcp       fine >| Missing MAC
+15:57 35.734 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+15:57 35.744 >| SQND/dhcp       fine >| Disabled
+15:57 35.744 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+15:57 35.744 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+15:57 35.746 >| SQND/dhcp       fine >| Static IP
+15:57 35.746 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+15:57 35.746 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+15:57 35.758 >| SQND/dhcp       fine >| Disabled
+15:57 35.758 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+15:57 35.758 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+15:57 35.762 >| SQND/dhcp       fine >| Disabled
+15:57 35.762 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+15:57 35.762 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+15:57 35.768 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+15:57 35.768 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+15:57 35.770 >| SQND/dhcp       fine >| Disabled
+15:57 35.770 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+15:57 35.770 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+15:57 35.770 >| SQND/dhcp       fine >| Missing MAC
+15:58  5.190 >| SQND/dhcp       fine >| IP Address table changed
+15:58  5.220 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+15:58  5.228 >| SQND/dhcp       fine >| Disabled
+15:58  5.228 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+15:58  5.228 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+15:58  5.228 >| SQND/dhcp       fine >| Missing MAC
+15:58  5.228 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+15:58  5.228 >| SQND/dhcp       fine >| Missing MAC
+15:58  5.228 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+15:58  5.228 >| SQND/dhcp       fine >| Disabled
+15:58  5.228 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+15:58  5.228 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+15:58  5.228 >| SQND/dhcp       fine >| Static IP
+15:58  5.228 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+15:58  5.228 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+15:58  5.228 >| SQND/dhcp       fine >| Disabled
+15:58  5.228 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+15:58  5.228 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+15:58  5.246 >| SQND/dhcp       fine >| Disabled
+15:58  5.246 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+15:58  5.246 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+15:58 14.228 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+15:58 14.228 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+15:58 14.246 >| SQND/dhcp       fine >| Disabled
+15:58 14.246 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+15:58 14.246 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+15:58 14.246 >| SQND/dhcp       fine >| Missing MAC
+15:58 17.680 >| SQND/dhcp       fine >| IP Address table changed
+15:58 17.708 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+15:58 17.716 >| SQND/dhcp       fine >| Disabled
+15:58 17.716 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+15:58 17.716 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+15:58 17.716 >| SQND/dhcp       fine >| Missing MAC
+15:58 17.716 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+15:58 17.716 >| SQND/dhcp       fine >| Missing MAC
+15:58 17.716 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+15:58 17.716 >| SQND/dhcp       fine >| Disabled
+15:58 17.716 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+15:58 17.716 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+15:58 17.716 >| SQND/dhcp       fine >| Static IP
+15:58 17.716 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+15:58 17.716 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+15:58 17.730 >| SQND/dhcp       fine >| Disabled
+15:58 17.730 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+15:58 17.730 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+15:58 17.730 >| SQND/dhcp       fine >| Disabled
+15:58 17.730 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+15:58 17.730 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+15:58 33.106 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+15:58 33.106 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+15:58 33.114 >| SQND/dhcp       fine >| Disabled
+15:58 33.114 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+15:58 33.114 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+15:58 33.114 >| SQND/dhcp       fine >| Missing MAC
+15:58 41.092 >| SQND/dhcp       fine >| IP Address table changed
+15:58 41.124 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+15:58 41.128 >| SQND/dhcp       fine >| Disabled
+15:58 41.128 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+15:58 41.128 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+15:58 41.128 >| SQND/dhcp       fine >| Missing MAC
+15:58 41.128 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+15:58 41.128 >| SQND/dhcp       fine >| Missing MAC
+15:58 41.128 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+15:58 41.138 >| SQND/dhcp       fine >| Disabled
+15:58 41.138 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+15:58 41.138 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+15:58 41.142 >| SQND/dhcp       fine >| Static IP
+15:58 41.142 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+15:58 41.144 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+15:58 41.144 >| SQND/dhcp       fine >| Disabled
+15:58 41.144 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+15:58 41.144 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+[1;31m15:58 41.244 >| SQND/dhcp    WARNING >| [0mProblem with DHCP
+15:58 41.244 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF disabled
+15:58 41.244 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+15:58 41.252 >| SQND/dhcp       fine >| Disabled
+15:58 41.252 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+15:58 41.252 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+15:58 41.252 >| SQND/dhcp       fine >| Missing MAC
+15:58 44.236 >| SQND/dhcp       fine >| IP Address table changed
+15:58 44.264 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+15:58 44.278 >| SQND/dhcp       fine >| Disabled
+15:58 44.278 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+15:58 44.278 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+15:58 44.278 >| SQND/dhcp       fine >| Missing MAC
+15:58 44.278 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+15:58 44.278 >| SQND/dhcp       fine >| Missing MAC
+15:58 44.278 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+15:58 44.288 >| SQND/dhcp       fine >| Disabled
+15:58 44.290 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+15:58 44.290 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+15:58 44.298 >| SQND/dhcp       fine >| Static IP
+15:58 44.298 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+15:58 44.298 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+15:58 44.306 >| SQND/dhcp       fine >| Disabled
+15:58 44.306 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+15:58 44.306 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+15:58 44.310 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+15:58 44.310 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+15:58 44.310 >| SQND/dhcp       fine >| Disabled
+15:58 44.310 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+15:58 44.310 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+15:58 44.310 >| SQND/dhcp       fine >| Missing MAC
+15:58 47.690 >| SQND/dhcp       fine >| IP Address table changed
+15:58 47.704 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+15:58 47.710 >| SQND/dhcp       fine >| Disabled
+15:58 47.710 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+15:58 47.710 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+15:58 47.710 >| SQND/dhcp       fine >| Missing MAC
+15:58 47.710 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+15:58 47.710 >| SQND/dhcp       fine >| Missing MAC
+15:58 47.710 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+15:58 47.714 >| SQND/dhcp       fine >| Disabled
+15:58 47.714 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+15:58 47.714 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+15:58 47.718 >| SQND/dhcp       fine >| Static IP
+15:58 47.718 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+15:58 47.718 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+15:58 47.724 >| SQND/dhcp       fine >| Disabled
+15:58 47.724 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+15:58 47.724 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+15:58 47.730 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+15:58 47.730 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+15:58 47.736 >| SQND/dhcp       fine >| Disabled
+15:58 47.736 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+15:58 47.736 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+15:58 47.736 >| SQND/dhcp       fine >| Missing MAC
+15:58 59.188 >| SQND/dhcp       fine >| IP Address table changed
+15:58 59.218 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+15:58 59.234 >| SQND/dhcp       fine >| Disabled
+15:58 59.234 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+15:58 59.234 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+15:58 59.234 >| SQND/dhcp       fine >| Missing MAC
+15:58 59.234 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+15:58 59.234 >| SQND/dhcp       fine >| Missing MAC
+15:58 59.234 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+15:58 59.234 >| SQND/dhcp       fine >| Disabled
+15:58 59.234 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+15:58 59.234 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+15:58 59.234 >| SQND/dhcp       fine >| Static IP
+15:58 59.234 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+15:58 59.234 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+15:58 59.246 >| SQND/dhcp       fine >| Disabled
+15:58 59.246 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+15:58 59.246 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+15:58 59.246 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+15:58 59.246 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+15:58 59.246 >| SQND/dhcp       fine >| Disabled
+15:58 59.246 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+15:58 59.246 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+15:58 59.246 >| SQND/dhcp       fine >| Missing MAC
+15:59 39.176 >| SQND/dhcp       fine >| IP Address table changed
+15:59 39.204 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+15:59 39.204 >| SQND/dhcp       fine >| Disabled
+15:59 39.204 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+15:59 39.204 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+15:59 39.204 >| SQND/dhcp       fine >| Missing MAC
+15:59 39.204 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+15:59 39.204 >| SQND/dhcp       fine >| Missing MAC
+15:59 39.204 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+15:59 39.214 >| SQND/dhcp       fine >| Disabled
+15:59 39.214 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+15:59 39.214 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+15:59 39.214 >| SQND/dhcp       fine >| Static IP
+15:59 39.214 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+15:59 39.214 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+15:59 39.214 >| SQND/dhcp       fine >| Disabled
+15:59 39.214 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+15:59 39.214 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+15:59 47.162 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+15:59 47.162 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+15:59 47.174 >| SQND/dhcp       fine >| Disabled
+15:59 47.174 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+15:59 47.174 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+15:59 47.174 >| SQND/dhcp       fine >| Missing MAC
+15:59 50.180 >| SQND/dhcp       fine >| IP Address table changed
+15:59 50.208 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+15:59 50.218 >| SQND/dhcp       fine >| Disabled
+15:59 50.218 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+15:59 50.218 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+15:59 50.218 >| SQND/dhcp       fine >| Missing MAC
+15:59 50.218 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+15:59 50.218 >| SQND/dhcp       fine >| Missing MAC
+15:59 50.218 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+15:59 50.218 >| SQND/dhcp       fine >| Disabled
+15:59 50.218 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+15:59 50.218 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+15:59 50.226 >| SQND/dhcp       fine >| Static IP
+15:59 50.226 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+15:59 50.226 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+15:59 50.228 >| SQND/dhcp       fine >| Disabled
+15:59 50.228 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+15:59 50.228 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+15:59 54.240 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+15:59 54.240 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+15:59 54.246 >| SQND/dhcp       fine >| Disabled
+15:59 54.246 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+15:59 54.246 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+15:59 54.246 >| SQND/dhcp       fine >| Missing MAC
+15:59 57.676 >| SQND/dhcp       fine >| IP Address table changed
+15:59 57.706 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+15:59 57.718 >| SQND/dhcp       fine >| Disabled
+15:59 57.718 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+15:59 57.718 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+15:59 57.718 >| SQND/dhcp       fine >| Missing MAC
+15:59 57.718 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+15:59 57.718 >| SQND/dhcp       fine >| Missing MAC
+15:59 57.718 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+15:59 57.718 >| SQND/dhcp       fine >| Disabled
+15:59 57.718 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+15:59 57.718 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+15:59 57.718 >| SQND/dhcp       fine >| Static IP
+15:59 57.718 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+15:59 57.718 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+15:59 57.718 >| SQND/dhcp       fine >| Disabled
+15:59 57.718 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+15:59 57.718 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+16:00 11.196 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+16:00 11.196 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+16:00 11.214 >| SQND/dhcp       fine >| Disabled
+16:00 11.214 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+16:00 11.214 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+16:00 11.214 >| SQND/dhcp       fine >| Missing MAC
+16:00 21.678 >| SQND/dhcp       fine >| IP Address table changed
+16:00 21.708 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+16:00 21.708 >| SQND/dhcp       fine >| Disabled
+16:00 21.708 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+16:00 21.708 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+16:00 21.708 >| SQND/dhcp       fine >| Missing MAC
+16:00 21.708 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+16:00 21.708 >| SQND/dhcp       fine >| Missing MAC
+16:00 21.708 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+16:00 21.708 >| SQND/dhcp       fine >| Disabled
+16:00 21.708 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+16:00 21.708 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+16:00 21.708 >| SQND/dhcp       fine >| Static IP
+16:00 21.708 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+16:00 21.708 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+16:00 21.724 >| SQND/dhcp       fine >| Disabled
+16:00 21.724 >| SQND/dhcp       info >| CE:70:85:3C:A4:32 disabled
+16:00 21.724 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+16:00 21.726 >| SQND/dhcp       fine >| Disabled
+16:00 21.726 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+16:00 21.726 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+16:00 21.726 >| SQND/dhcp       fine >| Disabled
+16:00 21.726 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+16:00 21.726 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+16:00 21.726 >| SQND/dhcp       fine >| Missing MAC
+16:01 15.982 >| SQND/dhcp       fine >| IP Address table changed
+16:01 16.022 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+16:01 16.032 >| SQND/dhcp       fine >| Disabled
+16:01 16.032 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+16:01 16.032 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+16:01 16.032 >| SQND/dhcp       fine >| Missing MAC
+16:01 16.032 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+16:01 16.032 >| SQND/dhcp       fine >| Missing MAC
+16:01 16.032 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+16:01 16.032 >| SQND/dhcp       fine >| Disabled
+16:01 16.032 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+16:01 16.032 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+16:01 16.032 >| SQND/dhcp       fine >| Static IP
+16:01 16.032 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+16:01 16.032 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+16:01 16.032 >| SQND/dhcp       fine >| Disabled
+16:01 16.032 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+16:01 16.032 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+16:01 16.046 >| SQND/dhcp       fine >| Disabled
+16:01 16.046 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF disabled
+16:01 16.046 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+16:01 16.046 >| SQND/dhcp       fine >| Disabled
+16:01 16.046 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+16:01 16.046 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+16:01 16.046 >| SQND/dhcp       fine >| Missing MAC
+16:01 18.450 >| SQND/dhcp       fine >| IP Address table changed
+16:01 18.488 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+16:01 18.496 >| SQND/dhcp       fine >| Disabled
+16:01 18.496 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+16:01 18.496 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+16:01 18.496 >| SQND/dhcp       fine >| Missing MAC
+16:01 18.496 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+16:01 18.496 >| SQND/dhcp       fine >| Missing MAC
+16:01 18.496 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+16:01 18.506 >| SQND/dhcp       fine >| Disabled
+16:01 18.508 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+16:01 18.508 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+16:01 18.514 >| SQND/dhcp       fine >| Static IP
+16:01 18.516 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+16:01 18.516 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+16:01 18.520 >| SQND/dhcp       fine >| Disabled
+16:01 18.520 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+16:01 18.520 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+[1;31m16:01 18.540 >| SQND/dhcp    WARNING >| [0mProblem with DHCP
+16:01 18.540 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF disabled
+16:01 18.540 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+16:01 18.548 >| SQND/dhcp       fine >| Disabled
+16:01 18.548 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+16:01 18.548 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+16:01 18.548 >| SQND/dhcp       fine >| Missing MAC
+16:01 21.588 >| SQND/dhcp       fine >| IP Address table changed
+16:01 21.630 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+16:01 21.640 >| SQND/dhcp       fine >| Disabled
+16:01 21.640 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+16:01 21.640 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+16:01 21.640 >| SQND/dhcp       fine >| Missing MAC
+16:01 21.640 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+16:01 21.640 >| SQND/dhcp       fine >| Missing MAC
+16:01 21.640 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+16:01 21.650 >| SQND/dhcp       fine >| Disabled
+16:01 21.650 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+16:01 21.650 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+16:01 21.662 >| SQND/dhcp       fine >| Static IP
+16:01 21.662 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+16:01 21.662 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+16:01 21.670 >| SQND/dhcp       fine >| Disabled
+16:01 21.670 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+16:01 21.670 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+16:01 21.670 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+16:01 21.670 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+16:01 21.670 >| SQND/dhcp       fine >| Disabled
+16:01 21.670 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+16:01 21.670 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+16:01 21.670 >| SQND/dhcp       fine >| Missing MAC
+16:01 24.736 >| SQND/dhcp       fine >| IP Address table changed
+16:01 24.752 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+16:01 24.762 >| SQND/dhcp       fine >| Disabled
+16:01 24.762 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+16:01 24.762 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+16:01 24.762 >| SQND/dhcp       fine >| Missing MAC
+16:01 24.762 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+16:01 24.762 >| SQND/dhcp       fine >| Missing MAC
+16:01 24.762 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+16:01 24.766 >| SQND/dhcp       fine >| Disabled
+16:01 24.766 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+16:01 24.766 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+16:01 24.766 >| SQND/dhcp       fine >| Static IP
+16:01 24.766 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+16:01 24.766 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+16:01 24.784 >| SQND/dhcp       fine >| Disabled
+16:01 24.784 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+16:01 24.784 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+16:01 24.790 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+16:01 24.790 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+16:01 24.798 >| SQND/dhcp       fine >| Disabled
+16:01 24.798 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+16:01 24.798 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+16:01 24.798 >| SQND/dhcp       fine >| Missing MAC
+16:02  7.676 >| SQND/dhcp       fine >| IP Address table changed
+16:02  7.696 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+16:02  7.702 >| SQND/dhcp       fine >| Disabled
+16:02  7.702 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+16:02  7.702 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+16:02  7.702 >| SQND/dhcp       fine >| Missing MAC
+16:02  7.702 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+16:02  7.702 >| SQND/dhcp       fine >| Missing MAC
+16:02  7.702 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+16:02  7.706 >| SQND/dhcp       fine >| Disabled
+16:02  7.706 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+16:02  7.706 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+16:02  7.710 >| SQND/dhcp       fine >| Static IP
+16:02  7.710 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+16:02  7.710 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+16:02  7.714 >| SQND/dhcp       fine >| Disabled
+16:02  7.714 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+16:02  7.714 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+16:02  7.720 >| SQND/dhcp       fine >| Disabled
+16:02  7.720 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+16:02  7.720 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+16:02  7.724 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+16:02  7.724 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+16:02  7.730 >| SQND/dhcp       fine >| Disabled
+16:02  7.730 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+16:02  7.730 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+16:02  7.730 >| SQND/dhcp       fine >| Missing MAC
+16:50 55.064 >| SQND/dhcp       fine >| IP Address table changed
+16:50 55.100 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+16:50 55.116 >| SQND/dhcp       fine >| Disabled
+16:50 55.116 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+16:50 55.116 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+16:50 55.116 >| SQND/dhcp       fine >| Missing MAC
+16:50 55.116 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+16:50 55.116 >| SQND/dhcp       fine >| Missing MAC
+16:50 55.116 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+16:50 55.118 >| SQND/dhcp       fine >| Disabled
+16:50 55.118 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+16:50 55.118 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+16:50 55.128 >| SQND/dhcp       fine >| Static IP
+16:50 55.128 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+16:50 55.128 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+16:50 55.128 >| SQND/dhcp       fine >| Disabled
+16:50 55.128 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+16:50 55.128 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+16:50 55.128 >| SQND/dhcp       fine >| Disabled
+16:50 55.128 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+16:50 55.128 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+16:50 55.128 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+16:50 55.128 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+16:50 55.146 >| SQND/dhcp       fine >| Disabled
+16:50 55.146 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+16:50 55.146 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+16:50 55.146 >| SQND/dhcp       fine >| Missing MAC
+16:50 56.068 >| SQND/dhcp       fine >| IP Address table changed
+16:50 56.084 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+16:50 56.084 >| SQND/dhcp       fine >| Missing MAC
+16:50 56.084 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+16:50 56.084 >| SQND/dhcp       fine >| Missing MAC
+16:50 56.084 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+16:50 56.088 >| SQND/dhcp       fine >| Disabled
+16:50 56.088 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+16:50 56.088 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+16:50 56.090 >| SQND/dhcp       fine >| Static IP
+16:50 56.090 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+16:50 56.090 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+16:50 56.090 >| SQND/dhcp       fine >| Disabled
+16:50 56.090 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+16:50 56.090 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+16:50 56.090 >| SQND/dhcp       fine >| Disabled
+16:50 56.090 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+16:50 56.090 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+16:50 56.090 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+16:50 56.090 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+16:50 56.090 >| SQND/dhcp       fine >| Disabled
+16:50 56.090 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+16:50 56.090 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+16:50 56.090 >| SQND/dhcp       fine >| Missing MAC
+18:32 38.530 >| SQND/dhcp       fine >| IP Address table changed
+18:32 38.546 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+18:32 38.546 >| SQND/dhcp       fine >| Missing MAC
+18:32 38.546 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+18:32 38.546 >| SQND/dhcp       fine >| Missing MAC
+18:32 38.546 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+18:32 38.562 >| SQND/dhcp       fine >| Disabled
+18:32 38.562 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+18:32 38.562 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+18:32 38.562 >| SQND/dhcp       fine >| Static IP
+18:32 38.562 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+18:32 38.562 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+18:32 38.576 >| SQND/dhcp       fine >| Disabled
+18:32 38.576 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+18:32 38.576 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+18:32 38.576 >| SQND/dhcp       fine >| Disabled
+18:32 38.576 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+18:32 38.576 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+18:32 38.576 >| SQND/dhcp       fine >| Disabled
+18:32 38.576 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF disabled
+18:32 38.576 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+18:32 38.592 >| SQND/dhcp       fine >| Disabled
+18:32 38.592 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+18:32 38.592 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+18:32 38.592 >| SQND/dhcp       fine >| Missing MAC
+18:32 44.796 >| SQND/dhcp       fine >| IP Address table changed
+18:32 44.844 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+18:32 44.852 >| SQND/dhcp       fine >| Disabled
+18:32 44.852 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+18:32 44.852 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+18:32 44.852 >| SQND/dhcp       fine >| Missing MAC
+18:32 44.852 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+18:32 44.852 >| SQND/dhcp       fine >| Missing MAC
+18:32 44.852 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+18:32 44.852 >| SQND/dhcp       fine >| Disabled
+18:32 44.852 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+18:32 44.852 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+18:32 44.880 >| SQND/dhcp       fine >| Static IP
+18:32 44.880 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+18:32 44.880 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+18:32 44.880 >| SQND/dhcp       fine >| Disabled
+18:32 44.880 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+18:32 44.880 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+18:32 44.910 >| SQND/dhcp       fine >| Disabled
+18:32 44.910 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+18:32 44.910 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+18:32 44.926 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+18:32 44.926 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+18:32 44.926 >| SQND/dhcp       fine >| Disabled
+18:32 44.926 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+18:32 44.926 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+18:32 44.926 >| SQND/dhcp       fine >| Missing MAC
+18:32 47.958 >| SQND/dhcp       fine >| IP Address table changed
+18:32 47.988 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+18:32 47.996 >| SQND/dhcp       fine >| Disabled
+18:32 47.996 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+18:32 47.996 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+18:32 47.996 >| SQND/dhcp       fine >| Missing MAC
+18:32 47.996 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+18:32 47.996 >| SQND/dhcp       fine >| Missing MAC
+18:32 47.996 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+18:32 48.004 >| SQND/dhcp       fine >| Disabled
+18:32 48.004 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+18:32 48.004 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+18:32 48.010 >| SQND/dhcp       fine >| Static IP
+18:32 48.010 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+18:32 48.010 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+18:32 48.016 >| SQND/dhcp       fine >| Disabled
+18:32 48.016 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+18:32 48.016 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+18:32 48.026 >| SQND/dhcp       fine >| Disabled
+18:32 48.026 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+18:32 48.026 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+18:32 48.038 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+18:32 48.038 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+18:32 48.046 >| SQND/dhcp       fine >| Disabled
+18:32 48.046 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+18:32 48.046 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+18:32 48.046 >| SQND/dhcp       fine >| Missing MAC
+18:32 51.006 >| SQND/dhcp       fine >| IP Address table changed
+18:32 51.032 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+18:32 51.032 >| SQND/dhcp       fine >| Disabled
+18:32 51.032 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+18:32 51.032 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+18:32 51.032 >| SQND/dhcp       fine >| Missing MAC
+18:32 51.032 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+18:32 51.032 >| SQND/dhcp       fine >| Missing MAC
+18:32 51.032 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+18:32 51.052 >| SQND/dhcp       fine >| Disabled
+18:32 51.052 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+18:32 51.052 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+18:32 51.058 >| SQND/dhcp       fine >| Static IP
+18:32 51.058 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+18:32 51.058 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+18:32 51.064 >| SQND/dhcp       fine >| Disabled
+18:32 51.064 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+18:32 51.064 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+18:32 51.064 >| SQND/dhcp       fine >| Disabled
+18:32 51.064 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+18:32 51.064 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+18:32 51.080 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+18:32 51.080 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+18:32 51.080 >| SQND/dhcp       fine >| Disabled
+18:32 51.080 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+18:32 51.080 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+18:32 51.080 >| SQND/dhcp       fine >| Missing MAC
+18:33  5.188 >| SQND/dhcp       fine >| IP Address table changed
+18:33  5.204 >| SQND/dhcp       fine >| 'ASIX AX88179 USB 3.0 to Gigabit Ethernet Adapter'
+
+18:33  5.214 >| SQND/dhcp       fine >| Disabled
+18:33  5.214 >| SQND/dhcp       info >| 90:20:3A:1A:AE:82 disabled
+18:33  5.214 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+18:33  5.214 >| SQND/dhcp       fine >| Disabled
+18:33  5.214 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+18:33  5.214 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+18:33  5.214 >| SQND/dhcp       fine >| Missing MAC
+18:33  5.214 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+18:33  5.214 >| SQND/dhcp       fine >| Missing MAC
+18:33  5.214 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+18:33  5.214 >| SQND/dhcp       fine >| Disabled
+18:33  5.214 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+18:33  5.214 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+18:33  5.214 >| SQND/dhcp       fine >| Static IP
+18:33  5.214 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+18:33  5.214 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+18:33  5.230 >| SQND/dhcp       fine >| Disabled
+18:33  5.230 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+18:33  5.230 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+18:33  5.230 >| SQND/dhcp       fine >| Disabled
+18:33  5.230 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+18:33  5.230 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+18:33  5.246 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+18:33  5.246 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+18:33  5.246 >| SQND/dhcp       fine >| Disabled
+18:33  5.246 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+18:33  5.246 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+18:33  5.246 >| SQND/dhcp       fine >| Missing MAC
+ 3:17 14.262 >| SQND/dhcp       fine >| IP Address table changed
+ 3:17 14.312 >| SQND/dhcp       fine >| 'ASIX AX88179 USB 3.0 to Gigabit Ethernet Adapter'
+
+ 3:17 14.314 >| SQND/dhcp       fine >| Disabled
+ 3:17 14.314 >| SQND/dhcp       info >| 90:20:3A:1A:AE:82 disabled
+ 3:17 14.314 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+ 3:17 14.330 >| SQND/dhcp       fine >| Disabled
+ 3:17 14.330 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+ 3:17 14.330 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+ 3:17 14.330 >| SQND/dhcp       fine >| Missing MAC
+ 3:17 14.330 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+ 3:17 14.330 >| SQND/dhcp       fine >| Missing MAC
+ 3:17 14.330 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+ 3:17 14.330 >| SQND/dhcp       fine >| Disabled
+ 3:17 14.330 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+ 3:17 14.330 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+ 3:17 14.330 >| SQND/dhcp       fine >| Static IP
+ 3:17 14.330 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+ 3:17 14.330 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+ 3:17 14.344 >| SQND/dhcp       fine >| Disabled
+ 3:17 14.344 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+ 3:17 14.344 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+ 3:17 14.344 >| SQND/dhcp       fine >| Disabled
+ 3:17 14.344 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+ 3:17 14.344 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+ 3:17 14.344 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+ 3:17 14.344 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+ 3:17 14.360 >| SQND/dhcp       fine >| Disabled
+ 3:17 14.360 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+ 3:17 14.360 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+ 3:17 14.360 >| SQND/dhcp       fine >| Missing MAC
+ 3:17 15.270 >| SQND/dhcp       fine >| IP Address table changed
+ 3:17 15.290 >| SQND/dhcp       fine >| 'ASIX AX88179 USB 3.0 to Gigabit Ethernet Adapter'
+
+ 3:17 15.296 >| SQND/dhcp       fine >| Disabled
+ 3:17 15.296 >| SQND/dhcp       info >| 90:20:3A:1A:AE:82 disabled
+ 3:17 15.296 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+ 3:17 15.296 >| SQND/dhcp       fine >| Missing MAC
+ 3:17 15.296 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+ 3:17 15.296 >| SQND/dhcp       fine >| Missing MAC
+ 3:17 15.296 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+ 3:17 15.298 >| SQND/dhcp       fine >| Disabled
+ 3:17 15.298 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+ 3:17 15.298 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+ 3:17 15.298 >| SQND/dhcp       fine >| Static IP
+ 3:17 15.298 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+ 3:17 15.298 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+ 3:17 15.298 >| SQND/dhcp       fine >| Disabled
+ 3:17 15.298 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+ 3:17 15.298 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+ 3:17 15.298 >| SQND/dhcp       fine >| Disabled
+ 3:17 15.298 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+ 3:17 15.298 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+ 3:17 15.314 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+ 3:17 15.314 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+ 3:17 15.314 >| SQND/dhcp       fine >| Disabled
+ 3:17 15.314 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+ 3:17 15.314 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+ 3:17 15.314 >| SQND/dhcp       fine >| Missing MAC
+ 6:17 16.530 >| SQND/dhcp       fine >| IP Address table changed
+ 6:17 16.562 >| SQND/dhcp       fine >| 'ASIX AX88179 USB 3.0 to Gigabit Ethernet Adapter'
+
+ 6:17 16.562 >| SQND/dhcp       fine >| Disabled
+ 6:17 16.562 >| SQND/dhcp       info >| 90:20:3A:1A:AE:82 disabled
+ 6:17 16.562 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+ 6:17 16.562 >| SQND/dhcp       fine >| Missing MAC
+ 6:17 16.562 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+ 6:17 16.562 >| SQND/dhcp       fine >| Missing MAC
+ 6:17 16.562 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+ 6:17 16.580 >| SQND/dhcp       fine >| Disabled
+ 6:17 16.580 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+ 6:17 16.580 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+ 6:17 16.580 >| SQND/dhcp       fine >| Static IP
+ 6:17 16.580 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+ 6:17 16.580 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+ 6:17 16.596 >| SQND/dhcp       fine >| Disabled
+ 6:17 16.596 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+ 6:17 16.596 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+ 6:17 16.596 >| SQND/dhcp       fine >| Disabled
+ 6:17 16.596 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+ 6:17 16.596 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+ 6:17 16.610 >| SQND/dhcp       fine >| Disabled
+ 6:17 16.610 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF disabled
+ 6:17 16.610 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+ 6:17 16.610 >| SQND/dhcp       fine >| Disabled
+ 6:17 16.610 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+ 6:17 16.610 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+ 6:17 16.610 >| SQND/dhcp       fine >| Missing MAC
+ 6:17 20.208 >| SQND/dhcp       fine >| IP Address table changed
+ 6:17 20.272 >| SQND/dhcp       fine >| 'ASIX AX88179 USB 3.0 to Gigabit Ethernet Adapter'
+
+ 6:17 20.280 >| SQND/dhcp       fine >| Disabled
+ 6:17 20.280 >| SQND/dhcp       info >| 90:20:3A:1A:AE:82 disabled
+ 6:17 20.280 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+ 6:17 20.280 >| SQND/dhcp       fine >| Missing MAC
+ 6:17 20.280 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+ 6:17 20.280 >| SQND/dhcp       fine >| Missing MAC
+ 6:17 20.280 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+ 6:17 20.290 >| SQND/dhcp       fine >| Disabled
+ 6:17 20.290 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+ 6:17 20.290 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+ 6:17 20.302 >| SQND/dhcp       fine >| Static IP
+ 6:17 20.302 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+ 6:17 20.302 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+ 6:17 20.310 >| SQND/dhcp       fine >| Disabled
+ 6:17 20.310 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+ 6:17 20.310 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+ 6:17 20.316 >| SQND/dhcp       fine >| Disabled
+ 6:17 20.316 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+ 6:17 20.316 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+ 6:17 20.346 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+ 6:17 20.346 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+ 6:17 20.356 >| SQND/dhcp       fine >| Disabled
+ 6:17 20.356 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+ 6:17 20.356 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+ 6:17 20.356 >| SQND/dhcp       fine >| Missing MAC
+ 6:17 23.392 >| SQND/dhcp       fine >| IP Address table changed
+ 6:17 23.448 >| SQND/dhcp       fine >| 'ASIX AX88179 USB 3.0 to Gigabit Ethernet Adapter'
+
+ 6:17 23.462 >| SQND/dhcp       fine >| Disabled
+ 6:17 23.462 >| SQND/dhcp       info >| 90:20:3A:1A:AE:82 disabled
+ 6:17 23.462 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+ 6:17 23.470 >| SQND/dhcp       fine >| Disabled
+ 6:17 23.470 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+ 6:17 23.470 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+ 6:17 23.470 >| SQND/dhcp       fine >| Missing MAC
+ 6:17 23.470 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+ 6:17 23.470 >| SQND/dhcp       fine >| Missing MAC
+ 6:17 23.470 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+ 6:17 23.476 >| SQND/dhcp       fine >| Disabled
+ 6:17 23.476 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+ 6:17 23.476 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+ 6:17 23.482 >| SQND/dhcp       fine >| Static IP
+ 6:17 23.484 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+ 6:17 23.484 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+ 6:17 23.492 >| SQND/dhcp       fine >| Disabled
+ 6:17 23.492 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+ 6:17 23.492 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+ 6:17 23.498 >| SQND/dhcp       fine >| Disabled
+ 6:17 23.498 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+ 6:17 23.498 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+ 6:17 23.506 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+ 6:17 23.506 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+ 6:17 23.514 >| SQND/dhcp       fine >| Disabled
+ 6:17 23.514 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+ 6:17 23.514 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+ 6:17 23.514 >| SQND/dhcp       fine >| Missing MAC
+ 6:17 25.198 >| SQND/dhcp       fine >| IP Address table changed
+ 6:17 25.224 >| SQND/dhcp       fine >| 'ASIX AX88179 USB 3.0 to Gigabit Ethernet Adapter'
+
+ 6:17 25.234 >| SQND/dhcp       fine >| Disabled
+ 6:17 25.234 >| SQND/dhcp       info >| 90:20:3A:1A:AE:82 disabled
+ 6:17 25.234 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+ 6:17 25.242 >| SQND/dhcp       fine >| Disabled
+ 6:17 25.242 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+ 6:17 25.242 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+ 6:17 25.242 >| SQND/dhcp       fine >| Missing MAC
+ 6:17 25.242 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+ 6:17 25.242 >| SQND/dhcp       fine >| Missing MAC
+ 6:17 25.242 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+ 6:17 25.248 >| SQND/dhcp       fine >| Disabled
+ 6:17 25.248 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+ 6:17 25.248 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+ 6:17 25.254 >| SQND/dhcp       fine >| Static IP
+ 6:17 25.254 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+ 6:17 25.254 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+ 6:17 25.258 >| SQND/dhcp       fine >| Disabled
+ 6:17 25.258 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+ 6:17 25.258 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+ 6:17 25.262 >| SQND/dhcp       fine >| Disabled
+ 6:17 25.262 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+ 6:17 25.262 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+ 6:17 25.266 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+ 6:17 25.266 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+ 6:17 25.270 >| SQND/dhcp       fine >| Disabled
+ 6:17 25.270 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+ 6:17 25.270 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+ 6:17 25.270 >| SQND/dhcp       fine >| Missing MAC
+ 6:17 25.404 >| SQND/dhcp       fine >| IP Address table changed
+ 6:17 25.422 >| SQND/dhcp       fine >| 'ASIX AX88179 USB 3.0 to Gigabit Ethernet Adapter'
+
+ 6:17 25.428 >| SQND/dhcp       fine >| Disabled
+ 6:17 25.428 >| SQND/dhcp       info >| 90:20:3A:1A:AE:82 disabled
+ 6:17 25.428 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+ 6:17 25.432 >| SQND/dhcp       fine >| Disabled
+ 6:17 25.432 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+ 6:17 25.432 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+ 6:17 25.432 >| SQND/dhcp       fine >| Missing MAC
+ 6:17 25.432 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+ 6:17 25.432 >| SQND/dhcp       fine >| Missing MAC
+ 6:17 25.432 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+ 6:17 25.436 >| SQND/dhcp       fine >| Disabled
+ 6:17 25.436 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+ 6:17 25.436 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+ 6:17 25.440 >| SQND/dhcp       fine >| Static IP
+ 6:17 25.440 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+ 6:17 25.440 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+ 6:17 25.444 >| SQND/dhcp       fine >| Disabled
+ 6:17 25.444 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+ 6:17 25.444 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+ 6:17 25.448 >| SQND/dhcp       fine >| Disabled
+ 6:17 25.448 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+ 6:17 25.448 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+ 6:17 25.452 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+ 6:17 25.452 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+ 6:17 25.458 >| SQND/dhcp       fine >| Disabled
+ 6:17 25.458 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+ 6:17 25.458 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+ 6:17 25.458 >| SQND/dhcp       fine >| Missing MAC
+11:13 18.348 >| SQND/dhcp       fine >| IP Address table changed
+11:13 18.402 >| SQND/dhcp       fine >| 'ASIX AX88179 USB 3.0 to Gigabit Ethernet Adapter'
+
+11:13 18.408 >| SQND/dhcp       fine >| Disabled
+11:13 18.408 >| SQND/dhcp       info >| 90:20:3A:1A:AE:82 disabled
+11:13 18.408 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+11:13 18.408 >| SQND/dhcp       fine >| Missing MAC
+11:13 18.408 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+11:13 18.408 >| SQND/dhcp       fine >| Missing MAC
+11:13 18.408 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+11:13 18.414 >| SQND/dhcp       fine >| Disabled
+11:13 18.414 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+11:13 18.414 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+11:13 18.426 >| SQND/dhcp       fine >| Static IP
+11:13 18.426 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+11:13 18.426 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+11:13 18.436 >| SQND/dhcp       fine >| Disabled
+11:13 18.436 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+11:13 18.436 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+11:13 18.444 >| SQND/dhcp       fine >| Disabled
+11:13 18.444 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+11:13 18.444 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+11:13 18.452 >| SQND/dhcp       fine >| Disabled
+11:13 18.452 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF disabled
+11:13 18.452 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+11:13 18.458 >| SQND/dhcp       fine >| Disabled
+11:13 18.458 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+11:13 18.458 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+11:13 18.458 >| SQND/dhcp       fine >| Missing MAC
+11:13 22.420 >| SQND/dhcp       fine >| IP Address table changed
+11:13 22.458 >| SQND/dhcp       fine >| 'ASIX AX88179 USB 3.0 to Gigabit Ethernet Adapter'
+
+11:13 22.466 >| SQND/dhcp       fine >| Disabled
+11:13 22.466 >| SQND/dhcp       info >| 90:20:3A:1A:AE:82 disabled
+11:13 22.466 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+11:13 22.482 >| SQND/dhcp       fine >| Disabled
+11:13 22.482 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+11:13 22.482 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+11:13 22.482 >| SQND/dhcp       fine >| Missing MAC
+11:13 22.482 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+11:13 22.482 >| SQND/dhcp       fine >| Missing MAC
+11:13 22.482 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+11:13 22.492 >| SQND/dhcp       fine >| Disabled
+11:13 22.492 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+11:13 22.492 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+11:13 22.502 >| SQND/dhcp       fine >| Static IP
+11:13 22.502 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+11:13 22.502 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+11:13 22.510 >| SQND/dhcp       fine >| Disabled
+11:13 22.510 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+11:13 22.510 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+11:13 22.522 >| SQND/dhcp       fine >| Disabled
+11:13 22.522 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+11:13 22.522 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+11:13 22.530 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+11:13 22.530 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+11:13 22.534 >| SQND/dhcp       fine >| Disabled
+11:13 22.534 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+11:13 22.534 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+11:13 22.534 >| SQND/dhcp       fine >| Missing MAC
+11:13 25.562 >| SQND/dhcp       fine >| IP Address table changed
+11:13 25.594 >| SQND/dhcp       fine >| 'ASIX AX88179 USB 3.0 to Gigabit Ethernet Adapter'
+
+11:13 25.604 >| SQND/dhcp       fine >| Disabled
+11:13 25.604 >| SQND/dhcp       info >| 90:20:3A:1A:AE:82 disabled
+11:13 25.604 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+11:13 25.622 >| SQND/dhcp       fine >| Disabled
+11:13 25.622 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+11:13 25.622 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+11:13 25.622 >| SQND/dhcp       fine >| Missing MAC
+11:13 25.622 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+11:13 25.622 >| SQND/dhcp       fine >| Missing MAC
+11:13 25.622 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+11:13 25.630 >| SQND/dhcp       fine >| Disabled
+11:13 25.630 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+11:13 25.630 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+11:13 25.640 >| SQND/dhcp       fine >| Static IP
+11:13 25.640 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+11:13 25.640 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+11:13 25.652 >| SQND/dhcp       fine >| Disabled
+11:13 25.652 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+11:13 25.652 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+11:13 25.660 >| SQND/dhcp       fine >| Disabled
+11:13 25.660 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+11:13 25.660 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+11:13 25.670 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+11:13 25.670 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+11:13 25.672 >| SQND/dhcp       fine >| Disabled
+11:13 25.672 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+11:13 25.672 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+11:13 25.672 >| SQND/dhcp       fine >| Missing MAC
+11:13 28.622 >| SQND/dhcp       fine >| IP Address table changed
+11:13 28.664 >| SQND/dhcp       fine >| 'ASIX AX88179 USB 3.0 to Gigabit Ethernet Adapter'
+
+11:13 28.674 >| SQND/dhcp       fine >| Disabled
+11:13 28.674 >| SQND/dhcp       info >| 90:20:3A:1A:AE:82 disabled
+11:13 28.674 >| SQND/dhcp       fine >| 'ExpressVPN TAP Adapter'
+
+11:13 28.674 >| SQND/dhcp       fine >| Disabled
+11:13 28.674 >| SQND/dhcp       info >| 00:FF:40:C4:F6:9B disabled
+11:13 28.674 >| SQND/dhcp       fine >| 'Wintun Userspace Tunnel'
+
+11:13 28.674 >| SQND/dhcp       fine >| Missing MAC
+11:13 28.674 >| SQND/dhcp       fine >| 'ExpressVPN TUN Driver'
+
+11:13 28.674 >| SQND/dhcp       fine >| Missing MAC
+11:13 28.674 >| SQND/dhcp       fine >| 'TAP-Windows Adapter V9'
+
+11:13 28.698 >| SQND/dhcp       fine >| Disabled
+11:13 28.698 >| SQND/dhcp       info >| 00:FF:C8:AE:CF:E9 disabled
+11:13 28.698 >| SQND/dhcp       fine >| 'VirtualBox Host-Only Ethernet Adapter'
+
+11:13 28.706 >| SQND/dhcp       fine >| Static IP
+11:13 28.708 >| SQND/dhcp       info >| 0A:00:27:00:00:0F enabled
+11:13 28.708 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter'
+
+11:13 28.716 >| SQND/dhcp       fine >| Disabled
+11:13 28.716 >| SQND/dhcp       info >| 64:5D:86:DE:61:C0 disabled
+11:13 28.716 >| SQND/dhcp       fine >| 'Microsoft Wi-Fi Direct Virtual Adapter #2'
+
+11:13 28.718 >| SQND/dhcp       fine >| Disabled
+11:13 28.718 >| SQND/dhcp       info >| 66:5D:86:DE:61:BF disabled
+11:13 28.718 >| SQND/dhcp       fine >| 'Intel(R) Wireless-AC 9260 160MHz'
+
+11:13 28.728 >| SQND/dhcp       info >| 64:5D:86:DE:61:BF enabled
+11:13 28.728 >| SQND/dhcp       fine >| 'Bluetooth Device (Personal Area Network)'
+
+11:13 28.738 >| SQND/dhcp       fine >| Disabled
+11:13 28.738 >| SQND/dhcp       info >| 64:5D:86:DE:61:C3 disabled
+11:13 28.738 >| SQND/dhcp       fine >| 'Software Loopback Interface 1'
+
+11:13 28.738 >| SQND/dhcp       fine >| Missing MAC

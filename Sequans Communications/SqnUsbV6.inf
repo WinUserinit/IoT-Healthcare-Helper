@@ -1,0 +1,168 @@
+[Version]
+Signature   = "$Windows NT$"
+Class       = Net
+ClassGUID   = {4d36e972-e325-11ce-bfc1-08002be10318}
+Provider    = %SQN%
+DriverVer=04/14/2014,3.3.0.15954
+CatalogFile=SqnUsbV6.cat
+
+[Manufacturer]
+%Sequans%     = Sequans, NTamd64, NTx86
+
+
+[ControlFlags]
+ExcludeFromSelect = *
+
+
+[Sequans.NTx86]
+; DisplayName                   Section         DeviceID
+; -----------                   -------         --------
+%Sequans.DeviceDesc%	=		Sequans.ndi, USB\VID_148E&PID_1000&MI_00
+%Sequans.DeviceDesc%	=		Sequans.ndi, USB\VID_148E&PID_1001&MI_00
+%Sequans.DeviceDesc%	=		Sequans.ndi, USB\VID_148E&PID_1100&MI_00
+%Sequans.DeviceDesc%	=		Sequans.ndi, USB\VID_148E&PID_1101&MI_00
+%Sequans.DeviceDesc%	=		Sequans.ndi, USB\VID_148E&PID_1200&MI_00
+%Sequans.DeviceDesc%	=		Sequans.ndi, USB\VID_148E&PID_1201&MI_00
+%Sequans.DeviceDesc%	=		Sequans.ndi, USB\VID_258D&PID_1000&MI_00
+%Sequans.DeviceDesc%	=		Sequans.ndi, USB\VID_258D&PID_1001&MI_00
+%Sequans.DeviceDesc%	=		Sequans.ndi, USB\VID_258D&PID_1100&MI_00
+%Sequans.DeviceDesc%	=		Sequans.ndi, USB\VID_258D&PID_1101&MI_00
+%Sequans.DeviceDesc%	=		Sequans.ndi, USB\VID_258D&PID_1200&MI_00
+%Sequans.DeviceDesc%	=		Sequans.ndi, USB\VID_258D&PID_1201&MI_00
+%Sequans.DeviceDesc%	=		Sequans.ndi, USB\VID_148E&PID_0900
+%Sequans.DeviceDesc%	=		Sequans.ndi, USB\VID_148E&PID_0900&MI_00
+%Sequans.DeviceDesc%	=		Sequans.ndi, USB\VID_148E&PID_0999
+%Sequans.DeviceDesc%	=		Sequans.ndi, USB\VID_148E&PID_0999&MI_00
+%Sequans.DeviceDesc%	=		Sequans.ndi, USB\VID_148E&PID_099A&MI_01
+%Sequans.DeviceDesc%	=		Sequans.ndi, USB\VID_258D&PID_2000&MI_00
+%Sequans.DeviceDesc%	=		Sequans.ndi, USB\VID_258D&PID_2000&MI_04
+%Sequans.DeviceDesc%    =       Sequans.ndi, USB\VID_258D&PID_E000&MI_02
+
+
+[Sequans.NTamd64]
+; DisplayName                   Section         DeviceID
+; -----------                   -------         --------
+%Sequans.DeviceDesc%	=		Sequans.ndi, USB\VID_148E&PID_1000&MI_00
+%Sequans.DeviceDesc%	=		Sequans.ndi, USB\VID_148E&PID_1001&MI_00
+%Sequans.DeviceDesc%	=		Sequans.ndi, USB\VID_148E&PID_1100&MI_00
+%Sequans.DeviceDesc%	=		Sequans.ndi, USB\VID_148E&PID_1101&MI_00
+%Sequans.DeviceDesc%	=		Sequans.ndi, USB\VID_148E&PID_1200&MI_00
+%Sequans.DeviceDesc%	=		Sequans.ndi, USB\VID_148E&PID_1201&MI_00
+%Sequans.DeviceDesc%	=		Sequans.ndi, USB\VID_258D&PID_1000&MI_00
+%Sequans.DeviceDesc%	=		Sequans.ndi, USB\VID_258D&PID_1001&MI_00
+%Sequans.DeviceDesc%	=		Sequans.ndi, USB\VID_258D&PID_1100&MI_00
+%Sequans.DeviceDesc%	=		Sequans.ndi, USB\VID_258D&PID_1101&MI_00
+%Sequans.DeviceDesc%	=		Sequans.ndi, USB\VID_258D&PID_1200&MI_00
+%Sequans.DeviceDesc%	=		Sequans.ndi, USB\VID_258D&PID_1201&MI_00
+%Sequans.DeviceDesc%	=		Sequans.ndi, USB\VID_148E&PID_0900
+%Sequans.DeviceDesc%	=		Sequans.ndi, USB\VID_148E&PID_0900&MI_00
+%Sequans.DeviceDesc%	=		Sequans.ndi, USB\VID_148E&PID_0999
+%Sequans.DeviceDesc%	=		Sequans.ndi, USB\VID_148E&PID_0999&MI_00
+%Sequans.DeviceDesc%	=		Sequans.ndi, USB\VID_148E&PID_099A&MI_01
+%Sequans.DeviceDesc%	=		Sequans.ndi, USB\VID_258D&PID_2000&MI_00
+%Sequans.DeviceDesc%	=		Sequans.ndi, USB\VID_258D&PID_2000&MI_04
+%Sequans.DeviceDesc%    =       Sequans.ndi, USB\VID_258D&PID_E000&MI_02
+
+[Sequans.ndi.NTx86]
+Characteristics = 0x81          ; NCF_HAS_UI & NCF_VIRTUAL
+AddReg          = Sequans.reg
+CopyFiles       = SqnUsbV6_Copy_File
+*IfType = 6 					; IF_TYPE_ETHERNET_CSMACD
+*MediaType = 0	 				; NdisMedium802_3
+*PhysicalMediaType = 0			; NdisPhysicalMediumUnspecified
+*SelectiveSuspend = 1
+*SSIdleTimeout = 5
+
+[Sequans.ndi.NTAMD64]
+Characteristics = 0x81          ; NCF_HAS_UI & NCF_VIRTUAL
+AddReg          = Sequans.reg
+CopyFiles       = SqnUsbV6_Copy_File
+*IfType = 6 					; IF_TYPE_ETHERNET_CSMACD
+*MediaType = 0	 				; NdisMedium802_3
+*PhysicalMediaType = 0			; NdisPhysicalMediumUnspecified
+*SelectiveSuspend = 1
+*SSIdleTimeout = 5
+
+[Sequans.ndi.NTx86.Services]
+AddService = SqnUsbV6, 2, Sequans.Service, Sequans.EventLog
+
+[Sequans.ndi.NTAMD64.Services]
+AddService = SqnUsbV6, 2, Sequans.Service, Sequans.EventLog
+
+[Sequans.reg]
+HKR, Ndi,                         Service,    0, "SqnUsbV6"
+HKR, Ndi\Interfaces,              UpperRange, 0, "ndis5"
+HKR, Ndi\Interfaces,              LowerRange, 0, "ethernet"
+
+;
+; Selective Suspend
+;
+HKR, ,                                 *SelectiveSuspend,      0, "1"
+HKR, NDI\params\*SelectiveSuspend,         ParamDesc,          0, "Selective Suspend"
+HKR, NDI\params\*SelectiveSuspend,         type,               0, "enum"
+HKR, NDI\params\*SelectiveSuspend,         default,            0, "1"
+HKR, NDI\params\*SelectiveSuspend\enum,    0,                  0, %Disable%
+HKR, NDI\params\*SelectiveSuspend\enum,    1,                  0, %Enable%
+
+HKR, ,                                 *SSIdleTimeout,      0, "5"
+HKR, NDI\params\*SSIdleTimeout,         ParamDesc,          0, "Selective suspend idle timeout in seconds"
+HKR, NDI\params\*SSIdleTimeout,         type,               0, "int"
+HKR, NDI\params\*SSIdleTimeout,         default,            0, "5"
+HKR, NDI\params\*SSIdleTimeout,         Min,                0, "1"
+HKR, NDI\params\*SSIdleTimeout,         Max,                0, "60"
+
+
+[Sequans.Service]
+DisplayName     = %Sequans.Service.DispName%
+ServiceType     = 1             ;SERVICE_KERNEL_DRIVER
+StartType       = 3             ;SERVICE_DEMAND_START
+ErrorControl    = 1             ;SERVICE_ERROR_NORMAL
+ServiceBinary   = %12%\SqnUsbV6.sys
+LoadOrderGroup  = NDIS
+
+
+[Sequans.EventLog]
+AddReg = Sequans.AddEventLog.reg
+
+[Sequans.AddEventLog.reg]
+HKR, , EventMessageFile, 0x00020000, "%%SystemRoot%%\System32\netevent.dll"
+HKR, , TypesSupported,   0x00010001, 7
+
+
+[SqnUsbV6_Copy_File]
+SqnUsbV6.sys,,,2
+
+[SourceDisksNames]
+1 = %DiskDescription%,SqnUsbV6.sys,,
+
+[SourceDisksFiles]
+SqnUsbV6.sys = 1,,
+
+[DestinationDirs]
+SqnUsbV6_Copy_File = 12
+DefaultDestDirs = 11
+
+
+;-------------- WDF Coinstaller installation
+[Sequans.ndi.NTx86.Wdf]
+KmdfService = SqnUsbV6, Sequans_wdfsect
+
+[Sequans.ndi.NTAMD64.Wdf]
+KmdfService = SqnUsbV6, Sequans_wdfsect
+
+[Sequans_wdfsect]
+KmdfLibraryVersion = 1.9
+
+;---------------------------------------------------------------;
+
+
+[Strings]
+SQN                          = "Sequans"
+Sequans                      = "Sequans Communications"
+Sequans.DeviceDesc		     = "SqnUsbV Device"
+Sequans.Service.DispName     = "Sequans Device Driver"
+DiskDescription              = "Sequans Driver Disk 1"
+TransmitBuffers              = "Transmit Buffers"
+ReceiveBuffers               = "Receive Buffers"
+Disable                      = "Disable"
+Enable                       = "Enable"
