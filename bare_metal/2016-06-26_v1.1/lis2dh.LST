@@ -1,0 +1,1677 @@
+C51 COMPILER V9.51   LIS2DH                                                                06/26/2015 13:32:25 PAGE 1   
+
+
+C51 COMPILER V9.51, COMPILATION OF MODULE LIS2DH
+OBJECT MODULE PLACED IN lis2dh.OBJ
+COMPILER INVOKED BY: c:\keil\C51\BIN\C51.exe lis2dh.c DB OE LARGE CD
+
+line level    source
+
+   1          /*******************************************************************************
+   2          * Copyright (C) 2015 Maxim Integrated Products, Inc., All rights Reserved.
+   3          * * This software is protected by copyright laws of the United States and
+   4          * of foreign countries. This material may also be protected by patent laws
+   5          * and technology transfer regulations of the United States and of foreign
+   6          * countries. This software is furnished under a license agreement and/or a
+   7          * nondisclosure agreement and may only be used or reproduced in accordance
+   8          * with the terms of those agreements. Dissemination of this information to
+   9          * any party or parties not specified in the license agreement and/or
+  10          * nondisclosure agreement is expressly prohibited.
+  11          *
+  12          * The above copyright notice and this permission notice shall be included
+  13          * in all copies or substantial portions of the Software.
+  14          *
+  15          * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+  16          * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+  17          * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+  18          * IN NO EVENT SHALL MAXIM INTEGRATED BE LIABLE FOR ANY CLAIM, DAMAGES
+  19          * OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+  20          * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+  21          * OTHER DEALINGS IN THE SOFTWARE.
+  22          *
+  23          * Except as contained in this notice, the name of Maxim Integrated
+  24          * Products, Inc. shall not be used except as stated in the Maxim Integrated
+  25          * Products, Inc. Branding Policy.
+  26          *
+  27          * The mere transfer of this software does not imply any licenses
+  28          * of trade secrets, proprietary technology, copyrights, patents,
+  29          * trademarks, maskwork rights, or any other form of intellectual
+  30          * property whatsoever. Maxim Integrated Products, Inc. retains all
+  31          * ownership rights.
+  32          *******************************************************************************
+  33          */
+  34          
+  35          //*******************************************************************************
+  36          //
+  37          // This source code file is under the same NDA terms as the IC data sheet.
+  38          //
+  39          //*******************************************************************************
+  40          
+  41          // ----------------------------------------------------------------------------
+  42          // Header files
+  43          // ----------------------------------------------------------------------------
+  44          
+  45          // Project-level preprocessor #defines effective across all *.c files
+  46          #include "ProjectDefines.h"
+*** MESSAGE C286 IN LINE 169 OF ProjectDefines.h: writeReadHID() EP3OUT 256-byte buffer
+*** MESSAGE C286 IN LINE 170 OF ProjectDefines.h: writeReadHID() EP3IN 256-byte buffer
+*** MESSAGE C286 IN LINE 171 OF ProjectDefines.h: USB_EP_INDEX 3 for EP_STATUS[USB_EP_INDEX] and POLL_WRITE_BYTE (INDEX,
+             - USB_EP_INDEX);
+  47          
+  48          // OS24EVK-58 Software Toolkit - bare metal device driver
+  49          #if SUPPORT_MAX30101
+  50          #include "max30101.h"
+  51          #endif // SUPPORT_MAX30101
+C51 COMPILER V9.51   LIS2DH                                                                06/26/2015 13:32:25 PAGE 2   
+
+  52          
+  53          #if SUPPORT_LIS2DH
+  54          #include "lis2dh.h"
+  55          #endif // SUPPORT_LIS2DH
+  56          
+  57          #if SUPPORT_MAX7311
+              #include "max7311.h"
+              #endif // SUPPORT_MAX7311
+  60          
+  61          // OS24EVK-66 Global LIS2DH device address gLIS2DHdeviceAddress
+  62          #if SUPPORT_LIS2DH
+  63          uint8_t gLIS2DHdeviceAddress = 0x00; //!< (default 0x32) LIS2DH I2C device address (slave address on I2C b
+             -us), 8-bits, LEFT-justified.
+  64          code uint8_t searchLIS2DHdeviceAddressList[] = {
+  65             0x30, //!< 0x30 is optional STMicro LIS2DH with SDO/SA0 pin low
+  66             0x32, //!< 0x32 is optional STMicro LIS2DH with SDO/SA0 pin high
+  67             0 //<! end of list
+  68          }; //!< LIS2DH I2C device address (slave address on I2C bus), 8-bits, LEFT-justified.
+  69          #endif // SUPPORT_LIS2DH
+  70          
+  71          
+  72          // OS24EVK-66 LIS2DH Accelerometer Register Read
+  73          #if SUPPORT_LIS2DH
+  74          int8_t lis2dh_RegRead(uint8_t regAddress, uint8_t *pRegValue)
+  75          {
+  76   1         return i2c_smbus_read_byte_data(gLIS2DHdeviceAddress, regAddress, pRegValue);
+  77   1      }
+  78          #endif // SUPPORT_LIS2DH
+  79          
+  80          // OS24EVK-66 LIS2DH Accelerometer Register Write
+  81          #if SUPPORT_LIS2DH
+  82          int8_t lis2dh_RegWrite(uint8_t regAddress, uint8_t regValue)
+  83          {
+  84   1         return i2c_smbus_write_byte_data(gLIS2DHdeviceAddress, regAddress, regValue);
+  85   1      }
+  86          #endif // SUPPORT_LIS2DH
+  87          
+  88          // read lis2dh 16-bit pair of registers
+  89          #if SUPPORT_LIS2DH
+  90          int16_t lis2dh_Read_16Bit(uint8_t regAddress_L, uint8_t regAddress_H, int16_t* resultPtr)
+  91          {
+  92   1         // TODO: OS24EVK-66 LIS2DH Accelerometer Register Read 16-bit pair
+  93   1         uint8_t regValue_L = 0;
+  94   1         uint8_t regValue_H = 0;
+  95   1         uint16_t regValue_HL = 0;
+  96   1         //
+  97   1         // C not C++, so all local variables must be declared before any statements
+  98   1         //
+  99   1         if (!gLIS2DHdeviceAddress) {
+ 100   2            return 0; // device is not available
+ 101   2         }
+ 102   1         //
+ 103   1      #if SUPPORT_i2c_smbus_read_bytes_data
+                 // TODO1: use i2c_smbus_read_bytes_data(uint8_t deviceAddress, uint8_t regAddress, uint8_t count, uint8
+             -_t *pRegValue)
+                 // assuming address OUT_X_H = 1 + address OUT_X_L
+                 i2c_smbus_read_bytes_data(gLIS2DHdeviceAddress, regAddress_L, 2, &regValue_HL);
+                 regValue_HL = SWAP_HIGH_AND_LOW_BYTE(regValue_HL);
+              #else // SUPPORT_i2c_smbus_read_bytes_data
+ 109   1         lis2dh_RegRead(regAddress_H, &regValue_H);
+ 110   1         lis2dh_RegRead(regAddress_L, &regValue_L);
+ 111   1         regValue_HL = (((int16_t)regValue_H << 8) & 0xFF00) | (regValue_L & 0x00FF);
+C51 COMPILER V9.51   LIS2DH                                                                06/26/2015 13:32:25 PAGE 3   
+
+ 112   1      #endif // SUPPORT_i2c_smbus_read_bytes_data
+ 113   1         //
+ 114   1         if (resultPtr != 0) {
+ 115   2            *(resultPtr) = regValue_HL;
+ 116   2         }
+ 117   1         return regValue_HL;
+ 118   1      }
+ 119          #endif // SUPPORT_LIS2DH
+ 120          
+ 121          #if SUPPORT_LIS2DH
+ 122          // read li2sdh X Y Z acceleration vector
+ 123          void lis2dh_Read_XYZ(int16_t* XPtr, int16_t* YPtr, int16_t* ZPtr)
+ 124          {
+ 125   1         // TODO: OS24EVK-66 LIS2DH Accelerometer Read XYZ vector
+ 126   1         //
+ 127   1         // C not C++, so all local variables must be declared before any statements
+ 128   1         //
+ 129   1         if (!gLIS2DHdeviceAddress) {
+ 130   2            return; // device is not available
+ 131   2         }
+ 132   1         //
+ 133   1      // #if SUPPORT_i2c_smbus_read_bytes_data
+ 134   1      // TODO1: OS24EVK-66 Read LIS2DH XYZ using a single 6-byte I2C read operation in lis2dh_Read_XYZ()
+ 135   1      // // TODO1: use i2c_smbus_read_bytes_data(uint8_t deviceAddress, uint8_t regAddress, uint8_t count, uint8
+             -_t *pRegValue)
+ 136   1         // 2015-04-16 OS24EVK-66 OS24EVK-57 LIS2DH multiple-byte read requires (regAddress | 0x80)
+ 137   1         // LIS2DH data sheet pg 25 5.1.1 I2C operation (near last paragraph)
+ 138   1         // In order to read multiple bytes, it is necessary to assert the most significant bit of the subaddres
+             -s
+ 139   1         // field. In other words, SUB(7) must be equal to 1 while SUB(6-0) represents the
+ 140   1         // address of first register to be read.
+ 141   1      // #else // SUPPORT_i2c_smbus_read_bytes_data
+ 142   1         lis2dh_Read_16Bit(lis2dh_OUT_X_L, lis2dh_OUT_X_H, XPtr);
+ 143   1         lis2dh_Read_16Bit(lis2dh_OUT_Y_L, lis2dh_OUT_Y_H, YPtr);
+ 144   1         lis2dh_Read_16Bit(lis2dh_OUT_Z_L, lis2dh_OUT_Z_H, ZPtr);
+ 145   1      // #endif // SUPPORT_i2c_smbus_read_bytes_data
+ 146   1      }
+ 147          #endif // SUPPORT_LIS2DH
+ 148          
+ 149          #if SUPPORT_LIS2DH
+ 150          uint8_t lis2dh_configure_outputDataRateHz(uint16_t outputDataRateHz)
+ 151          {
+ 152   1          uint8_t lis2dh_CTRL_REG1_value = 0; //!< ODR3 ODR2 ODR1 ODR0 LPen Zen Yen Xen (ODR3:0=0000:PowerDown; 
+             -0101:100Hz)
+ 153   1          //~ uint8_t lis2dh_CTRL_REG2_value = 0; //!< HPM1 HPM0 HPCF2 HPCF1 FDS HPCLICK HPIS2 HPIS1
+ 154   1          //~ uint8_t lis2dh_CTRL_REG3_value = 0; //!< I1_CLICK I1_AOI1 I1_AOI2 I1_DRDY1 I1_DRDY2 I1_WTM I1_OVER
+             -RUN --
+ 155   1          //~ uint8_t lis2dh_CTRL_REG4_value = 0; //!< BDU BLE FS1 FS0 HR ST1 ST0 SIM (ST1:ST0 self test mode 10
+             - or 01)
+ 156   1          //~ uint8_t lis2dh_CTRL_REG5_value = 0; //!< BOOT FIFO_EN -- -- LIR_INT1 D4D_INT1 LIR_INT2 D4D_INT2
+ 157   1          //~ uint8_t lis2dh_CTRL_REG6_value = 0; //!< I2_CLICKen I2_INT1 I2_INT2 BOOT_I2 P2_ACT -- -- H_LACTIVE
+             - --
+ 158   1          //
+ 159   1          // C not C++, so all local variables must be declared before any statements
+ 160   1          //
+ 161   1         if (!gLIS2DHdeviceAddress) {
+ 162   2            return 0; // device is not available
+ 163   2         }
+ 164   1          //
+ 165   1          lis2dh_RegRead(lis2dh_CTRL_REG1, &lis2dh_CTRL_REG1_value);
+ 166   1          //~ lis2dh_RegRead(lis2dh_CTRL_REG2, &lis2dh_CTRL_REG2_value);
+ 167   1          //~ lis2dh_RegRead(lis2dh_CTRL_REG3, &lis2dh_CTRL_REG3_value);
+C51 COMPILER V9.51   LIS2DH                                                                06/26/2015 13:32:25 PAGE 4   
+
+ 168   1          //~ lis2dh_RegRead(lis2dh_CTRL_REG4, &lis2dh_CTRL_REG4_value);
+ 169   1          //~ lis2dh_RegRead(lis2dh_CTRL_REG5, &lis2dh_CTRL_REG5_value);
+ 170   1          //~ lis2dh_RegRead(lis2dh_CTRL_REG6, &lis2dh_CTRL_REG6_value);
+ 171   1          //
+ 172   1          switch(outputDataRateHz)
+ 173   1          {
+ 174   2          case 0:
+ 175   2              // lis2dh_CTRL_REG1 ODR3 ODR2 ODR1 ODR0: 0 0 0 0 Power down mode
+ 176   2              lis2dh_CTRL_REG1_value &=~ (0x0F << 4); // lis2dh_CTRL_REG1 ODR3 ODR2 ODR1 ODR0
+ 177   2              lis2dh_CTRL_REG1_value |=  (0x00 << 4); // lis2dh_CTRL_REG1 ODR3 ODR2 ODR1 ODR0
+ 178   2              break;
+ 179   2          case 1:
+ 180   2              // lis2dh_CTRL_REG1 ODR3 ODR2 ODR1 ODR0: 0 0 0 1 HR / normal / Low power mode (1 Hz)
+ 181   2              lis2dh_CTRL_REG1_value &=~ (0x0F << 4); // lis2dh_CTRL_REG1 ODR3 ODR2 ODR1 ODR0
+ 182   2              lis2dh_CTRL_REG1_value |=  (0x01 << 4); // lis2dh_CTRL_REG1 ODR3 ODR2 ODR1 ODR0
+ 183   2              break;
+ 184   2          case 10:
+ 185   2              // lis2dh_CTRL_REG1 ODR3 ODR2 ODR1 ODR0: 0 0 1 0 HR / normal / Low power mode (10 Hz)
+ 186   2              lis2dh_CTRL_REG1_value &=~ (0x0F << 4); // lis2dh_CTRL_REG1 ODR3 ODR2 ODR1 ODR0
+ 187   2              lis2dh_CTRL_REG1_value |=  (0x02 << 4); // lis2dh_CTRL_REG1 ODR3 ODR2 ODR1 ODR0
+ 188   2              break;
+ 189   2          case 25:
+ 190   2              // lis2dh_CTRL_REG1 ODR3 ODR2 ODR1 ODR0: 0 0 1 1 HR / normal / Low power mode (25 Hz)
+ 191   2              lis2dh_CTRL_REG1_value &=~ (0x0F << 4); // lis2dh_CTRL_REG1 ODR3 ODR2 ODR1 ODR0
+ 192   2              lis2dh_CTRL_REG1_value |=  (0x03 << 4); // lis2dh_CTRL_REG1 ODR3 ODR2 ODR1 ODR0
+ 193   2              break;
+ 194   2          case 50:
+ 195   2              // lis2dh_CTRL_REG1 ODR3 ODR2 ODR1 ODR0: 0 1 0 0 HR / normal / Low power mode (50 Hz)
+ 196   2              lis2dh_CTRL_REG1_value &=~ (0x0F << 4); // lis2dh_CTRL_REG1 ODR3 ODR2 ODR1 ODR0
+ 197   2              lis2dh_CTRL_REG1_value |=  (0x04 << 4); // lis2dh_CTRL_REG1 ODR3 ODR2 ODR1 ODR0
+ 198   2              break;
+ 199   2          case 100:
+ 200   2              // lis2dh_CTRL_REG1 ODR3 ODR2 ODR1 ODR0: 0 1 0 1 HR / normal / Low power mode (100 Hz)
+ 201   2              lis2dh_CTRL_REG1_value &=~ (0x0F << 4); // lis2dh_CTRL_REG1 ODR3 ODR2 ODR1 ODR0
+ 202   2              lis2dh_CTRL_REG1_value |=  (0x05 << 4); // lis2dh_CTRL_REG1 ODR3 ODR2 ODR1 ODR0
+ 203   2              break;
+ 204   2          case 200:
+ 205   2              // lis2dh_CTRL_REG1 ODR3 ODR2 ODR1 ODR0: 0 1 1 0 HR / normal / Low power mode (200 Hz)
+ 206   2              lis2dh_CTRL_REG1_value &=~ (0x0F << 4); // lis2dh_CTRL_REG1 ODR3 ODR2 ODR1 ODR0
+ 207   2              lis2dh_CTRL_REG1_value |=  (0x06 << 4); // lis2dh_CTRL_REG1 ODR3 ODR2 ODR1 ODR0
+ 208   2              break;
+ 209   2          case 400:
+ 210   2              // lis2dh_CTRL_REG1 ODR3 ODR2 ODR1 ODR0: 0 1 1 1 HR/ normal / Low power mode (400 Hz)
+ 211   2              lis2dh_CTRL_REG1_value &=~ (0x0F << 4); // lis2dh_CTRL_REG1 ODR3 ODR2 ODR1 ODR0
+ 212   2              lis2dh_CTRL_REG1_value |=  (0x07 << 4); // lis2dh_CTRL_REG1 ODR3 ODR2 ODR1 ODR0
+ 213   2              break;
+ 214   2          case 1620:
+ 215   2              // lis2dh_CTRL_REG1 ODR3 ODR2 ODR1 ODR0: 1 0 0 0 Low power mode (1.620 kHz)
+ 216   2              lis2dh_CTRL_REG1_value &=~ (0x0F << 4); // lis2dh_CTRL_REG1 ODR3 ODR2 ODR1 ODR0
+ 217   2              lis2dh_CTRL_REG1_value |=  (0x08 << 4); // lis2dh_CTRL_REG1 ODR3 ODR2 ODR1 ODR0
+ 218   2              break;
+ 219   2          case 1344:
+ 220   2              // lis2dh_CTRL_REG1 ODR3 ODR2 ODR1 ODR0: 1 0 0 1 HR/ normal (1.344 kHz); Low power mode (5.376 kHz
+             -)
+ 221   2              lis2dh_CTRL_REG1_value &=~ (0x0F << 4); // lis2dh_CTRL_REG1 ODR3 ODR2 ODR1 ODR0
+ 222   2              lis2dh_CTRL_REG1_value |=  (0x09 << 4); // lis2dh_CTRL_REG1 ODR3 ODR2 ODR1 ODR0
+ 223   2              break;
+ 224   2          case 5376:
+ 225   2              // lis2dh_CTRL_REG1 ODR3 ODR2 ODR1 ODR0: 1 0 0 1 HR/ normal (1.344 kHz); Low power mode (5.376 kHz
+             -)
+ 226   2              lis2dh_CTRL_REG1_value &=~ (0x0F << 4); // lis2dh_CTRL_REG1 ODR3 ODR2 ODR1 ODR0
+ 227   2              lis2dh_CTRL_REG1_value |=  (0x09 << 4); // lis2dh_CTRL_REG1 ODR3 ODR2 ODR1 ODR0
+C51 COMPILER V9.51   LIS2DH                                                                06/26/2015 13:32:25 PAGE 5   
+
+ 228   2              break;
+ 229   2          default:
+ 230   2              return 0; // failure; invalid configuration
+ 231   2          }
+ 232   1          //
+ 233   1          lis2dh_RegWrite(lis2dh_CTRL_REG1, lis2dh_CTRL_REG1_value);
+ 234   1          //~ lis2dh_RegWrite(lis2dh_CTRL_REG2, lis2dh_CTRL_REG2_value);
+ 235   1          //~ lis2dh_RegWrite(lis2dh_CTRL_REG3, lis2dh_CTRL_REG3_value);
+ 236   1          //~ lis2dh_RegWrite(lis2dh_CTRL_REG4, lis2dh_CTRL_REG4_value);
+ 237   1          //~ lis2dh_RegWrite(lis2dh_CTRL_REG5, lis2dh_CTRL_REG5_value);
+ 238   1          //~ lis2dh_RegWrite(lis2dh_CTRL_REG6, lis2dh_CTRL_REG6_value);
+ 239   1          //
+ 240   1          return 1; // success
+ 241   1      }
+ 242          #endif // SUPPORT_LIS2DH
+ 243          
+ 244          #if SUPPORT_LIS2DH
+ 245          uint8_t lis2dh_configure_resolutionBits(uint8_t resolutionBits)
+ 246          {
+ 247   1          uint8_t lis2dh_CTRL_REG1_value = 0; //!< ODR3 ODR2 ODR1 ODR0 LPen Zen Yen Xen (ODR3:0=0000:PowerDown; 
+             -0101:100Hz)
+ 248   1          //~ uint8_t lis2dh_CTRL_REG2_value = 0; //!< HPM1 HPM0 HPCF2 HPCF1 FDS HPCLICK HPIS2 HPIS1
+ 249   1          //~ uint8_t lis2dh_CTRL_REG3_value = 0; //!< I1_CLICK I1_AOI1 I1_AOI2 I1_DRDY1 I1_DRDY2 I1_WTM I1_OVER
+             -RUN --
+ 250   1          uint8_t lis2dh_CTRL_REG4_value = 0; //!< BDU BLE FS1 FS0 HR ST1 ST0 SIM (ST1:ST0 self test mode 10 or 
+             -01)
+ 251   1          //~ uint8_t lis2dh_CTRL_REG5_value = 0; //!< BOOT FIFO_EN -- -- LIR_INT1 D4D_INT1 LIR_INT2 D4D_INT2
+ 252   1          //~ uint8_t lis2dh_CTRL_REG6_value = 0; //!< I2_CLICKen I2_INT1 I2_INT2 BOOT_I2 P2_ACT -- -- H_LACTIVE
+             - --
+ 253   1          //
+ 254   1          // C not C++, so all local variables must be declared before any statements
+ 255   1          //
+ 256   1         if (!gLIS2DHdeviceAddress) {
+ 257   2            return 0; // device is not available
+ 258   2         }
+ 259   1          //
+ 260   1          lis2dh_RegRead(lis2dh_CTRL_REG1, &lis2dh_CTRL_REG1_value);
+ 261   1          //~ lis2dh_RegRead(lis2dh_CTRL_REG2, &lis2dh_CTRL_REG2_value);
+ 262   1          //~ lis2dh_RegRead(lis2dh_CTRL_REG3, &lis2dh_CTRL_REG3_value);
+ 263   1          lis2dh_RegRead(lis2dh_CTRL_REG4, &lis2dh_CTRL_REG4_value);
+ 264   1          //~ lis2dh_RegRead(lis2dh_CTRL_REG5, &lis2dh_CTRL_REG5_value);
+ 265   1          //~ lis2dh_RegRead(lis2dh_CTRL_REG6, &lis2dh_CTRL_REG6_value);
+ 266   1          //
+ 267   1          switch(resolutionBits)
+ 268   1          {
+ 269   2          case 12:
+ 270   2              // 12-bit mode: lis2dh_CTRL_REG1 bit 0x08 LPen = 0, lis2dh_CTRL_REG4 bit 0x08 HR = 1
+ 271   2              lis2dh_CTRL_REG1_value &=~ (0x01 << 3); // lis2dh_CTRL_REG1 LPen
+ 272   2              lis2dh_CTRL_REG4_value |=  (0x01 << 3); // lis2dh_CTRL_REG4 HR
+ 273   2              break;
+ 274   2          case 10:
+ 275   2              // 10-bit mode: lis2dh_CTRL_REG1 bit 0x08 LPen = 0, lis2dh_CTRL_REG4 bit 0x08 HR = 0
+ 276   2              lis2dh_CTRL_REG1_value &=~ (0x01 << 3); // lis2dh_CTRL_REG1 LPen
+ 277   2              lis2dh_CTRL_REG4_value &=~ (0x01 << 3); // lis2dh_CTRL_REG4 HR
+ 278   2              break;
+ 279   2          case 8:
+ 280   2              //  8-bit mode: lis2dh_CTRL_REG1 bit 0x08 LPen = 1, lis2dh_CTRL_REG4 bit 0x08 HR = 0
+ 281   2              lis2dh_CTRL_REG1_value |=  (0x01 << 3); // lis2dh_CTRL_REG1 LPen
+ 282   2              lis2dh_CTRL_REG4_value &=~ (0x01 << 3); // lis2dh_CTRL_REG4 HR
+ 283   2              break;
+ 284   2          default:
+ 285   2              return 0; // failure; invalid configuration
+C51 COMPILER V9.51   LIS2DH                                                                06/26/2015 13:32:25 PAGE 6   
+
+ 286   2          }
+ 287   1          //
+ 288   1          lis2dh_RegWrite(lis2dh_CTRL_REG1, lis2dh_CTRL_REG1_value);
+ 289   1          //~ lis2dh_RegWrite(lis2dh_CTRL_REG2, lis2dh_CTRL_REG2_value);
+ 290   1          //~ lis2dh_RegWrite(lis2dh_CTRL_REG3, lis2dh_CTRL_REG3_value);
+ 291   1          lis2dh_RegWrite(lis2dh_CTRL_REG4, lis2dh_CTRL_REG4_value);
+ 292   1          //~ lis2dh_RegWrite(lis2dh_CTRL_REG5, lis2dh_CTRL_REG5_value);
+ 293   1          //~ lis2dh_RegWrite(lis2dh_CTRL_REG6, lis2dh_CTRL_REG6_value);
+ 294   1          //
+ 295   1          return 1; // success
+ 296   1      }
+ 297          #endif // SUPPORT_LIS2DH
+ 298          
+ 299          #if 0 // SUPPORT_LIS2DH
+              uint8_t lis2dh_configure_selfTest(uint8_t selfTest)
+              {
+                  //~ uint8_t lis2dh_CTRL_REG1_value = 0; //!< ODR3 ODR2 ODR1 ODR0 LPen Zen Yen Xen (ODR3:0=0000:PowerDo
+             -wn; 0101:100Hz)
+                  //~ uint8_t lis2dh_CTRL_REG2_value = 0; //!< HPM1 HPM0 HPCF2 HPCF1 FDS HPCLICK HPIS2 HPIS1
+                  //~ uint8_t lis2dh_CTRL_REG3_value = 0; //!< I1_CLICK I1_AOI1 I1_AOI2 I1_DRDY1 I1_DRDY2 I1_WTM I1_OVER
+             -RUN --
+                  uint8_t lis2dh_CTRL_REG4_value = 0; //!< BDU BLE FS1 FS0 HR ST1 ST0 SIM (ST1:ST0 self test mode 10 or 
+             -01)
+                  //~ uint8_t lis2dh_CTRL_REG5_value = 0; //!< BOOT FIFO_EN -- -- LIR_INT1 D4D_INT1 LIR_INT2 D4D_INT2
+                  //~ uint8_t lis2dh_CTRL_REG6_value = 0; //!< I2_CLICKen I2_INT1 I2_INT2 BOOT_I2 P2_ACT -- -- H_LACTIVE
+             - --
+                  //
+                  // C not C++, so all local variables must be declared before any statements
+                  //
+                 if (!gLIS2DHdeviceAddress) {
+                    return 0; // device is not available
+                 }
+                  //
+                  //~ lis2dh_RegRead(lis2dh_CTRL_REG1, &lis2dh_CTRL_REG1_value);
+                  //~ lis2dh_RegRead(lis2dh_CTRL_REG2, &lis2dh_CTRL_REG2_value);
+                  //~ lis2dh_RegRead(lis2dh_CTRL_REG3, &lis2dh_CTRL_REG3_value);
+                  lis2dh_RegRead(lis2dh_CTRL_REG4, &lis2dh_CTRL_REG4_value);
+                  //~ lis2dh_RegRead(lis2dh_CTRL_REG5, &lis2dh_CTRL_REG5_value);
+                  //~ lis2dh_RegRead(lis2dh_CTRL_REG6, &lis2dh_CTRL_REG6_value);
+                  //
+                  switch(selfTest)
+                  {
+                  case 0:
+                      // Normal mode: lis2dh_CTRL_REG4 ST1:ST0 = 00
+                      lis2dh_CTRL_REG4_value &=~ (0x03 << 1); // lis2dh_CTRL_REG4 ST1:ST0
+                      lis2dh_CTRL_REG4_value |=  (0x00 << 1); // lis2dh_CTRL_REG4 ST1:ST0
+                      break;
+                  case 1:
+                      // Self test 0: lis2dh_CTRL_REG4 ST1:ST0 = 01
+                      lis2dh_CTRL_REG4_value &=~ (0x03 << 1); // lis2dh_CTRL_REG4 ST1:ST0
+                      lis2dh_CTRL_REG4_value |=  (0x01 << 1); // lis2dh_CTRL_REG4 ST1:ST0
+                      break;
+                  case 2:
+                      // Self test 1: lis2dh_CTRL_REG4 ST1:ST0 = 10
+                      lis2dh_CTRL_REG4_value &=~ (0x03 << 1); // lis2dh_CTRL_REG4 ST1:ST0
+                      lis2dh_CTRL_REG4_value |=  (0x02 << 1); // lis2dh_CTRL_REG4 ST1:ST0
+                      break;
+                  default:
+                      return 0; // failure; invalid configuration
+                  }
+                  //
+                  //~ lis2dh_RegWrite(lis2dh_CTRL_REG1, lis2dh_CTRL_REG1_value);
+C51 COMPILER V9.51   LIS2DH                                                                06/26/2015 13:32:25 PAGE 7   
+
+                  //~ lis2dh_RegWrite(lis2dh_CTRL_REG2, lis2dh_CTRL_REG2_value);
+                  //~ lis2dh_RegWrite(lis2dh_CTRL_REG3, lis2dh_CTRL_REG3_value);
+                  lis2dh_RegWrite(lis2dh_CTRL_REG4, lis2dh_CTRL_REG4_value);
+                  //~ lis2dh_RegWrite(lis2dh_CTRL_REG5, lis2dh_CTRL_REG5_value);
+                  //~ lis2dh_RegWrite(lis2dh_CTRL_REG6, lis2dh_CTRL_REG6_value);
+                  //
+                  return 1; // success
+              }
+              #endif // SUPPORT_LIS2DH
+ 353          
+ 354          #if SUPPORT_LIS2DH
+ 355          uint8_t lis2dh_configure_BDU(uint8_t bduBlockDataUpdate)
+ 356          {
+ 357   1          //~ uint8_t lis2dh_CTRL_REG1_value = 0; //!< ODR3 ODR2 ODR1 ODR0 LPen Zen Yen Xen (ODR3:0=0000:PowerDo
+             -wn; 0101:100Hz)
+ 358   1          //~ uint8_t lis2dh_CTRL_REG2_value = 0; //!< HPM1 HPM0 HPCF2 HPCF1 FDS HPCLICK HPIS2 HPIS1
+ 359   1          //~ uint8_t lis2dh_CTRL_REG3_value = 0; //!< I1_CLICK I1_AOI1 I1_AOI2 I1_DRDY1 I1_DRDY2 I1_WTM I1_OVER
+             -RUN --
+ 360   1          uint8_t lis2dh_CTRL_REG4_value = 0; //!< BDU BLE FS1 FS0 HR ST1 ST0 SIM (ST1:ST0 self test mode 10 or 
+             -01)
+ 361   1          //~ uint8_t lis2dh_CTRL_REG5_value = 0; //!< BOOT FIFO_EN -- -- LIR_INT1 D4D_INT1 LIR_INT2 D4D_INT2
+ 362   1          //~ uint8_t lis2dh_CTRL_REG6_value = 0; //!< I2_CLICKen I2_INT1 I2_INT2 BOOT_I2 P2_ACT -- -- H_LACTIVE
+             - --
+ 363   1          //
+ 364   1          // C not C++, so all local variables must be declared before any statements
+ 365   1          //
+ 366   1         if (!gLIS2DHdeviceAddress) {
+ 367   2            return 0; // device is not available
+ 368   2         }
+ 369   1          //
+ 370   1          //~ lis2dh_RegRead(lis2dh_CTRL_REG1, &lis2dh_CTRL_REG1_value);
+ 371   1          //~ lis2dh_RegRead(lis2dh_CTRL_REG2, &lis2dh_CTRL_REG2_value);
+ 372   1          //~ lis2dh_RegRead(lis2dh_CTRL_REG3, &lis2dh_CTRL_REG3_value);
+ 373   1          lis2dh_RegRead(lis2dh_CTRL_REG4, &lis2dh_CTRL_REG4_value);
+ 374   1          //~ lis2dh_RegRead(lis2dh_CTRL_REG5, &lis2dh_CTRL_REG5_value);
+ 375   1          //~ lis2dh_RegRead(lis2dh_CTRL_REG6, &lis2dh_CTRL_REG6_value);
+ 376   1          //
+ 377   1          switch(bduBlockDataUpdate)
+ 378   1          {
+ 379   2          case 0:
+ 380   2              // Normal mode: lis2dh_CTRL_REG4 BDU = 0
+ 381   2              lis2dh_CTRL_REG4_value &=~ (0x01 << 7); // lis2dh_CTRL_REG4 BDU
+ 382   2              lis2dh_CTRL_REG4_value |=  (0x00 << 7); // lis2dh_CTRL_REG4 BDU
+ 383   2              break;
+ 384   2          case 1:
+ 385   2              // Self test 0: lis2dh_CTRL_REG4 BDU = 1
+ 386   2              lis2dh_CTRL_REG4_value &=~ (0x01 << 7); // lis2dh_CTRL_REG4 BDU
+ 387   2              lis2dh_CTRL_REG4_value |=  (0x01 << 7); // lis2dh_CTRL_REG4 BDU
+ 388   2              break;
+ 389   2          default:
+ 390   2              return 0; // failure; invalid configuration
+ 391   2          }
+ 392   1          //
+ 393   1          //~ lis2dh_RegWrite(lis2dh_CTRL_REG1, lis2dh_CTRL_REG1_value);
+ 394   1          //~ lis2dh_RegWrite(lis2dh_CTRL_REG2, lis2dh_CTRL_REG2_value);
+ 395   1          //~ lis2dh_RegWrite(lis2dh_CTRL_REG3, lis2dh_CTRL_REG3_value);
+ 396   1          lis2dh_RegWrite(lis2dh_CTRL_REG4, lis2dh_CTRL_REG4_value);
+ 397   1          //~ lis2dh_RegWrite(lis2dh_CTRL_REG5, lis2dh_CTRL_REG5_value);
+ 398   1          //~ lis2dh_RegWrite(lis2dh_CTRL_REG6, lis2dh_CTRL_REG6_value);
+ 399   1          //
+ 400   1          return 1; // success
+ 401   1      }
+C51 COMPILER V9.51   LIS2DH                                                                06/26/2015 13:32:25 PAGE 8   
+
+ 402          #endif // SUPPORT_LIS2DH
+ 403          
+ 404          #if SUPPORT_LIS2DH
+ 405          uint8_t lis2dh_configure_FIFO(uint8_t fifoModeFM10, uint8_t fifoTR, uint8_t fifoWatermarkLevelFTH40)
+ 406          {
+ 407   1      #if 0 // TODO1: (Firmware 2015-04-26) OS24EVK-66 OS24EVK-83 configure LIS2DH
+                  xdata uint8_t lis2dh_CTRL_REG1_value = 0; //!< ODR3 ODR2 ODR1 ODR0 LPen Zen Yen Xen (ODR3:0=0000:Power
+             -Down; 0101:100Hz)
+              #endif // TODO1: (Firmware 2015-04-26) OS24EVK-66 OS24EVK-83 configure LIS2DH
+ 410   1      #if 0 // TODO1: (Firmware 2015-04-26) OS24EVK-66 OS24EVK-83 configure LIS2DH
+                  xdata uint8_t lis2dh_CTRL_REG2_value = 0; //!< HPM1 HPM0 HPCF2 HPCF1 FDS HPCLICK HPIS2 HPIS1
+              #endif // TODO1: (Firmware 2015-04-26) OS24EVK-66 OS24EVK-83 configure LIS2DH
+ 413   1          xdata uint8_t lis2dh_CTRL_REG3_value = 0; //!< I1_CLICK I1_AOI1 I1_AOI2 I1_DRDY1 I1_DRDY2 I1_WTM I1_OV
+             -ERRUN --
+ 414   1          //~ uint8_t lis2dh_CTRL_REG4_value = 0; //!< BDU BLE FS1 FS0 HR ST1 ST0 SIM (ST1:ST0 self test mode 10
+             - or 01)
+ 415   1          xdata uint8_t lis2dh_CTRL_REG5_value = 0; //!< BOOT FIFO_EN -- -- LIR_INT1 D4D_INT1 LIR_INT2 D4D_INT2
+ 416   1      #if 0 // TODO1: (Firmware 2015-04-26) OS24EVK-66 OS24EVK-83 configure LIS2DH
+                  //~ xdata uint8_t lis2dh_CTRL_REG6_value = 0; //!< I2_CLICKen I2_INT1 I2_INT2 BOOT_I2 P2_ACT -- -- H_L
+             -ACTIVE --
+              #endif // TODO1: (Firmware 2015-04-26) OS24EVK-66 OS24EVK-83 configure LIS2DH
+ 419   1          xdata uint8_t lis2dh_FIFO_CTRL_REG_value = 0; //!< FM1 FM0 TR FTH4 FTH3 FTH2 FTH1 FTH0
+ 420   1          //~ uint8_t lis2dh_FIFO_SRC_REG_value = 0;  //!< (read-only) WTM OVRN_FIFO EMPTY FSS4 FSS3 FSS2 FSS1 F
+             -SS0
+ 421   1      #if 0 // TODO1: (Firmware 2015-04-26) OS24EVK-66 OS24EVK-83 configure LIS2DH
+                  xdata uint8_t lis2dh_INT1_CFG_value = 0; //!< AOI 6D ZHIE/ZUPE ZLIE/ZDOWNE YHIE/YUPE YLIE/YDOWNE XHIE/
+             -XUPE XLIE/XDOWNE
+                  //~ uint8_t lis2dh_INT1_SOURCE_value = 0; //!< (read-only) 0 IA ZH ZL YH YL XH XL
+                  xdata uint8_t lis2dh_INT1_THS_value = 0; //!< Interrupt 1 threshold. 1LSb = 16mg FS=2g; 1LSb = 32 mg F
+             -S=4g; 1LSb = 62 mg FS=8g; 1LSb = 186 mg FS=16g
+                  xdata uint8_t lis2dh_INT1_DURATION_value = 0; //!< D6 - D0 bits set the minimum duration of the Interr
+             -upt 2 event to be recognized. Duration steps and maximum values depend on the ODR chosen.
+              #endif // TODO1: (Firmware 2015-04-26) OS24EVK-66 OS24EVK-83 configure LIS2DH
+ 427   1          //
+ 428   1          // C not C++, so all local variables must be declared before any statements
+ 429   1          //
+ 430   1         if (!gLIS2DHdeviceAddress) {
+ 431   2            return 0; // device is not available
+ 432   2         }
+ 433   1         
+ 434   1         //
+ 435   1         // OS24EVK-66 lis2dh_configure_FIFO GOTCHA! need lis2dh_CTRL_REG5 bit 0x40 FIFO_EN, and maybe lis2dh_CT
+             -RL_REG3 bit 0x04 I1_WTM
+ 436   1         //
+ 437   1         
+ 438   1          //
+ 439   1      #if 0 // TODO1: (Firmware 2015-04-26) OS24EVK-66 OS24EVK-83 configure LIS2DH
+                  lis2dh_RegRead(lis2dh_CTRL_REG1, &lis2dh_CTRL_REG1_value);
+              #endif // TODO1: (Firmware 2015-04-26) OS24EVK-66 OS24EVK-83 configure LIS2DH
+ 442   1      #if 0 // TODO1: (Firmware 2015-04-26) OS24EVK-66 OS24EVK-83 configure LIS2DH
+                  lis2dh_RegRead(lis2dh_CTRL_REG2, &lis2dh_CTRL_REG2_value);
+              #endif // TODO1: (Firmware 2015-04-26) OS24EVK-66 OS24EVK-83 configure LIS2DH
+ 445   1          lis2dh_RegRead(lis2dh_CTRL_REG3, &lis2dh_CTRL_REG3_value);
+ 446   1          //~ lis2dh_RegRead(lis2dh_CTRL_REG4, &lis2dh_CTRL_REG4_value);
+ 447   1          lis2dh_RegRead(lis2dh_CTRL_REG5, &lis2dh_CTRL_REG5_value);
+ 448   1      #if 0 // TODO1: (Firmware 2015-04-26) OS24EVK-66 OS24EVK-83 configure LIS2DH
+                  //~ lis2dh_RegRead(lis2dh_CTRL_REG6, &lis2dh_CTRL_REG6_value);
+              #endif // TODO1: (Firmware 2015-04-26) OS24EVK-66 OS24EVK-83 configure LIS2DH
+ 451   1          lis2dh_RegRead(lis2dh_FIFO_CTRL_REG, &lis2dh_FIFO_CTRL_REG_value);
+ 452   1          //~ lis2dh_RegRead(lis2dh_FIFO_SRC_REG,  &lis2dh_FIFO_SRC_REG_value);
+ 453   1      #if 0 // TODO1: (Firmware 2015-04-26) OS24EVK-66 OS24EVK-83 configure LIS2DH
+                  lis2dh_RegRead(lis2dh_INT1_CFG, &lis2dh_INT1_CFG_value);
+C51 COMPILER V9.51   LIS2DH                                                                06/26/2015 13:32:25 PAGE 9   
+
+                  //~ lis2dh_RegRead(lis2dh_INT1_SOURCE, &lis2dh_INT1_SOURCE_value);
+                  lis2dh_RegRead(lis2dh_INT1_THS, &lis2dh_INT1_THS_value);
+                  lis2dh_RegRead(lis2dh_INT1_DURATION, &lis2dh_INT1_DURATION_value);
+              #endif // TODO1: (Firmware 2015-04-26) OS24EVK-66 OS24EVK-83 configure LIS2DH
+ 459   1          //
+ 460   1          switch(fifoModeFM10)
+ 461   1          {
+ 462   2          case 0:
+ 463   2              // Bypass Mode: lis2dh_FIFO_CTRL_REG FM1:FM0 = 00
+ 464   2              lis2dh_FIFO_CTRL_REG_value &=~ (0x03 << 6); // lis2dh_CTRL_REG4 FM1:FM0
+ 465   2              lis2dh_FIFO_CTRL_REG_value |=  (0x00 << 6); // lis2dh_CTRL_REG4 FM1:FM0 = 00
+ 466   2              lis2dh_CTRL_REG5_value &=~  (0x01 << 6); // lis2dh_CTRL_REG5 bit 0x40 FIFO_EN = 0
+ 467   2              break;
+ 468   2          case 1:
+ 469   2              // "FIFO Mode": lis2dh_FIFO_CTRL_REG FM1:FM0 = 01
+ 470   2              lis2dh_FIFO_CTRL_REG_value &=~ (0x03 << 6); // lis2dh_CTRL_REG4 FM1:FM0
+ 471   2              lis2dh_FIFO_CTRL_REG_value |=  (0x01 << 6); // lis2dh_CTRL_REG4 FM1:FM0 = 01
+ 472   2              lis2dh_CTRL_REG5_value |=  (0x01 << 6); // lis2dh_CTRL_REG5 bit 0x40 FIFO_EN = 1
+ 473   2              break;
+ 474   2          case 2:
+ 475   2              // Stream Mode: lis2dh_FIFO_CTRL_REG FM1:FM0 = 10
+ 476   2              lis2dh_FIFO_CTRL_REG_value &=~ (0x03 << 6); // lis2dh_CTRL_REG4 FM1:FM0
+ 477   2              lis2dh_FIFO_CTRL_REG_value |=  (0x02 << 6); // lis2dh_CTRL_REG4 FM1:FM0 = 10
+ 478   2              lis2dh_CTRL_REG5_value |=  (0x01 << 6); // lis2dh_CTRL_REG5 bit 0x40 FIFO_EN = 1
+ 479   2              //
+ 480   2              // TODO1: (Firmware 2015-04-26) OS24EVK-66 OS24EVK-83 enable LIS2DH interrupt INT1: EX1 = 1
+ 481   2              // TODO1: (Firmware 2015-04-26) OS24EVK-66 OS24EVK-83 configure LIS2DH interrupt source
+ 482   2              //
+ 483   2      #if 0 // TODO1: (Firmware 2015-04-26) OS24EVK-66 OS24EVK-83 configure LIS2DH interrupt source
+                      lis2dh_CTRL_REG1_value |=  (0x07 << 0); // lis2dh_CTRL_REG1 Zen = 1, Yen = 1, Xen = 1
+              #endif // TODO1: (Firmware 2015-04-26) OS24EVK-66 OS24EVK-83 configure LIS2DH
+ 486   2      #if 0 // TODO1: (Firmware 2015-04-26) OS24EVK-66 OS24EVK-83 configure LIS2DH
+                      lis2dh_CTRL_REG2_value |=  (0x01 << 0); // lis2dh_CTRL_REG2 HPIS1 = 1
+              #endif // TODO1: (Firmware 2015-04-26) OS24EVK-66 OS24EVK-83 configure LIS2DH
+ 489   2              lis2dh_CTRL_REG3_value |=  (0x01 << 2); // lis2dh_CTRL_REG3 bit 0x04 I1_WTM should be 1 to enable 
+             -FIFO Watermark interrupt on INT1 pin.
+ 490   2              lis2dh_CTRL_REG3_value |=  (0x01 << 1); // lis2dh_CTRL_REG3 bit 0x02 I1_OVERRUN should be 1 to ena
+             -ble FIFO Overrun interrupt on INT1 pin.
+ 491   2              //
+ 492   2              lis2dh_CTRL_REG5_value |=  (0x01 << 3); // lis2dh_CTRL_REG5 bit 0x08 LIR_INT1 Latch Interrupt; cle
+             -ar INT by reading INT1_SRC register
+ 493   2      #if 0 // TODO1: (Firmware 2015-04-26) OS24EVK-66 OS24EVK-83 configure LIS2DH
+                      lis2dh_CTRL_REG5_value |=  (0x01 << 0); // lis2dh_CTRL_REG5 D4D_INT2
+              #endif // TODO1: (Firmware 2015-04-26) OS24EVK-66 OS24EVK-83 configure LIS2DH
+ 496   2              //
+ 497   2      #if 0 // TODO1: (Firmware 2015-04-26) OS24EVK-66 OS24EVK-83 configure LIS2DH
+                      //~ lis2dh_CTRL_REG6_value |=  (0x01 << 1); // lis2dh_CTRL_REG6 bit 0x02 H_LACTIVE interrupt activ
+             -e low
+              #endif // TODO1: (Firmware 2015-04-26) OS24EVK-66 OS24EVK-83 configure LIS2DH
+ 500   2      #if 0 // TODO1: (Firmware 2015-04-26) OS24EVK-66 OS24EVK-83 configure LIS2DH
+                      //~ lis2dh_CTRL_REG6_value |=  (0x01 << 5); // lis2dh_CTRL_REG6 I2_INT2
+              #endif // TODO1: (Firmware 2015-04-26) OS24EVK-66 OS24EVK-83 configure LIS2DH
+ 503   2      #if 0 // TODO1: (Firmware 2015-04-26) OS24EVK-66 OS24EVK-83 configure LIS2DH
+                      lis2dh_INT1_CFG_value = 0x7f; // 6 direction movement recognition
+                      lis2dh_INT1_THS_value = 0x04;
+                      lis2dh_INT1_DURATION_value = 0x00;
+              #endif // TODO1: (Firmware 2015-04-26) OS24EVK-66 OS24EVK-83 configure LIS2DH
+ 508   2              //
+ 509   2              break;
+ 510   2          case 3:
+ 511   2              // Trigger Mode: lis2dh_FIFO_CTRL_REG FM1:FM0 = 10
+ 512   2              lis2dh_FIFO_CTRL_REG_value &=~ (0x03 << 6); // lis2dh_CTRL_REG4 FM1:FM0
+C51 COMPILER V9.51   LIS2DH                                                                06/26/2015 13:32:25 PAGE 10  
+
+ 513   2              lis2dh_FIFO_CTRL_REG_value |=  (0x03 << 6); // lis2dh_CTRL_REG4 FM1:FM0 = 11
+ 514   2              lis2dh_CTRL_REG5_value |=  (0x01 << 6); // lis2dh_CTRL_REG5 bit 0x40 FIFO_EN = 1
+ 515   2              break;
+ 516   2          default:
+ 517   2              return 0; // failure; invalid configuration
+ 518   2          }
+ 519   1          //
+ 520   1          // FIFO TR bit (??)
+ 521   1          lis2dh_FIFO_CTRL_REG_value &=~ (  0x01 << 5); // lis2dh_CTRL_REG4 TR
+ 522   1          lis2dh_FIFO_CTRL_REG_value |=  ( (fifoTR & 0x01) << 5); // lis2dh_CTRL_REG4 TR
+ 523   1          //
+ 524   1          // FIFO watermark level (valid in fifoModeFM10 1 and 3)
+ 525   1          lis2dh_FIFO_CTRL_REG_value &=~ ( 0x1F << 0); // lis2dh_CTRL_REG4 FTH4:FTH0
+ 526   1          lis2dh_FIFO_CTRL_REG_value |=  ( (fifoWatermarkLevelFTH40 & 0x1F) << 0); // lis2dh_CTRL_REG4 FTH4:FTH0
+ 527   1          //
+ 528   1      #if 0 // TODO1: (Firmware 2015-04-26) OS24EVK-66 OS24EVK-83 configure LIS2DH
+                  lis2dh_RegWrite(lis2dh_CTRL_REG1, lis2dh_CTRL_REG1_value); // lis2dh_CTRL_REG1 Zen = 1, Yen = 1, Xen =
+             - 1
+              #endif // TODO1: (Firmware 2015-04-26) OS24EVK-66 OS24EVK-83 configure LIS2DH
+ 531   1      #if 0 // TODO1: (Firmware 2015-04-26) OS24EVK-66 OS24EVK-83 configure LIS2DH
+                  lis2dh_RegWrite(lis2dh_CTRL_REG2, lis2dh_CTRL_REG2_value); // lis2dh_CTRL_REG2 HPIS1 = 1
+              #endif // TODO1: (Firmware 2015-04-26) OS24EVK-66 OS24EVK-83 configure LIS2DH
+ 534   1          lis2dh_RegWrite(lis2dh_CTRL_REG3, lis2dh_CTRL_REG3_value);
+ 535   1          //~ lis2dh_RegWrite(lis2dh_CTRL_REG4, lis2dh_CTRL_REG4_value);
+ 536   1          lis2dh_RegWrite(lis2dh_CTRL_REG5, lis2dh_CTRL_REG5_value);
+ 537   1      #if 0 // TODO1: (Firmware 2015-04-26) OS24EVK-66 OS24EVK-83 configure LIS2DH
+                  //~ lis2dh_RegWrite(lis2dh_CTRL_REG6, lis2dh_CTRL_REG6_value); // lis2dh_CTRL_REG6 I2_INT2 H_LACTIVE
+              #endif // TODO1: (Firmware 2015-04-26) OS24EVK-66 OS24EVK-83 configure LIS2DH
+ 540   1          lis2dh_RegWrite(lis2dh_FIFO_CTRL_REG, lis2dh_FIFO_CTRL_REG_value);
+ 541   1      #if 0 // TODO1: (Firmware 2015-04-26) OS24EVK-66 OS24EVK-83 configure LIS2DH
+                  lis2dh_RegWrite(lis2dh_INT1_CFG, lis2dh_INT1_CFG_value); // 6 direction movement recognition
+                  //~ lis2dh_RegWrite(lis2dh_INT1_SOURCE, lis2dh_INT1_SOURCE_value);
+                  lis2dh_RegWrite(lis2dh_INT1_THS, lis2dh_INT1_THS_value);
+                  lis2dh_RegWrite(lis2dh_INT1_DURATION, lis2dh_INT1_DURATION_value);
+              #endif // TODO1: (Firmware 2015-04-26) OS24EVK-66 OS24EVK-83 configure LIS2DH
+ 547   1          //
+ 548   1          return 1; // success
+ 549   1      }
+ 550          #endif // SUPPORT_LIS2DH
+ 551          
+ 552          // OS24EVK-66 LIS2DH Accelerometer Present?
+ 553          // @post gLIS2DHdeviceAddress = 0 if Accelerometer not connected,
+ 554          //       gLIS2DHdeviceAddress = Accelerometer device address if present
+ 555          #if SUPPORT_LIS2DH
+ 556          void lis2dh_open()
+ 557          {
+ 558   1         // OS24EVK-66 Init: lis2dh_open() Search LIS2DH device address 0x30, 0x32 gLIS2DHdeviceAddress
+ 559   1         //
+ 560   1         int8_t i2cAddressIndex;
+ 561   1         int8_t DeviceID_regAddr;
+ 562   1         int8_t DeviceID_expect;
+ 563   1         int8_t DeviceID_actual;
+ 564   1         //
+ 565   1         // C not C++, so all local variables must be declared before any statements
+ 566   1         //
+ 567   1         // loop through list of deviceAddress to search
+ 568   1         // static uint8_t searchMAX30101deviceAddressList[] = {0xAE, 0};
+ 569   1         //
+ 570   1         // // example: lis2dh_RegRead NACK status
+ 571   1         // gLIS2DHdeviceAddress = 0x44; // MAX30101 0xAE
+ 572   1         //    DeviceID_regAddr = 0xFF; // MAX30101 register DeviceId (constant 0x15) Device identification regi
+             -ster.
+C51 COMPILER V9.51   LIS2DH                                                                06/26/2015 13:32:25 PAGE 11  
+
+ 573   1         //    DeviceID_expect = 0x15;
+ 574   1         //    DeviceID_actual = lis2dh_RegRead(DeviceID_regAddr, 0); // MAX30101
+ 575   1         //
+ 576   1         // // example: lis2dh_RegRead NACK status
+ 577   1         // gLIS2DHdeviceAddress = 0xAE; // MAX30101 0xAE
+ 578   1         //    DeviceID_regAddr = 0xFF; // MAX30101 register DeviceId (constant 0x15) Device identification regi
+             -ster.
+ 579   1         //    DeviceID_expect = 0x15;
+ 580   1         //    DeviceID_actual = lis2dh_RegRead(DeviceID_regAddr, 0); // MAX30101
+ 581   1         //
+ 582   1         // // example: lis2dh_RegRead NACK status
+ 583   1         // gLIS2DHdeviceAddress = 0x32; // LIS2DH
+ 584   1         //    DeviceID_regAddr = 0x0F; // LIS2DH register WHO_AM_I (constant 0x33) Device identification regist
+             -er.
+ 585   1         //    DeviceID_expect = 0x33;
+ 586   1         //    DeviceID_actual = lis2dh_RegRead(DeviceID_regAddr, 0); // MAX30101
+ 587   1         //
+ 588   1         // Search the i2c address list for possible devices
+ 589   1         for (i2cAddressIndex = 0; searchLIS2DHdeviceAddressList[i2cAddressIndex] != 0; i2cAddressIndex++)
+ 590   1         {
+ 591   2            gLIS2DHdeviceAddress = searchLIS2DHdeviceAddressList[i2cAddressIndex];
+ 592   2            //
+ 593   2            //~ blockArr[5] = DeviceID_regAddr;
+ 594   2            //~ i2c_read(gLIS2DHdeviceAddress & 0xFE, blockArr, 1, 1);        
+ 595   2            //        blockArr[2+0] = value read from Device Register
+ 596   2            //
+ 597   2            DeviceID_regAddr = lis2dh_WHO_AM_I; // 0x0F; // LIS2DH register WHO_AM_I (constant 0x33) Device iden
+             -tification register.
+ 598   2            DeviceID_expect = 0x33;
+ 599   2            // DeviceID_actual = lis2dh_RegRead(DeviceID_regAddr, 0);
+ 600   2            if (lis2dh_RegRead(DeviceID_regAddr, &DeviceID_actual) < 0) {
+ 601   3               // typically for NACK, errno=5 and return value = -1
+ 602   3               //~ flash_Led1Led2_Blink();
+ 603   3               //~ flash_Led1Led2_East();
+ 604   3               continue;
+ 605   3            } else if ((DeviceID_actual & 0xFF) != (DeviceID_expect & 0xFF)) {
+ 606   3               //~ printf("\n""lis2dh_open(): i2c address 0x%2.2X (8-bit 0x%2.2X) ACK"
+ 607   3               //~ "\n""                but reg 0x%2.2X %s=0x%2.2X not 0x%2.2X so wrong device",
+ 608   3               //~ global_lis2dh_device_data.i2cDeviceAddress7bits,
+ 609   3               //~ global_lis2dh_device_data.i2cDeviceAddress7bits * 2,
+ 610   3               //~ (DeviceID_regAddr & 0xFF),
+ 611   3               //~ lis2dh_RegisterAddressName((uint8_t)DeviceID_regAddr, 0, 0),
+ 612   3               //~ (DeviceID_actual & 0xFF),
+ 613   3               //~ (DeviceID_expect & 0xFF)
+ 614   3               //~ );
+ 615   3               //~ flash_Led1Led2_Blink();
+ 616   3               //~ flash_Led1Led2_Blink();
+ 617   3               //~ flash_Led1Led2_East();
+ 618   3               continue;
+ 619   3            } else {
+ 620   3               //~ printf("\n""lis2dh_open(): i2c address 0x%2.2X (8-bit 0x%2.2X) ACK; %s=0x%2.2X OK",
+ 621   3               //~ global_lis2dh_device_data.i2cDeviceAddress7bits,
+ 622   3               //~ global_lis2dh_device_data.i2cDeviceAddress7bits * 2,
+ 623   3               //~ lis2dh_RegisterAddressName((uint8_t)DeviceID_regAddr, 0, 0),
+ 624   3               //~ (DeviceID_actual & 0xFF)
+ 625   3               //~ );
+ 626   3               //
+ 627   3               // OS24EVK-66 Init: if LIS2DH present, initialize INT1 Active-Low by writing 0x25 CTRL_REG6 bit 0
+             -x02 H_LACTIVE=1
+ 628   3               lis2dh_RegWrite(lis2dh_CTRL_REG6, 0x02); //!< I2_CLICKen I2_INT1 I2_INT2 BOOT_I2 P2_ACT -- -- H_L
+             -ACTIVE --
+ 629   3               // lis2dh_open() is the only place we write lis2dh_CTRL_REG6.
+C51 COMPILER V9.51   LIS2DH                                                                06/26/2015 13:32:25 PAGE 12  
+
+ 630   3               //
+ 631   3               lis2dh_configure_outputDataRateHz(100);
+ 632   3               lis2dh_configure_resolutionBits(12);
+ 633   3               //~ lis2dh_configure_selfTest(0);
+ 634   3               //
+ 635   3               // TODO1: OS24EVK-66 Configure LIS2DH to enable FIFO buffer (get out of "bypass mode")
+ 636   3               //
+ 637   3               // Block data update. Default value: 0
+ 638   3               // (0: continuos update; 1: output registers not updated until MSB and LSB have
+ 639   3               // been read)
+ 640   3               lis2dh_configure_BDU( /* int16_t bduBlockDataUpdate */ 1);
+ 641   3               //
+ 642   3               // In bypass mode, the FIFO is not operational and for this reason it remains empty. As
+ 643   3               // described in the next figure, for each channel only the first address is used. The remaining
+ 644   3               // FIFO slots are empty.
+ 645   3               lis2dh_configure_FIFO(/* fifoModeFM10 0:Bypass */ 0, /* fifoTR */ 0, /* fifoWatermarkLevelFTH40 *
+             -/ 0);
+ 646   3               //
+ 647   3               // In FIFO mode, data from X, Y and Z channels are stored into the FIFO. A watermark
+ 648   3               // interrupt can be enabled (FIFO_WTMK_EN bit into FIFO_CTRL_REG (2E) in order to be
+ 649   3               // raised when the FIFO is filled to the level specified into the FIFO_WTMK_LEVEL bits of
+ 650   3               // FIFO_CTRL_REG (2E). The FIFO continues filling until it is full (32 slots of data for X, Y and
+ 651   3               // Z). When full, the FIFO stops collecting data from the input channels.
+ 652   3      #if 0 // OS24EVK-66 ISR Poll for 0x27 STATUS_REG2 bit 0x08 ZYXDA      
+                       lis2dh_configure_FIFO(/* fifoModeFM10 1:FIFO mode */ 1, /* fifoTR */ 0, /* fifoWatermarkLevelFTH4
+             -0 */ 0);
+              #endif // OS24EVK-66 ISR Poll for 0x27 STATUS_REG2 bit 0x08 ZYXDA      
+ 655   3               //
+ 656   3               // In the stream mode, data from X, Y and Z measurement are stored into the FIFO. A
+ 657   3               // watermark interrupt can be enabled and set as in the FIFO mode.The FIFO continues filling
+ 658   3               // until it’s full (32 slots of data for X, Y and Z). When full, the FIFO discards the older data
+             - as
+ 659   3               // the new arrive.
+ 660   3               //~ lis2dh_configure_FIFO(/* fifoModeFM10 2:Stream mode */ 2, /* fifoTR */ 0, /* fifoWatermarkLev
+             -elFTH40 */ 0);
+ 661   3               //
+ 662   3               // In Stream-to_FIFO mode, data from X, Y and Z measurement are stored into the FIFO. A
+ 663   3               // watermark interrupt can be enabled (FIFO_WTMK_EN bit into FIFO_CTRL_REG) in order
+ 664   3               // to be raised when the FIFO is filled to the level specified into the FIFO_WTMK_LEVEL bits
+ 665   3               // of FIFO_CTRL_REG. The FIFO continues filling until it’s full (32 slots of 10 bit for for X, Y
+ 666   3               // and Z). When full, the FIFO discards the older data as the new arrive. Once trigger event
+ 667   3               // occurs, the FIFO starts operating in FIFO mode.
+ 668   3               //~ lis2dh_configure_FIFO(/* fifoModeFM10 3:Trigger mode */ 3, /* fifoTR */ 0, /* fifoWatermarkLe
+             -velFTH40 */ 0);
+ 669   3               //
+ 670   3               // TODO1: OS24EVK-66 Configure LIS2DH to issue FIFO watermark interrupt
+ 671   3               //
+ 672   3               //~ flash_Led1Led2_Blink();
+ 673   3               //~ flash_Led1Led2_Blink();
+ 674   3               //~ flash_Led1Led2_Blink();
+ 675   3               //~ flash_Led1Led2_East();
+ 676   3               return; //  1; // success
+ 677   3            }
+ 678   2         }
+ 679   1         gLIS2DHdeviceAddress = 0; // LIS2DH not found
+ 680   1      }
+ 681          #endif // SUPPORT_LIS2DH
+C51 COMPILER V9.51   LIS2DH                                                                06/26/2015 13:32:25 PAGE 13  
+
+ASSEMBLY LISTING OF GENERATED OBJECT CODE
+
+
+             ; FUNCTION _lis2dh_RegRead (BEGIN)
+                                           ; SOURCE LINE # 74
+;---- Variable 'pRegValue' assigned to Register 'R1/R2/R3' ----
+;---- Variable 'regAddress' assigned to Register 'R6' ----
+0000 AE07              MOV     R6,AR7
+                                           ; SOURCE LINE # 75
+                                           ; SOURCE LINE # 76
+0002 900000      R     MOV     DPTR,#gLIS2DHdeviceAddress
+0005 E0                MOVX    A,@DPTR
+0006 FF                MOV     R7,A
+0007 AD06              MOV     R5,AR6
+0009 120000      E     LCALL   _i2c_smbus_read_byte_data
+                                           ; SOURCE LINE # 77
+000C         ?C0001:
+000C 22                RET     
+             ; FUNCTION _lis2dh_RegRead (END)
+
+             ; FUNCTION _lis2dh_RegWrite (BEGIN)
+                                           ; SOURCE LINE # 82
+;---- Variable 'regValue' assigned to Register 'R6' ----
+0000 AE05              MOV     R6,AR5
+;---- Variable 'regAddress' assigned to Register 'R5' ----
+0002 AD07              MOV     R5,AR7
+                                           ; SOURCE LINE # 83
+                                           ; SOURCE LINE # 84
+0004 900000      R     MOV     DPTR,#gLIS2DHdeviceAddress
+0007 E0                MOVX    A,@DPTR
+0008 FF                MOV     R7,A
+0009 AB06              MOV     R3,AR6
+000B 120000      E     LCALL   _i2c_smbus_write_byte_data
+                                           ; SOURCE LINE # 85
+000E         ?C0002:
+000E 22                RET     
+             ; FUNCTION _lis2dh_RegWrite (END)
+
+             ; FUNCTION L?0056 (BEGIN)
+0000 E0                MOVX    A,@DPTR
+0001 FB                MOV     R3,A
+0002 A3                INC     DPTR
+0003 E0                MOVX    A,@DPTR
+0004 FA                MOV     R2,A
+0005 A3                INC     DPTR
+0006 E0                MOVX    A,@DPTR
+0007 F9                MOV     R1,A
+             ; FUNCTION _lis2dh_Read_16Bit (BEGIN)
+                                           ; SOURCE LINE # 90
+0008 900000      R     MOV     DPTR,#regAddress_L
+000B EF                MOV     A,R7
+000C F0                MOVX    @DPTR,A
+000D A3                INC     DPTR
+000E ED                MOV     A,R5
+000F F0                MOVX    @DPTR,A
+0010 A3                INC     DPTR
+0011 EB                MOV     A,R3
+0012 F0                MOVX    @DPTR,A
+0013 A3                INC     DPTR
+0014 EA                MOV     A,R2
+0015 F0                MOVX    @DPTR,A
+0016 A3                INC     DPTR
+C51 COMPILER V9.51   LIS2DH                                                                06/26/2015 13:32:25 PAGE 14  
+
+0017 E9                MOV     A,R1
+0018 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 91
+                                           ; SOURCE LINE # 93
+0019 E4                CLR     A
+001A A3                INC     DPTR
+001B F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 94
+001C A3                INC     DPTR
+001D F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 95
+;---- Variable 'regValue_HL' assigned to Register 'R6/R7' ----
+001E FF                MOV     R7,A
+001F FE                MOV     R6,A
+                                           ; SOURCE LINE # 99
+0020 900000      R     MOV     DPTR,#gLIS2DHdeviceAddress
+0023 E0                MOVX    A,@DPTR
+0024 7001              JNZ     ?C0003
+                                           ; SOURCE LINE # 100
+0026 22                RET     
+                                           ; SOURCE LINE # 101
+0027         ?C0003:
+                                           ; SOURCE LINE # 109
+0027 900000      R     MOV     DPTR,#regAddress_H
+002A E0                MOVX    A,@DPTR
+002B FF                MOV     R7,A
+002C 7B01              MOV     R3,#01H
+002E 7A00        R     MOV     R2,#HIGH regValue_H
+0030 7900        R     MOV     R1,#LOW regValue_H
+0032 120000      R     LCALL   _lis2dh_RegRead
+                                           ; SOURCE LINE # 110
+0035 900000      R     MOV     DPTR,#regAddress_L
+0038 E0                MOVX    A,@DPTR
+0039 FF                MOV     R7,A
+003A 7B01              MOV     R3,#01H
+003C 7A00        R     MOV     R2,#HIGH regValue_L
+003E 7900        R     MOV     R1,#LOW regValue_L
+0040 120000      R     LCALL   _lis2dh_RegRead
+                                           ; SOURCE LINE # 111
+0043 900000      R     MOV     DPTR,#regValue_H
+0046 E0                MOVX    A,@DPTR
+0047 FE                MOV     R6,A
+0048 900000      R     MOV     DPTR,#regValue_L
+004B E0                MOVX    A,@DPTR
+004C FD                MOV     R5,A
+004D ED                MOV     A,R5
+004E FF                MOV     R7,A
+                                           ; SOURCE LINE # 114
+004F 900000      R     MOV     DPTR,#resultPtr
+0052 E0                MOVX    A,@DPTR
+0053 FB                MOV     R3,A
+0054 A3                INC     DPTR
+0055 E0                MOVX    A,@DPTR
+0056 FA                MOV     R2,A
+0057 A3                INC     DPTR
+0058 E0                MOVX    A,@DPTR
+0059 F9                MOV     R1,A
+005A 4A                ORL     A,R2
+005B 6006              JZ      ?C0005
+                                           ; SOURCE LINE # 115
+005D EE                MOV     A,R6
+005E 8FF0              MOV     B,R7
+C51 COMPILER V9.51   LIS2DH                                                                06/26/2015 13:32:25 PAGE 15  
+
+0060 120000      E     LCALL   ?C?ISTPTR
+                                           ; SOURCE LINE # 116
+0063         ?C0005:
+                                           ; SOURCE LINE # 117
+                                           ; SOURCE LINE # 118
+0063         ?C0004:
+0063 22                RET     
+             ; FUNCTION _lis2dh_Read_16Bit (END)
+
+             ; FUNCTION _lis2dh_Read_XYZ (BEGIN)
+                                           ; SOURCE LINE # 123
+;---- Variable 'XPtr' assigned to Register 'R1/R2/R3' ----
+                                           ; SOURCE LINE # 124
+                                           ; SOURCE LINE # 129
+0000 900000      R     MOV     DPTR,#gLIS2DHdeviceAddress
+0003 E0                MOVX    A,@DPTR
+0004 601B              JZ      ?C0007
+                                           ; SOURCE LINE # 131
+0006         ?C0006:
+                                           ; SOURCE LINE # 142
+0006 7D29              MOV     R5,#029H
+0008 7F28              MOV     R7,#028H
+000A 120000      R     LCALL   _lis2dh_Read_16Bit
+                                           ; SOURCE LINE # 143
+000D 900000      R     MOV     DPTR,#YPtr
+0010 7D2B              MOV     R5,#02BH
+0012 7F2A              MOV     R7,#02AH
+0014 120000      R     LCALL   L?0056
+                                           ; SOURCE LINE # 144
+0017 900000      R     MOV     DPTR,#ZPtr
+001A 7D2D              MOV     R5,#02DH
+001C 7F2C              MOV     R7,#02CH
+001E 120000      R     LCALL   L?0056
+                                           ; SOURCE LINE # 146
+0021         ?C0007:
+0021 22                RET     
+             ; FUNCTION _lis2dh_Read_XYZ (END)
+
+             ; FUNCTION _lis2dh_configure_outputDataRateHz (BEGIN)
+                                           ; SOURCE LINE # 150
+0000 900000      R     MOV     DPTR,#outputDataRateHz
+0003 EE                MOV     A,R6
+0004 F0                MOVX    @DPTR,A
+0005 A3                INC     DPTR
+0006 EF                MOV     A,R7
+0007 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 151
+                                           ; SOURCE LINE # 152
+0008 E4                CLR     A
+0009 A3                INC     DPTR
+000A F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 161
+000B 900000      R     MOV     DPTR,#gLIS2DHdeviceAddress
+000E E0                MOVX    A,@DPTR
+000F 7002              JNZ     ?C0008
+                                           ; SOURCE LINE # 162
+0011 FF                MOV     R7,A
+0012 22                RET     
+                                           ; SOURCE LINE # 163
+0013         ?C0008:
+                                           ; SOURCE LINE # 165
+0013 7B01              MOV     R3,#01H
+C51 COMPILER V9.51   LIS2DH                                                                06/26/2015 13:32:25 PAGE 16  
+
+0015 7A00        R     MOV     R2,#HIGH lis2dh_CTRL_REG1_value
+0017 7900        R     MOV     R1,#LOW lis2dh_CTRL_REG1_value
+0019 7F20              MOV     R7,#020H
+001B 120000      R     LCALL   _lis2dh_RegRead
+                                           ; SOURCE LINE # 172
+001E 900000      R     MOV     DPTR,#outputDataRateHz
+0021 E0                MOVX    A,@DPTR
+0022 FE                MOV     R6,A
+0023 A3                INC     DPTR
+0024 E0                MOVX    A,@DPTR
+0025 8EF0              MOV     B,R6
+0027 120000      E     LCALL   ?C?ICASE
+002A 0000        R     DW      ?C0011
+002C 0000              DW      00H
+002E 0000        R     DW      ?C0012
+0030 0001              DW      01H
+0032 0000        R     DW      ?C0013
+0034 000A              DW      0AH
+0036 0000        R     DW      ?C0014
+0038 0019              DW      019H
+003A 0000        R     DW      ?C0015
+003C 0032              DW      032H
+003E 0000        R     DW      ?C0016
+0040 0064              DW      064H
+0042 0000        R     DW      ?C0017
+0044 00C8              DW      0C8H
+0046 0000        R     DW      ?C0018
+0048 0190              DW      0190H
+004A 0000        R     DW      ?C0020
+004C 0540              DW      0540H
+004E 0000        R     DW      ?C0019
+0050 0654              DW      0654H
+0052 0000        R     DW      ?C0020
+0054 1500              DW      01500H
+0056 0000              DW      00H
+0058 0000        R     DW      ?C0022
+                                           ; SOURCE LINE # 173
+                                           ; SOURCE LINE # 174
+005A         ?C0011:
+                                           ; SOURCE LINE # 176
+005A 900000      R     MOV     DPTR,#lis2dh_CTRL_REG1_value
+005D E0                MOVX    A,@DPTR
+005E 540F              ANL     A,#0FH
+0060 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 177
+0061 E0                MOVX    A,@DPTR
+0062 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 178
+0063 8078              SJMP    ?C0010
+                                           ; SOURCE LINE # 179
+0065         ?C0012:
+                                           ; SOURCE LINE # 181
+0065 900000      R     MOV     DPTR,#lis2dh_CTRL_REG1_value
+0068 E0                MOVX    A,@DPTR
+0069 540F              ANL     A,#0FH
+006B F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 182
+006C E0                MOVX    A,@DPTR
+006D 4410              ORL     A,#010H
+006F F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 183
+0070 806B              SJMP    ?C0010
+C51 COMPILER V9.51   LIS2DH                                                                06/26/2015 13:32:25 PAGE 17  
+
+                                           ; SOURCE LINE # 184
+0072         ?C0013:
+                                           ; SOURCE LINE # 186
+0072 900000      R     MOV     DPTR,#lis2dh_CTRL_REG1_value
+0075 E0                MOVX    A,@DPTR
+0076 540F              ANL     A,#0FH
+0078 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 187
+0079 E0                MOVX    A,@DPTR
+007A 4420              ORL     A,#020H
+007C F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 188
+007D 805E              SJMP    ?C0010
+                                           ; SOURCE LINE # 189
+007F         ?C0014:
+                                           ; SOURCE LINE # 191
+007F 900000      R     MOV     DPTR,#lis2dh_CTRL_REG1_value
+0082 E0                MOVX    A,@DPTR
+0083 540F              ANL     A,#0FH
+0085 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 192
+0086 E0                MOVX    A,@DPTR
+0087 4430              ORL     A,#030H
+0089 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 193
+008A 8051              SJMP    ?C0010
+                                           ; SOURCE LINE # 194
+008C         ?C0015:
+                                           ; SOURCE LINE # 196
+008C 900000      R     MOV     DPTR,#lis2dh_CTRL_REG1_value
+008F E0                MOVX    A,@DPTR
+0090 540F              ANL     A,#0FH
+0092 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 197
+0093 E0                MOVX    A,@DPTR
+0094 4440              ORL     A,#040H
+0096 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 198
+0097 8044              SJMP    ?C0010
+                                           ; SOURCE LINE # 199
+0099         ?C0016:
+                                           ; SOURCE LINE # 201
+0099 900000      R     MOV     DPTR,#lis2dh_CTRL_REG1_value
+009C E0                MOVX    A,@DPTR
+009D 540F              ANL     A,#0FH
+009F F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 202
+00A0 E0                MOVX    A,@DPTR
+00A1 4450              ORL     A,#050H
+00A3 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 203
+00A4 8037              SJMP    ?C0010
+                                           ; SOURCE LINE # 204
+00A6         ?C0017:
+                                           ; SOURCE LINE # 206
+00A6 900000      R     MOV     DPTR,#lis2dh_CTRL_REG1_value
+00A9 E0                MOVX    A,@DPTR
+00AA 540F              ANL     A,#0FH
+00AC F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 207
+00AD E0                MOVX    A,@DPTR
+00AE 4460              ORL     A,#060H
+C51 COMPILER V9.51   LIS2DH                                                                06/26/2015 13:32:25 PAGE 18  
+
+00B0 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 208
+00B1 802A              SJMP    ?C0010
+                                           ; SOURCE LINE # 209
+00B3         ?C0018:
+                                           ; SOURCE LINE # 211
+00B3 900000      R     MOV     DPTR,#lis2dh_CTRL_REG1_value
+00B6 E0                MOVX    A,@DPTR
+00B7 540F              ANL     A,#0FH
+00B9 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 212
+00BA E0                MOVX    A,@DPTR
+00BB 4470              ORL     A,#070H
+00BD F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 213
+00BE 801D              SJMP    ?C0010
+                                           ; SOURCE LINE # 214
+00C0         ?C0019:
+                                           ; SOURCE LINE # 216
+00C0 900000      R     MOV     DPTR,#lis2dh_CTRL_REG1_value
+00C3 E0                MOVX    A,@DPTR
+00C4 540F              ANL     A,#0FH
+00C6 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 217
+00C7 E0                MOVX    A,@DPTR
+00C8 4480              ORL     A,#080H
+00CA F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 218
+00CB 8010              SJMP    ?C0010
+                                           ; SOURCE LINE # 219
+00CD         ?C0020:
+                                           ; SOURCE LINE # 221
+                                           ; SOURCE LINE # 222
+                                           ; SOURCE LINE # 223
+                                           ; SOURCE LINE # 224
+00CD         ?C0053:
+00CD 900000      R     MOV     DPTR,#lis2dh_CTRL_REG1_value
+00D0 E0                MOVX    A,@DPTR
+00D1 540F              ANL     A,#0FH
+00D3 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 227
+00D4 E0                MOVX    A,@DPTR
+00D5 4490              ORL     A,#090H
+00D7 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 228
+00D8 8003              SJMP    ?C0010
+                                           ; SOURCE LINE # 229
+00DA         ?C0022:
+                                           ; SOURCE LINE # 230
+00DA 7F00              MOV     R7,#00H
+00DC 22                RET     
+                                           ; SOURCE LINE # 231
+00DD         ?C0010:
+                                           ; SOURCE LINE # 233
+00DD 900000      R     MOV     DPTR,#lis2dh_CTRL_REG1_value
+00E0 E0                MOVX    A,@DPTR
+00E1 FD                MOV     R5,A
+00E2 7F20              MOV     R7,#020H
+00E4 120000      R     LCALL   _lis2dh_RegWrite
+                                           ; SOURCE LINE # 240
+00E7 7F01              MOV     R7,#01H
+                                           ; SOURCE LINE # 241
+C51 COMPILER V9.51   LIS2DH                                                                06/26/2015 13:32:25 PAGE 19  
+
+00E9         ?C0009:
+00E9 22                RET     
+             ; FUNCTION _lis2dh_configure_outputDataRateHz (END)
+
+             ; FUNCTION _lis2dh_configure_resolutionBits (BEGIN)
+                                           ; SOURCE LINE # 245
+0000 900000      R     MOV     DPTR,#resolutionBits
+0003 EF                MOV     A,R7
+0004 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 246
+                                           ; SOURCE LINE # 247
+0005 E4                CLR     A
+0006 A3                INC     DPTR
+0007 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 250
+0008 A3                INC     DPTR
+0009 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 256
+000A 900000      R     MOV     DPTR,#gLIS2DHdeviceAddress
+000D E0                MOVX    A,@DPTR
+000E 7002              JNZ     ?C0023
+                                           ; SOURCE LINE # 257
+0010 FF                MOV     R7,A
+0011 22                RET     
+                                           ; SOURCE LINE # 258
+0012         ?C0023:
+                                           ; SOURCE LINE # 260
+0012 7B01              MOV     R3,#01H
+0014 7A00        R     MOV     R2,#HIGH lis2dh_CTRL_REG1_value
+0016 7900        R     MOV     R1,#LOW lis2dh_CTRL_REG1_value
+0018 7F20              MOV     R7,#020H
+001A 120000      R     LCALL   _lis2dh_RegRead
+                                           ; SOURCE LINE # 263
+001D 7B01              MOV     R3,#01H
+001F 7A00        R     MOV     R2,#HIGH lis2dh_CTRL_REG4_value
+0021 7900        R     MOV     R1,#LOW lis2dh_CTRL_REG4_value
+0023 7F23              MOV     R7,#023H
+0025 120000      R     LCALL   _lis2dh_RegRead
+                                           ; SOURCE LINE # 267
+0028 900000      R     MOV     DPTR,#resolutionBits
+002B E0                MOVX    A,@DPTR
+002C 24F8              ADD     A,#0F8H
+002E 601E              JZ      ?C0028
+0030 24FE              ADD     A,#0FEH
+0032 6012              JZ      ?C0027
+0034 24FE              ADD     A,#0FEH
+0036 7024              JNZ     ?C0029
+                                           ; SOURCE LINE # 268
+                                           ; SOURCE LINE # 269
+0038         ?C0026:
+                                           ; SOURCE LINE # 271
+0038 900000      R     MOV     DPTR,#lis2dh_CTRL_REG1_value
+003B E0                MOVX    A,@DPTR
+003C 54F7              ANL     A,#0F7H
+003E F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 272
+003F A3                INC     DPTR
+0040 E0                MOVX    A,@DPTR
+0041 4408              ORL     A,#08H
+0043 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 273
+0044 8019              SJMP    ?C0025
+C51 COMPILER V9.51   LIS2DH                                                                06/26/2015 13:32:25 PAGE 20  
+
+                                           ; SOURCE LINE # 274
+0046         ?C0027:
+                                           ; SOURCE LINE # 276
+0046 900000      R     MOV     DPTR,#lis2dh_CTRL_REG1_value
+0049 E0                MOVX    A,@DPTR
+004A 54F7              ANL     A,#0F7H
+                                           ; SOURCE LINE # 277
+                                           ; SOURCE LINE # 278
+004C 8006              SJMP    ?C0054
+                                           ; SOURCE LINE # 279
+004E         ?C0028:
+                                           ; SOURCE LINE # 281
+004E 900000      R     MOV     DPTR,#lis2dh_CTRL_REG1_value
+0051 E0                MOVX    A,@DPTR
+0052 4408              ORL     A,#08H
+0054         ?C0054:
+0054 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 282
+0055 A3                INC     DPTR
+0056 E0                MOVX    A,@DPTR
+0057 54F7              ANL     A,#0F7H
+0059 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 283
+005A 8003              SJMP    ?C0025
+                                           ; SOURCE LINE # 284
+005C         ?C0029:
+                                           ; SOURCE LINE # 285
+005C 7F00              MOV     R7,#00H
+005E 22                RET     
+                                           ; SOURCE LINE # 286
+005F         ?C0025:
+                                           ; SOURCE LINE # 288
+005F 900000      R     MOV     DPTR,#lis2dh_CTRL_REG1_value
+0062 E0                MOVX    A,@DPTR
+0063 FD                MOV     R5,A
+0064 7F20              MOV     R7,#020H
+0066 120000      R     LCALL   _lis2dh_RegWrite
+                                           ; SOURCE LINE # 291
+0069 900000      R     MOV     DPTR,#lis2dh_CTRL_REG4_value
+006C E0                MOVX    A,@DPTR
+006D FD                MOV     R5,A
+006E 7F23              MOV     R7,#023H
+0070 120000      R     LCALL   _lis2dh_RegWrite
+                                           ; SOURCE LINE # 295
+0073 7F01              MOV     R7,#01H
+                                           ; SOURCE LINE # 296
+0075         ?C0024:
+0075 22                RET     
+             ; FUNCTION _lis2dh_configure_resolutionBits (END)
+
+             ; FUNCTION _lis2dh_configure_BDU (BEGIN)
+                                           ; SOURCE LINE # 355
+0000 900000      R     MOV     DPTR,#bduBlockDataUpdate
+0003 EF                MOV     A,R7
+0004 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 356
+                                           ; SOURCE LINE # 360
+0005 E4                CLR     A
+0006 A3                INC     DPTR
+0007 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 366
+0008 900000      R     MOV     DPTR,#gLIS2DHdeviceAddress
+C51 COMPILER V9.51   LIS2DH                                                                06/26/2015 13:32:25 PAGE 21  
+
+000B E0                MOVX    A,@DPTR
+000C 7002              JNZ     ?C0030
+                                           ; SOURCE LINE # 367
+000E FF                MOV     R7,A
+000F 22                RET     
+                                           ; SOURCE LINE # 368
+0010         ?C0030:
+                                           ; SOURCE LINE # 373
+0010 7B01              MOV     R3,#01H
+0012 7A00        R     MOV     R2,#HIGH lis2dh_CTRL_REG4_value
+0014 7900        R     MOV     R1,#LOW lis2dh_CTRL_REG4_value
+0016 7F23              MOV     R7,#023H
+0018 120000      R     LCALL   _lis2dh_RegRead
+                                           ; SOURCE LINE # 377
+001B 900000      R     MOV     DPTR,#bduBlockDataUpdate
+001E E0                MOVX    A,@DPTR
+001F 14                DEC     A
+0020 600E              JZ      ?C0034
+0022 04                INC     A
+0023 7018              JNZ     ?C0035
+                                           ; SOURCE LINE # 378
+                                           ; SOURCE LINE # 379
+0025         ?C0033:
+                                           ; SOURCE LINE # 381
+0025 900000      R     MOV     DPTR,#lis2dh_CTRL_REG4_value
+0028 E0                MOVX    A,@DPTR
+0029 547F              ANL     A,#07FH
+002B F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 382
+002C E0                MOVX    A,@DPTR
+002D F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 383
+002E 8010              SJMP    ?C0032
+                                           ; SOURCE LINE # 384
+0030         ?C0034:
+                                           ; SOURCE LINE # 386
+0030 900000      R     MOV     DPTR,#lis2dh_CTRL_REG4_value
+0033 E0                MOVX    A,@DPTR
+0034 547F              ANL     A,#07FH
+0036 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 387
+0037 E0                MOVX    A,@DPTR
+0038 4480              ORL     A,#080H
+003A F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 388
+003B 8003              SJMP    ?C0032
+                                           ; SOURCE LINE # 389
+003D         ?C0035:
+                                           ; SOURCE LINE # 390
+003D 7F00              MOV     R7,#00H
+003F 22                RET     
+                                           ; SOURCE LINE # 391
+0040         ?C0032:
+                                           ; SOURCE LINE # 396
+0040 900000      R     MOV     DPTR,#lis2dh_CTRL_REG4_value
+0043 E0                MOVX    A,@DPTR
+0044 FD                MOV     R5,A
+0045 7F23              MOV     R7,#023H
+0047 120000      R     LCALL   _lis2dh_RegWrite
+                                           ; SOURCE LINE # 400
+004A 7F01              MOV     R7,#01H
+                                           ; SOURCE LINE # 401
+C51 COMPILER V9.51   LIS2DH                                                                06/26/2015 13:32:25 PAGE 22  
+
+004C         ?C0031:
+004C 22                RET     
+             ; FUNCTION _lis2dh_configure_BDU (END)
+
+             ; FUNCTION _lis2dh_configure_FIFO (BEGIN)
+                                           ; SOURCE LINE # 405
+0000 900000      R     MOV     DPTR,#fifoModeFM10
+0003 EF                MOV     A,R7
+0004 F0                MOVX    @DPTR,A
+0005 A3                INC     DPTR
+0006 ED                MOV     A,R5
+0007 F0                MOVX    @DPTR,A
+0008 A3                INC     DPTR
+0009 EB                MOV     A,R3
+000A F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 406
+                                           ; SOURCE LINE # 413
+000B E4                CLR     A
+000C A3                INC     DPTR
+000D F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 415
+000E A3                INC     DPTR
+000F F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 419
+0010 A3                INC     DPTR
+0011 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 430
+0012 900000      R     MOV     DPTR,#gLIS2DHdeviceAddress
+0015 E0                MOVX    A,@DPTR
+0016 7002              JNZ     ?C0036
+                                           ; SOURCE LINE # 431
+0018 FF                MOV     R7,A
+0019 22                RET     
+                                           ; SOURCE LINE # 432
+001A         ?C0036:
+                                           ; SOURCE LINE # 445
+001A 7B01              MOV     R3,#01H
+001C 7A00        R     MOV     R2,#HIGH lis2dh_CTRL_REG3_value
+001E 7900        R     MOV     R1,#LOW lis2dh_CTRL_REG3_value
+0020 7F22              MOV     R7,#022H
+0022 120000      R     LCALL   _lis2dh_RegRead
+                                           ; SOURCE LINE # 447
+0025 7B01              MOV     R3,#01H
+0027 7A00        R     MOV     R2,#HIGH lis2dh_CTRL_REG5_value
+0029 7900        R     MOV     R1,#LOW lis2dh_CTRL_REG5_value
+002B 7F24              MOV     R7,#024H
+002D 120000      R     LCALL   _lis2dh_RegRead
+                                           ; SOURCE LINE # 451
+0030 7B01              MOV     R3,#01H
+0032 7A00        R     MOV     R2,#HIGH lis2dh_FIFO_CTRL_REG_value
+0034 7900        R     MOV     R1,#LOW lis2dh_FIFO_CTRL_REG_value
+0036 7F2E              MOV     R7,#02EH
+0038 120000      R     LCALL   _lis2dh_RegRead
+                                           ; SOURCE LINE # 460
+003B 900000      R     MOV     DPTR,#fifoModeFM10
+003E E0                MOVX    A,@DPTR
+003F 14                DEC     A
+0040 601C              JZ      ?C0040
+0042 14                DEC     A
+0043 6025              JZ      ?C0041
+0045 14                DEC     A
+0046 6046              JZ      ?C0042
+C51 COMPILER V9.51   LIS2DH                                                                06/26/2015 13:32:25 PAGE 23  
+
+0048 2403              ADD     A,#03H
+004A 7056              JNZ     ?C0043
+                                           ; SOURCE LINE # 461
+                                           ; SOURCE LINE # 462
+004C         ?C0039:
+                                           ; SOURCE LINE # 464
+004C 900000      R     MOV     DPTR,#lis2dh_FIFO_CTRL_REG_value
+004F E0                MOVX    A,@DPTR
+0050 543F              ANL     A,#03FH
+0052 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 465
+0053 E0                MOVX    A,@DPTR
+0054 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 466
+0055 900000      R     MOV     DPTR,#lis2dh_CTRL_REG5_value
+0058 E0                MOVX    A,@DPTR
+0059 54BF              ANL     A,#0BFH
+005B F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 467
+005C 8047              SJMP    ?C0038
+                                           ; SOURCE LINE # 468
+005E         ?C0040:
+                                           ; SOURCE LINE # 470
+005E 900000      R     MOV     DPTR,#lis2dh_FIFO_CTRL_REG_value
+0061 E0                MOVX    A,@DPTR
+0062 543F              ANL     A,#03FH
+0064 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 471
+0065 E0                MOVX    A,@DPTR
+0066 4440              ORL     A,#040H
+                                           ; SOURCE LINE # 472
+                                           ; SOURCE LINE # 473
+0068 802E              SJMP    ?C0055
+                                           ; SOURCE LINE # 474
+006A         ?C0041:
+                                           ; SOURCE LINE # 476
+006A 900000      R     MOV     DPTR,#lis2dh_FIFO_CTRL_REG_value
+006D E0                MOVX    A,@DPTR
+006E 543F              ANL     A,#03FH
+0070 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 477
+0071 E0                MOVX    A,@DPTR
+0072 4480              ORL     A,#080H
+0074 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 478
+0075 900000      R     MOV     DPTR,#lis2dh_CTRL_REG5_value
+0078 E0                MOVX    A,@DPTR
+0079 4440              ORL     A,#040H
+007B F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 489
+007C 900000      R     MOV     DPTR,#lis2dh_CTRL_REG3_value
+007F E0                MOVX    A,@DPTR
+0080 4404              ORL     A,#04H
+0082 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 490
+0083 E0                MOVX    A,@DPTR
+0084 4402              ORL     A,#02H
+0086 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 492
+0087 A3                INC     DPTR
+0088 E0                MOVX    A,@DPTR
+0089 4408              ORL     A,#08H
+C51 COMPILER V9.51   LIS2DH                                                                06/26/2015 13:32:25 PAGE 24  
+
+008B F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 509
+008C 8017              SJMP    ?C0038
+                                           ; SOURCE LINE # 510
+008E         ?C0042:
+                                           ; SOURCE LINE # 512
+008E 900000      R     MOV     DPTR,#lis2dh_FIFO_CTRL_REG_value
+0091 E0                MOVX    A,@DPTR
+0092 543F              ANL     A,#03FH
+0094 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 513
+0095 E0                MOVX    A,@DPTR
+0096 44C0              ORL     A,#0C0H
+0098         ?C0055:
+0098 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 514
+0099 900000      R     MOV     DPTR,#lis2dh_CTRL_REG5_value
+009C E0                MOVX    A,@DPTR
+009D 4440              ORL     A,#040H
+009F F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 515
+00A0 8003              SJMP    ?C0038
+                                           ; SOURCE LINE # 516
+00A2         ?C0043:
+                                           ; SOURCE LINE # 517
+00A2 7F00              MOV     R7,#00H
+00A4 22                RET     
+                                           ; SOURCE LINE # 518
+00A5         ?C0038:
+                                           ; SOURCE LINE # 521
+00A5 900000      R     MOV     DPTR,#lis2dh_FIFO_CTRL_REG_value
+00A8 E0                MOVX    A,@DPTR
+00A9 54DF              ANL     A,#0DFH
+00AB F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 522
+00AC E0                MOVX    A,@DPTR
+00AD FF                MOV     R7,A
+00AE 900000      R     MOV     DPTR,#fifoTR
+00B1 E0                MOVX    A,@DPTR
+00B2 5401              ANL     A,#01H
+00B4 C4                SWAP    A
+00B5 33                RLC     A
+00B6 54E0              ANL     A,#0E0H
+00B8 FE                MOV     R6,A
+00B9 EF                MOV     A,R7
+00BA 4E                ORL     A,R6
+00BB 900000      R     MOV     DPTR,#lis2dh_FIFO_CTRL_REG_value
+00BE F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 525
+00BF E0                MOVX    A,@DPTR
+00C0 54E0              ANL     A,#0E0H
+00C2 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 526
+00C3 E0                MOVX    A,@DPTR
+00C4 FF                MOV     R7,A
+00C5 900000      R     MOV     DPTR,#fifoWatermarkLevelFTH40
+00C8 E0                MOVX    A,@DPTR
+00C9 541F              ANL     A,#01FH
+00CB FE                MOV     R6,A
+00CC EF                MOV     A,R7
+00CD 4E                ORL     A,R6
+00CE 900000      R     MOV     DPTR,#lis2dh_FIFO_CTRL_REG_value
+C51 COMPILER V9.51   LIS2DH                                                                06/26/2015 13:32:25 PAGE 25  
+
+00D1 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 534
+00D2 900000      R     MOV     DPTR,#lis2dh_CTRL_REG3_value
+00D5 E0                MOVX    A,@DPTR
+00D6 FD                MOV     R5,A
+00D7 7F22              MOV     R7,#022H
+00D9 120000      R     LCALL   _lis2dh_RegWrite
+                                           ; SOURCE LINE # 536
+00DC 900000      R     MOV     DPTR,#lis2dh_CTRL_REG5_value
+00DF E0                MOVX    A,@DPTR
+00E0 FD                MOV     R5,A
+00E1 7F24              MOV     R7,#024H
+00E3 120000      R     LCALL   _lis2dh_RegWrite
+                                           ; SOURCE LINE # 540
+00E6 900000      R     MOV     DPTR,#lis2dh_FIFO_CTRL_REG_value
+00E9 E0                MOVX    A,@DPTR
+00EA FD                MOV     R5,A
+00EB 7F2E              MOV     R7,#02EH
+00ED 120000      R     LCALL   _lis2dh_RegWrite
+                                           ; SOURCE LINE # 548
+00F0 7F01              MOV     R7,#01H
+                                           ; SOURCE LINE # 549
+00F2         ?C0037:
+00F2 22                RET     
+             ; FUNCTION _lis2dh_configure_FIFO (END)
+
+             ; FUNCTION lis2dh_open (BEGIN)
+                                           ; SOURCE LINE # 556
+                                           ; SOURCE LINE # 557
+                                           ; SOURCE LINE # 589
+0000 E4                CLR     A
+0001 900000      R     MOV     DPTR,#i2cAddressIndex
+0004 F0                MOVX    @DPTR,A
+0005         ?C0044:
+0005 900000      R     MOV     DPTR,#i2cAddressIndex
+0008 E0                MOVX    A,@DPTR
+0009 FF                MOV     R7,A
+000A 33                RLC     A
+000B 95E0              SUBB    A,ACC
+000D FE                MOV     R6,A
+000E 7400        R     MOV     A,#LOW searchLIS2DHdeviceAddressList
+0010 2F                ADD     A,R7
+0011 F582              MOV     DPL,A
+0013 7400        R     MOV     A,#HIGH searchLIS2DHdeviceAddressList
+0015 3E                ADDC    A,R6
+0016 F583              MOV     DPH,A
+0018 E4                CLR     A
+0019 93                MOVC    A,@A+DPTR
+001A 6055              JZ      ?C0045
+                                           ; SOURCE LINE # 590
+                                           ; SOURCE LINE # 591
+001C 900000      R     MOV     DPTR,#gLIS2DHdeviceAddress
+001F F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 597
+;---- Variable 'DeviceID_regAddr' assigned to Register 'R7' ----
+0020 7F0F              MOV     R7,#0FH
+                                           ; SOURCE LINE # 598
+0022 900000      R     MOV     DPTR,#DeviceID_expect
+0025 7433              MOV     A,#033H
+0027 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 600
+0028 7B01              MOV     R3,#01H
+C51 COMPILER V9.51   LIS2DH                                                                06/26/2015 13:32:25 PAGE 26  
+
+002A 7A00        R     MOV     R2,#HIGH DeviceID_actual
+002C 7900        R     MOV     R1,#LOW DeviceID_actual
+002E 120000      R     LCALL   _lis2dh_RegRead
+0031 C3                CLR     C
+0032 EF                MOV     A,R7
+0033 6480              XRL     A,#080H
+0035 9480              SUBB    A,#080H
+0037 5002              JNC     ?C0047
+                                           ; SOURCE LINE # 604
+0039 802E              SJMP    ?C0046
+                                           ; SOURCE LINE # 605
+003B         ?C0047:
+003B 900000      R     MOV     DPTR,#DeviceID_expect
+003E E0                MOVX    A,@DPTR
+003F FF                MOV     R7,A
+0040 A3                INC     DPTR
+0041 E0                MOVX    A,@DPTR
+0042 6F                XRL     A,R7
+0043 7001              JNZ     ?C0052
+0045 E4                CLR     A
+0046         ?C0052:
+0046 6002              JZ      ?C0049
+                                           ; SOURCE LINE # 618
+0048 801F              SJMP    ?C0046
+                                           ; SOURCE LINE # 619
+004A         ?C0049:
+                                           ; SOURCE LINE # 628
+004A 7D02              MOV     R5,#02H
+004C 7F25              MOV     R7,#025H
+004E 120000      R     LCALL   _lis2dh_RegWrite
+                                           ; SOURCE LINE # 631
+0051 7F64              MOV     R7,#064H
+0053 7E00              MOV     R6,#00H
+0055 120000      R     LCALL   _lis2dh_configure_outputDataRateHz
+                                           ; SOURCE LINE # 632
+0058 7F0C              MOV     R7,#0CH
+005A 120000      R     LCALL   _lis2dh_configure_resolutionBits
+                                           ; SOURCE LINE # 640
+005D 7F01              MOV     R7,#01H
+005F 120000      R     LCALL   _lis2dh_configure_BDU
+                                           ; SOURCE LINE # 645
+0062 E4                CLR     A
+0063 FB                MOV     R3,A
+0064 FD                MOV     R5,A
+0065 FF                MOV     R7,A
+0066 020000      R     LJMP    _lis2dh_configure_FIFO
+                                           ; SOURCE LINE # 677
+                                           ; SOURCE LINE # 678
+0069         ?C0046:
+0069 900000      R     MOV     DPTR,#i2cAddressIndex
+006C E0                MOVX    A,@DPTR
+006D 04                INC     A
+006E F0                MOVX    @DPTR,A
+006F 8094              SJMP    ?C0044
+0071         ?C0045:
+                                           ; SOURCE LINE # 679
+0071 E4                CLR     A
+0072 900000      R     MOV     DPTR,#gLIS2DHdeviceAddress
+0075 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 680
+0076         ?C0051:
+0076 22                RET     
+C51 COMPILER V9.51   LIS2DH                                                                06/26/2015 13:32:25 PAGE 27  
+
+             ; FUNCTION lis2dh_open (END)
+
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    953    ----
+   CONSTANT SIZE    =      3    ----
+   XDATA SIZE       =      1      33
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

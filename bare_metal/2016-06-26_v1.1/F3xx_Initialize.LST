@@ -1,0 +1,1403 @@
+C51 COMPILER V9.51   F3XX_INITIALIZE                                                       06/26/2015 13:32:25 PAGE 1   
+
+
+C51 COMPILER V9.51, COMPILATION OF MODULE F3XX_INITIALIZE
+OBJECT MODULE PLACED IN F3xx_Initialize.OBJ
+COMPILER INVOKED BY: c:\keil\C51\BIN\C51.exe F3xx_Initialize.c DB OE LARGE CD
+
+line level    source
+
+   1          //-----------------------------------------------------------------------------
+   2          // F3xx_Initialize.c
+   3          //-----------------------------------------------------------------------------
+   4          // Copyright 2014
+   5          //
+   6          // Program Description:
+   7          //
+   8          // Initializes uC's system clock, timers, USB, SMBus, ports.
+   9          //
+  10          //
+  11          // FID             3XX000001
+  12          // Target:         C8051F32x/C8051F340
+  13          // Tool chain:     Keil C51 7.50 / Keil EVAL C51
+  14          //                 Silicon Laboratories IDE version 2.6
+  15          // Project Name:   Generic HID Firmware
+  16          //
+  17          //
+  18          // Release 1.0
+  19          //    -140401 Initial Revision (Tushar Mazumder)
+  20          //
+  21          // Other than bug fixes or implementation changes, this file should not need to be updated. (But, configur
+             -e port pins in this file if using this file as a base for other projects.)
+  22          
+  23          //-----------------------------------------------------------------------------
+  24          // Header Files
+  25          //-----------------------------------------------------------------------------
+  26          
+  27          // Project-level preprocessor #defines effective across all *.c files
+  28          #include "ProjectDefines.h"
+*** MESSAGE C286 IN LINE 169 OF ProjectDefines.h: writeReadHID() EP3OUT 256-byte buffer
+*** MESSAGE C286 IN LINE 170 OF ProjectDefines.h: writeReadHID() EP3IN 256-byte buffer
+*** MESSAGE C286 IN LINE 171 OF ProjectDefines.h: USB_EP_INDEX 3 for EP_STATUS[USB_EP_INDEX] and POLL_WRITE_BYTE (INDEX,
+             - USB_EP_INDEX);
+  29          
+  30          #include "C8051F320.h"
+  31          #include "F3xx_Initialize.h"
+  32          #include "F3xx_USB0_InterruptServiceRoutine.h"
+  33          #include "F3xx_USB0_Register.h"
+  34          #include "SMBus.h"
+  35          
+  36          //-----------------------------------------------------------------------------
+  37          // Definitions
+  38          //-----------------------------------------------------------------------------
+  39          
+  40          // USB clock selections (SFR CLKSEL)
+  41          #define USB_4X_CLOCK       0x00        // Select 4x clock multiplier, for USB
+  42          #define USB_INT_OSC_DIV_2  0x10        // Full Speed
+  43          #define USB_EXT_OSC        0x20
+  44          #define USB_EXT_OSC_DIV_2  0x30
+  45          #define USB_EXT_OSC_DIV_3  0x40
+  46          #define USB_EXT_OSC_DIV_4  0x50
+  47          
+  48          // System clock selections (SFR CLKSEL)
+  49          #define SYS_INT_OSC        0x00        // Select to use internal oscillator
+  50          #define SYS_EXT_OSC        0x01        // Select to use an external oscillator
+C51 COMPILER V9.51   F3XX_INITIALIZE                                                       06/26/2015 13:32:25 PAGE 2   
+
+  51          #define SYS_4X_DIV_2       0x02
+  52          
+  53          // ----------------------------------------------------------------------------
+  54          // Global Variable Declarations
+  55          // ----------------------------------------------------------------------------
+  56          float gSysClkFreq;      
+  57          float gTimer1ClkFreq;   // global to send back to GUI in order to calculate allowable SMBus clock frequencie
+             -s
+  58          float gSMBusClkFreq;
+  59          uint8_t xdata IO_PACKET[64]; // alias IO_BUFFER.Ptr[0..63]
+  60          extern bit gSMBbusy; 
+  61          // uint16_t gTH0; // VERIFY: OS24EVK-66 remove unused global varaibles; conserve xdata space
+  62          // uint16_t gTL0; // VERIFY: OS24EVK-66 remove unused global varaibles; conserve xdata space
+  63          
+  64          // ----------------------------------------------------------------------------
+  65          // Local Function Prototypes
+  66          // ----------------------------------------------------------------------------
+  67          void Sysclk_Init(void);                
+  68          void Port_Init(void);                  
+  69          void Usb_Init(void);
+  70          #if SUPPORT_SPI
+              void SPI_Init(void);
+              #endif // SUPPORT_SPI
+  73          void SMBus_Init(void);
+  74          void Timer0_Init(uint8_t delayUnitsAreMicroseconds);
+  75          void Timer1_Init(void);
+  76          void Timer3_Init(void);
+  77          void T0_Wait(uint16_t delayCount); // number of half-milliseconds or microseconds to wait, depending on pr
+             -evious Timer0_Init(uint8_t delayUnitsAreMicroseconds)
+  78          void getTimer0or1ClkFreq(uint8_t, float*);
+  79          void getTimer2ClkFreq(float*);
+  80          void getTimer3ClkFreq(float*);
+  81          void INT0_Init(void);
+  82          
+  83          
+  84          
+  85          //-----------------------------------------------------------------------------
+  86          // System_Init (void)
+  87          //-----------------------------------------------------------------------------
+  88          //
+  89          // Return Value - None
+  90          // Parameters - None
+  91          //
+  92          // This top-level initialization routine calls all support routine.
+  93          //
+  94          // ----------------------------------------------------------------------------
+  95          void System_Init(void)
+  96          {
+  97   1              PCA0MD &= ~0x40;                    // Disable Watchdog timer
+  98   1      
+  99   1              Sysclk_Init();                      // Initialize oscillator
+ 100   1              Port_Init();                        // Initialize crossbar and GPIO
+ 101   1              Usb_Init();                         // Initialize USB0
+ 102   1              //Timer0_Init(1);
+ 103   1              Timer1_Init();                      // Initialize timer1 for SMBus clock
+ 104   1              Timer3_Init ();                                         // Initialize timer3 for SMBus clock low timeout
+ 105   1      #if SUPPORT_SPI
+                      SPI_Init();                                                     // Inititalize SPI
+              #endif // SUPPORT_SPI
+ 108   1              SMBus_Init();                                           // Initialize SMBus (I2C)
+ 109   1              INT0_Init();
+ 110   1      }
+C51 COMPILER V9.51   F3XX_INITIALIZE                                                       06/26/2015 13:32:25 PAGE 3   
+
+ 111          
+ 112          //-----------------------------------------------------------------------------
+ 113          // Sysclk_Init
+ 114          //-----------------------------------------------------------------------------
+ 115          //
+ 116          // Return Value - None
+ 117          // Parameters - None
+ 118          //
+ 119          // Initialize system clock to maximum frequency.
+ 120          //
+ 121          //-----------------------------------------------------------------------------
+ 122          void Sysclk_Init(void)
+ 123          {
+ 124   1              uint8_t delay = 100;
+ 125   1                                                                                              //internal oscillator = 12MHz
+ 126   1              OSCICN = 0x83;                          //enable internal oscillator (default); SYSCLK = internal oscillat
+             -or div 1 if CLKSEL.[10] = 00
+ 127   1      
+ 128   1              CLKMUL = 0x00;                          //reset 4x clock multiplier; select internal oscillator as input 
+             -to 4x clock multiplier
+ 129   1              CLKMUL |= 0x80;                         //enable 4x clock multiplier
+ 130   1              while (delay--);                        //delay for >5us per page 121 of manual
+ 131   1              CLKMUL |= 0xC0;                         //initialize the 4x clock multiplier
+ 132   1              while(!(CLKMUL & 0x20));                //wait for 4x clock multiplier to lock
+ 133   1      
+ 134   1              CLKSEL = 0x00;                                  //USB clock is from the 4x clock multiplier = 48MHz
+ 135   1              CLKSEL |= 0x02;                                                 //SYSCLK is from the 4x clock multiplier div 2 = 24MHz (if lowest two bits 0, then 
+             -would come from OSCICN = 12MHz)
+ 136   1              switch (CLKSEL & 3)
+ 137   1              {
+ 138   2                      case (0):
+ 139   2                              switch (OSCICN & 3)
+ 140   2                              {
+ 141   3                                      case (0):
+ 142   3                                              gSysClkFreq = INT_OSC_FREQ / 8.0;
+ 143   3                                              break;
+ 144   3                                      case (1):
+ 145   3                                              gSysClkFreq = INT_OSC_FREQ / 4.0;
+ 146   3                                              break;
+ 147   3                                      case (2):
+ 148   3                                              gSysClkFreq = INT_OSC_FREQ / 2.0;
+ 149   3                                              break;
+ 150   3                                      case (3):
+ 151   3                                              gSysClkFreq = INT_OSC_FREQ / 1.0;
+ 152   3                                              break;
+ 153   3                                      default:
+ 154   3                                              gSysClkFreq = 0.0;
+ 155   3                              }
+ 156   2                              break;
+ 157   2                      case (2):
+ 158   2                              gSysClkFreq = INT_OSC_FREQ * 4.0 / 2.0;
+ 159   2                              break;
+ 160   2                      default:
+ 161   2                              gSysClkFreq = 0.0;
+ 162   2              }
+ 163   1      }
+ 164          
+ 165          
+ 166          //-----------------------------------------------------------------------------
+ 167          // Port_Init
+ 168          //-----------------------------------------------------------------------------
+ 169          //
+C51 COMPILER V9.51   F3XX_INITIALIZE                                                       06/26/2015 13:32:25 PAGE 4   
+
+ 170          // Return Value - None
+ 171          // Parameters - None
+ 172          //
+ 173          // - Configure the Crossbar and GPIO ports.
+ 174          //
+ 175          //-----------------------------------------------------------------------------
+ 176          void Port_Init(void)
+ 177          {  
+ 178   1                                              // P0.7 LED2 (1 = on)                                                   PP      LO      D       NS
+ 179   1                                              // P0.6 LED1 (1 = on)                                                   PP      LO      D       NS
+ 180   1                                              // P0.5 SCL                                                                             PP      LO      D       NS will automatically be configured for OC
+ 181   1                                              // P0.4 SDA                                                                             PP      LO      D       NS will automatically be configured for OC
+ 182   1                                              // P0.3 NSS                                                                             PP      LO      D       NS
+ 183   1                                              // P0.2 MOSI                                                                    PP      LO      D       NS
+ 184   1                                              // P0.1 MISO                                                                    PP      LO      D       NS
+ 185   1                                              // P0.0 SCK                                                                             PP      LO      D       NS
+ 186   1              //P0MDOUT = 0xFF;       // PP PP PP PP : PP PP PP PP
+ 187   1              //P0MDIN  = 0xFF;       // D  D  D  D  : D  D  D  D
+ 188   1              //P0SKIP  = 0x00;       // NS NS NS NS : NS NS NS NS
+ 189   1              //P0      = 0x00;       // LO LO LO LO : LO LO LO LO
+ 190   1      
+ 191   1                                              // P1.7 GPIO or ADC input
+ 192   1                                              // P1.6 GPIO or ADC input
+ 193   1                                              // P1.5 GPIO or ADC input
+ 194   1                                              // P1.4 GPIO or ADC input
+ 195   1                                              // P1.3 GPIO or ADC input
+ 196   1                                              // P1.2 GPIO or ADC input
+ 197   1                                              // P1.1 GPIO or ADC input
+ 198   1                                              // P1.0 GPIO or ADC input
+ 199   1              //P1MDOUT = 0x00;       // OC OC OC OC : OC OC OC OC
+ 200   1              //P1MDIN  = 0xFF;       // D  D  D  D  : D  D  D  D
+ 201   1              //P1SKIP  = 0x00;       // NS NS NS NS : NS NS NS NS
+ 202   1              //P1      = 0xFF;       // HI HI HI HI : HI HI HI HI
+ 203   1      
+ 204   1                                              // P2.7 NOT USED
+ 205   1                                              // P2.6 NOT USED
+ 206   1                                              // P2.5 NOT USED
+ 207   1                                              // P2.4 NOT USED
+ 208   1                                              // P2.3 GPIO or ADC input
+ 209   1                                              // P2.2 GPIO or ADC input
+ 210   1                                              // P2.1 GPIO or ADC input
+ 211   1                                              // P2.0 GPIO or ADC input
+ 212   1              //P2MDOUT = 0x00;       // OC OC OC OC : OC OC OC OC
+ 213   1              //P2MDIN  = 0xFF;       // D  D  D  D  : D  D  D  D
+ 214   1              //P2SKIP  = 0x00;       // NS NS NS NS : NS NS NS NS
+ 215   1              //P2      = 0xFF;       // HI HI HI HI : HI HI HI HI
+ 216   1      
+ 217   1              //---------------------------------------------
+ 218   1              // MAX30101EVKIT pin assignment:
+ 219   1              //   P0.0 = Accelerometer INT (optional INT1 interrupt source)
+ 220   1              //   P0.1 = MAX30101 INT (INT0 interrupt source)
+ 221   1              //   P0.2 = MAX30101 SDA
+ 222   1              //   P0.3 = MAX30101 SCL
+ 223   1              //   P2.1 = diagnostic LED driver DS2
+ 224   1              //   P2.2 = diagnostic LED driver DS1
+ 225   1              P0SKIP  = 0x03; // Port0 Skip Register bitmap: 1=skipped by the crossbar
+ 226   1              //   crossbar skip P0.0 = unassigned
+ 227   1              //   crossbar skip P0.1 = MAX30101 INT
+ 228   1              //   P0.2 = MAX30101 SDA
+ 229   1              //   P0.3 = MAX30101 SCL
+ 230   1              P2MDOUT = 0x06; // Port 2 Output Mode Register bitmap: 1=push-pull, 0=open-drain
+ 231   1              //   push-pull P2.1 = diagnostic LED driver DS2
+C51 COMPILER V9.51   F3XX_INITIALIZE                                                       06/26/2015 13:32:25 PAGE 5   
+
+ 232   1              //   push-pull P2.2 = diagnostic LED driver DS1
+ 233   1              XBR0    = 0x04; // SMB0E=1: SMBus (I2C) enable
+ 234   1                              // XBR0: CP1AE=0 CP1E=0 CP0AE=0 CP0E=0 SYSCKE=0 SMB0E=1 SPI0E=0 URT0E=0 
+ 235   1              XBR1    = 0x40; // XBARE=1: XBAR enable
+ 236   1                              // XBR1: WEAKPUD=0 XBARE=1 T1E=0 T0E=0 ECIE=0 PCA0ME=000
+ 237   1              //XBR0    = 0x06;       // SPI and SMBus (I2C) enable
+ 238   1              //XBR1    = 0xC0;       // XBAR enable, Pull-Up disable
+ 239   1      
+ 240   1              //---------------------------------------------
+ 241   1              // SiLabs C8051F321 crossbar assigns pin resources in order (LSB first):
+ 242   1              // UART can only use TX0/P0.4 and RX0/P0.5
+ 243   1              // SPI assigns SCLK, MISO, MOSI, and possibly NSS in 4-wire mode
+ 244   1              // SMBus (I2C) assigns SDA, SCL
+ 245   1              // CP0 comparator outputs (CP0 cannot be on P0.1)
+ 246   1              // CP1 comparator outputs
+ 247   1              // SYSCLK
+ 248   1              // PCA
+ 249   1              // Timers T0, T1
+ 250   1              // GPIO ports P0, P1, P2, P3
+ 251   1              //---------------------------------------------
+ 252   1              // Independently of the crossbar, the external interrupts INT0/INT1 are assigned
+ 253   1              // by the IT01CF register.
+ 254   1              // default INT0 active-low monitoring port P0.1
+ 255   1              // default INT1 active-low monitoring port P0.0
+ 256   1              //---------------------------------------------
+ 257   1              // If both SPI and SMBus(I2C) are both enabled enabled, and we reserve P0.0 and P0.1:
+ 258   1              //   P0.0 = unassigned (INT1 interrupt source)
+ 259   1              //   P0.1 = unassigned (INT0 interrupt source)
+ 260   1              //   P0.2 = SCK
+ 261   1              //   P0.3 = MISO
+ 262   1              //   P0.4 = MOSI
+ 263   1              //   P0.5 = SDA
+ 264   1              //   P0.6 = SCL
+ 265   1              //---------------------------------------------
+ 266   1              // If no SPI but SMBus(I2C) is enabled, and we reserve P0.0 and P0.1:
+ 267   1              //   P0.0 = unassigned (INT1 interrupt source)
+ 268   1              //   P0.1 = unassigned (INT0 interrupt source)
+ 269   1              //   P0.2 = SDA
+ 270   1              //   P0.3 = SCL
+ 271   1              //---------------------------------------------
+ 272   1      
+ 273   1      }
+ 274          
+ 275          #if SUPPORT_SPI
+              void SPI_Init(void)
+              {
+                      SPI0CFG = 0x40; // Enable master mode, CKPOL = 0, CKPHA = 0
+                  SPI0CN  = 0x0D;     // Single master mode, NSS = 1, SPI0 enabled
+                  SPI0CKR = 0x0B;     // SPI clock rate divisor; SPI clock rate is SYSCLK / [2 * (SPI0CKR + 1)]
+              }
+              #endif // SUPPORT_SPI
+ 283          
+ 284          void SMBus_Init(void)
+ 285          {                       
+ 286   1          SMB0CF      = 0xCD;         //Enable SMBus; enable SMBus slave inhibit; enable SCL timeout detection; enable SMBb
+             -us free timeout detection; timer1 overflow is SMBus clock source
+ 287   1              EIE1    |= 0x01;        //Enable SMBus interrupts. Make sure to OR this since the register is preset elsewhere.
+ 288   1              EIP1    |= 0x01;        //set SMBus interrupt to  high priority
+ 289   1      }
+ 290          
+ 291          //-----------------------------------------------------------------------------
+ 292          // USB0_Init
+C51 COMPILER V9.51   F3XX_INITIALIZE                                                       06/26/2015 13:32:25 PAGE 6   
+
+ 293          //-----------------------------------------------------------------------------
+ 294          //
+ 295          // Return Value - None
+ 296          // Parameters - None
+ 297          //
+ 298          // - Initialize USB0
+ 299          // - Enable USB0 interrupts
+ 300          // - Enable USB0 transceiver
+ 301          // - Enable USB0 with suspend detection
+ 302          //
+ 303          //-----------------------------------------------------------------------------
+ 304          void Usb_Init(void)
+ 305          {
+ 306   1         POLL_WRITE_BYTE(POWER,  0x08);      // Force Asynchronous USB Reset
+ 307   1         POLL_WRITE_BYTE(IN1IE,  0x07);      // Enable Endpoint 0-2 in interrupts
+ 308   1         POLL_WRITE_BYTE(OUT1IE, 0x07);      // Enable Endpoint 0-2 out interrupts
+ 309   1         POLL_WRITE_BYTE(CMIE,   0x07);      // Enable Reset, Resume, and Suspend
+ 310   1         USB0XCN = 0xE0;                     // Enable transceiver; select full speed
+ 311   1         POLL_WRITE_BYTE(CLKREC, 0x80);      // Enable clock recovery, single-step
+ 312   1         EIE1 |= 0x02;                       // Enable USB0 Interrupts
+ 313   1         EA = 1;                             // Global Interrupt enable
+ 314   1                                             // Enable USB0 by clearing the USB
+ 315   1                                             // Inhibit bit
+ 316   1         POLL_WRITE_BYTE(POWER,  0x01);      // and enable suspend detection
+ 317   1      }
+ 318          
+ 319          
+ 320          //-----------------------------------------------------------------------------
+ 321          // T0_Wait
+ 322          //-----------------------------------------------------------------------------
+ 323          //
+ 324          // Return Value : None
+ 325          // Parameters   :
+ 326          //   1) uint16_t ms - number of half-milliseconds or microseconds to wait
+ 327          //                        range is full range of int: 0 to 65536
+ 328          //
+ 329          // Configure Timer0 to wait for <half-ms> half-milliseconds or microseconds using SYSCLK as its time
+ 330          // base.
+ 331          //
+ 332          void Timer0_Init(uint8_t delayUnitsAreMicroseconds)
+ 333          //delayUnitsAreMicroseconds: 0 half-ms delay; 1 us delay
+ 334          {
+ 335   1              float timer0ClkFreq;
+ 336   1              TCON &= ~0x30;                      // Stop Timer0; Clear TF0
+ 337   1              TMOD &= ~0x0f;                      // clear T0 settings
+ 338   1              TMOD |=  0x02;                                          // Timer0 in 8-bit auto-reload mode
+ 339   1              CKCON &= ~0x07;                                         // clear Timer0 clock settings; WARNING: this clears timer0/1 prescale bits too!
+ 340   1              CKCON |= (delayUnitsAreMicroseconds ? 0x04 : 0x02);             // T0 clock is SYSCLK if 0x04 (us delay); T0 clock i
+             -s SYSCLK/48 if 0x02 (half-ms delay; cannot do ms delay using 8-bit counter)
+ 341   1              //IP |= 2;                                                      // high priority required in order to preempt USB interrupt
+ 342   1              //ET0 = 1;                                                      // T0 interrupt enable
+ 343   1              getTimer0or1ClkFreq(0, &timer0ClkFreq);
+ 344   1              TH0 = -((uint32_t)timer0ClkFreq/(delayUnitsAreMicroseconds ? 1000000 : 1000));  // overflow every us or ha
+             -lf-ms
+ 345   1              // (1/timer0ClkFreq) is the time for one clock in s; (1/timer0ClkFreq)*1000 is the time for one clock in 
+             -ms (ms/clock)
+ 346   1              // 1 / [(1/timer0ClkFreq)*1000] ms/clock = timer0ClkFreq/1000 clocks/ms is the number of clocks for one m
+             -s
+ 347   1      }
+ 348          
+ 349          void T0_Wait(uint16_t delayCount) // number of half-milliseconds or microseconds to wait, depending on pre
+             -vious Timer0_Init(uint8_t delayUnitsAreMicroseconds)
+C51 COMPILER V9.51   F3XX_INITIALIZE                                                       06/26/2015 13:32:25 PAGE 7   
+
+ 350          {
+ 351   1              if (delayCount < 5) {
+ 352   2                      return;
+ 353   2         }
+ 354   1              TL0 = TH0;                                                      // set inital count before starting counter
+ 355   1              TF0 = 0;                                // Clear overflow indicator
+ 356   1              TR0 = 1;        
+ 357   1              while (delayCount - 5)
+ 358   1              {
+ 359   2                      while (!TF0);
+ 360   2                      TF0 = 0;                                                // Clear overflow indicator
+ 361   2                      delayCount--;
+ 362   2              }
+ 363   1              TR0 = 0;                            
+ 364   1      }
+ 365          
+ 366          void getTimer0or1ClkFreq(uint8_t timer, float *timer0or1ClkFreq)
+ 367          {
+ 368   1              uint8_t mask;
+ 369   1              uint8_t rightShift;
+ 370   1              switch (timer)                  
+ 371   1              {
+ 372   2                      case 0:                         //timer0 uses bit 2 to determine the clock source; right shift twice to get it into the 0 pos
+             -ition for comparison
+ 373   2                              mask = 4;
+ 374   2                              rightShift = 2;
+ 375   2                              break;
+ 376   2                      case 1:                         //timer1 uses bit 3 to determine the clock source; right shift thrice to get it into the 0 po
+             -sition for comparison
+ 377   2                              mask = 8;
+ 378   2                              rightShift = 3;
+ 379   2                              break;
+ 380   2              }
+ 381   1              switch ((CKCON & mask) >> rightShift)
+ 382   1              {
+ 383   2                      case (0):
+ 384   2                              switch (CKCON & 3)
+ 385   2                              {
+ 386   3                                      case (0):
+ 387   3                                              *timer0or1ClkFreq = gSysClkFreq / 12.0;
+ 388   3                                              break;
+ 389   3                                      case (1):
+ 390   3                                              *timer0or1ClkFreq = gSysClkFreq / 4.0;
+ 391   3                                              break;
+ 392   3                                      case (2):
+ 393   3                                              *timer0or1ClkFreq = gSysClkFreq / 48.0;
+ 394   3                                              break;
+ 395   3                                      default:
+ 396   3                                              *timer0or1ClkFreq = 0.0;
+ 397   3                              }
+ 398   2                              break;
+ 399   2                      case (1):
+ 400   2                              *timer0or1ClkFreq = gSysClkFreq;
+ 401   2                              break;
+ 402   2                      default:
+ 403   2                              *timer0or1ClkFreq = 0.0;
+ 404   2              }
+ 405   1      }
+ 406          
+ 407          //-----------------------------------------------------------------------------
+ 408          // Timer1_Init()
+ 409          //-----------------------------------------------------------------------------
+C51 COMPILER V9.51   F3XX_INITIALIZE                                                       06/26/2015 13:32:25 PAGE 8   
+
+ 410          //
+ 411          // Return Value : None
+ 412          // Parameters   : None
+ 413          //
+ 414          // Timer1 is configured as the SMBus clock source as follows:
+ 415          // - Timer1 in 8-bit auto-reload mode
+ 416          // - Timer1 overflow rate => 3 * gSMBusClkFreq
+ 417          // - The maximum SCL clock rate will be ~1/3 the Timer1 overflow rate
+ 418          // - Timer1 enabled
+ 419          //
+ 420          void Timer1_Init (void)
+ 421          {
+ 422   1      // gSMBusClkFreq = timer1ClkFreq / (0xFF - TH1 + 1) / 3 
+ 423   1              //CKCON &= ~0x08;       // clear Timer1 clock settings; don't clear prescale bits
+ 424   1              CKCON |= 0x08;  // Timer1 clock source = gSysClkFreq
+ 425   1              TMOD &= ~0xf0;  // clear T1 settings
+ 426   1              TMOD |= 0x20;   // Timer1 in 8-bit auto-reload mode
+ 427   1              getTimer0or1ClkFreq(1, &gTimer1ClkFreq);
+ 428   1              // Timer1 configured to overflow at 1/3 the rate defined by gSMBusClkFreq
+ 429   1              if ((gTimer1ClkFreq/gSMBusClkFreq/3.0) < 255.0) // SMBus clock = 31.25kHz min, 8MHz max; not contiguous s
+             -ince integer division
+ 430   1                      TH1 = -(gTimer1ClkFreq/gSMBusClkFreq/3.0);
+ 431   1              else
+ 432   1                      TH1 = 0;        // gSysClkFreq is too fast to generate the desired gSMBusClkFreq; set to the slowest possible 
+             -SMB_FREQUENCY
+ 433   1              TL1 = TH1;              // Init Timer1
+ 434   1              TR1 = 1;                // Timer1 enabled
+ 435   1      }
+ 436          
+ 437          //-----------------------------------------------------------------------------
+ 438          // Timer3_Init()
+ 439          //-----------------------------------------------------------------------------
+ 440          //
+ 441          // Return Value : None
+ 442          // Parameters   : None
+ 443          //
+ 444          // Timer3 configured for use by the SMBus low timeout detect feature as
+ 445          // follows:
+ 446          // - Timer3 in 16-bit auto-reload mode
+ 447          // - SYSCLK/12 as Timer3 clock source
+ 448          // - Timer3 reload registers loaded for a 25ms overflow period
+ 449          // - Timer3 pre-loaded to overflow after 25ms
+ 450          // - Timer3 enabled
+ 451          //
+ 452          void Timer3_Init (void)
+ 453          {
+ 454   1              float timer3ClkFreq;
+ 455   1              TMR3CN = 0x00;                      // Timer3 configured for 16-bit auto-reload, low-byte interrupt disab
+             -led
+ 456   1              CKCON &= ~0x40;                     // Timer3 uses SYSCLK/12
+ 457   1              getTimer3ClkFreq(&timer3ClkFreq);
+ 458   1              TMR3RL = -(timer3ClkFreq/40.0);         // Timer3 configured to overflow after ~25ms (for SMBus low timeout dete
+             -ct)
+ 459   1              TMR3 = TMR3RL;                      // number of clocks for 25ms = 25 / [(1/timer3ClkFreq) * 1000] = time
+             -r3ClkFreq/40
+ 460   1      
+ 461   1              EIE1 |= 0x80;                       // Timer3 interrupt enable
+ 462   1              TMR3CN |= 0x04;                     // Start Timer3
+ 463   1      }
+ 464          
+ 465          void getTimer3ClkFreq(float *timer3ClkFreq)
+ 466          {
+C51 COMPILER V9.51   F3XX_INITIALIZE                                                       06/26/2015 13:32:25 PAGE 9   
+
+ 467   1              switch (CKCON & 0x40)
+ 468   1              {
+ 469   2                      case (0):
+ 470   2                              switch (TMR3CN & 1)
+ 471   2                              {
+ 472   3                                      case (0):
+ 473   3                                              *timer3ClkFreq = gSysClkFreq / 12.0;
+ 474   3                                              break;
+ 475   3                                      default:
+ 476   3                                              *timer3ClkFreq = 0.0;
+ 477   3                              }
+ 478   2                              break;
+ 479   2                      case (0x40):
+ 480   2                              *timer3ClkFreq = gSysClkFreq;
+ 481   2                              break;
+ 482   2                      default:
+ 483   2                              *timer3ClkFreq = 0.0;
+ 484   2              }
+ 485   1      }
+ 486          
+ 487          //-----------------------------------------------------------------------------
+ 488          // Timer3 Interrupt Service Routine (ISR)
+ 489          //-----------------------------------------------------------------------------
+ 490          // A Timer3 interrupt indicates an SMBus SCL low timeout.
+ 491          // The SMBus is disabled and re-enabled if a timeout occurs.
+ 492          //
+ 493          void Timer3_ISR (void) interrupt INTERRUPT_TIMER3 /* interrupt 14 */
+ 494          {
+ 495   1         SMB0CF &= ~0x80;                    // Disable SMBus
+ 496   1         SMB0CF |= 0x80;                     // Re-enable SMBus
+ 497   1         TMR3CN &= ~0x80;                    // Clear Timer3 interrupt-pending flag
+ 498   1         gSMBbusy = 0;                       // Free bus
+ 499   1      }
+ 500          
+ 501          void INT0_Init(void)
+ 502          {
+ 503   1              TCON |= 0x05; // TF1=x TR1=x TF0=x TR0=x IE1=x IT1=1 (INT1 edge trigger) IE0=x IT0=1 (INT0 edge trigger)
+ 504   1              //IT01CF   = 0x11;                   // INT0 on P0.1, active low (default)
+ 505   1              EX0 = 1;                                                        // Enable INT0 interrupt        // FIXME this needs to be enabled on startup, otherwise when we e
+             -nable a bogus report is sent.
+ 506   1              //EX1 = 1;                                                      // Enable INT1 interrupt
+ 507   1      }
+C51 COMPILER V9.51   F3XX_INITIALIZE                                                       06/26/2015 13:32:25 PAGE 10  
+
+ASSEMBLY LISTING OF GENERATED OBJECT CODE
+
+
+             ; FUNCTION System_Init (BEGIN)
+                                           ; SOURCE LINE # 95
+                                           ; SOURCE LINE # 96
+                                           ; SOURCE LINE # 97
+0000 53D9BF            ANL     PCA0MD,#0BFH
+                                           ; SOURCE LINE # 99
+0003 120000      R     LCALL   Sysclk_Init
+                                           ; SOURCE LINE # 100
+0006 120000      R     LCALL   Port_Init
+                                           ; SOURCE LINE # 101
+0009 120000      R     LCALL   Usb_Init
+                                           ; SOURCE LINE # 103
+000C 120000      R     LCALL   Timer1_Init
+                                           ; SOURCE LINE # 104
+000F 120000      R     LCALL   Timer3_Init
+                                           ; SOURCE LINE # 108
+0012 120000      R     LCALL   SMBus_Init
+                                           ; SOURCE LINE # 109
+0015 020000      R     LJMP    INT0_Init
+             ; FUNCTION System_Init (END)
+
+             ; FUNCTION Sysclk_Init (BEGIN)
+                                           ; SOURCE LINE # 122
+                                           ; SOURCE LINE # 123
+                                           ; SOURCE LINE # 124
+;---- Variable 'delay' assigned to Register 'R7' ----
+0000 7F64              MOV     R7,#064H
+                                           ; SOURCE LINE # 126
+0002 75B283            MOV     OSCICN,#083H
+                                           ; SOURCE LINE # 128
+0005 E4                CLR     A
+0006 F5B9              MOV     CLKMUL,A
+                                           ; SOURCE LINE # 129
+0008 43B980            ORL     CLKMUL,#080H
+000B         ?C0002:
+                                           ; SOURCE LINE # 130
+000B AE07              MOV     R6,AR7
+000D 1F                DEC     R7
+000E EE                MOV     A,R6
+000F 70FA              JNZ     ?C0002
+0011         ?C0003:
+                                           ; SOURCE LINE # 131
+0011 43B9C0            ORL     CLKMUL,#0C0H
+0014         ?C0004:
+                                           ; SOURCE LINE # 132
+0014 E5B9              MOV     A,CLKMUL
+0016 30E5FB            JNB     ACC.5,?C0004
+0019         ?C0005:
+                                           ; SOURCE LINE # 134
+0019 E4                CLR     A
+001A F5A9              MOV     CLKSEL,A
+                                           ; SOURCE LINE # 135
+001C 43A902            ORL     CLKSEL,#02H
+                                           ; SOURCE LINE # 136
+001F E5A9              MOV     A,CLKSEL
+0021 5403              ANL     A,#03H
+0023 24FE              ADD     A,#0FEH
+0025 6041              JZ      ?C0014
+0027 2402              ADD     A,#02H
+C51 COMPILER V9.51   F3XX_INITIALIZE                                                       06/26/2015 13:32:25 PAGE 11  
+
+0029 7048              JNZ     ?C0015
+                                           ; SOURCE LINE # 137
+                                           ; SOURCE LINE # 138
+002B         ?C0007:
+                                           ; SOURCE LINE # 139
+002B E5B2              MOV     A,OSCICN
+002D 5403              ANL     A,#03H
+002F 14                DEC     A
+0030 6015              JZ      ?C0010
+0032 14                DEC     A
+0033 601D              JZ      ?C0011
+0035 14                DEC     A
+0036 6025              JZ      ?C0012
+0038 2403              ADD     A,#03H
+003A 7037              JNZ     ?C0073
+                                           ; SOURCE LINE # 140
+                                           ; SOURCE LINE # 141
+003C         ?C0009:
+                                           ; SOURCE LINE # 142
+003C 900000      R     MOV     DPTR,#gSysClkFreq
+003F 120000      E     LCALL   ?C?LSTKXDATA
+0042 49                DB      049H
+0043 B7                DB      0B7H
+0044 1B                DB      01BH
+0045 00                DB      00H
+                                           ; SOURCE LINE # 143
+0046 22                RET     
+                                           ; SOURCE LINE # 144
+0047         ?C0010:
+                                           ; SOURCE LINE # 145
+0047 900000      R     MOV     DPTR,#gSysClkFreq
+004A 120000      E     LCALL   ?C?LSTKXDATA
+004D 4A                DB      04AH
+004E 37                DB      037H
+004F 1B                DB      01BH
+0050 00                DB      00H
+                                           ; SOURCE LINE # 146
+0051 22                RET     
+                                           ; SOURCE LINE # 147
+0052         ?C0011:
+                                           ; SOURCE LINE # 148
+0052 900000      R     MOV     DPTR,#gSysClkFreq
+0055 120000      E     LCALL   ?C?LSTKXDATA
+0058 4A                DB      04AH
+0059 B7                DB      0B7H
+005A 1B                DB      01BH
+005B 00                DB      00H
+                                           ; SOURCE LINE # 149
+005C 22                RET     
+                                           ; SOURCE LINE # 150
+005D         ?C0012:
+                                           ; SOURCE LINE # 151
+005D 900000      R     MOV     DPTR,#gSysClkFreq
+0060 120000      E     LCALL   ?C?LSTKXDATA
+0063 4B                DB      04BH
+0064 37                DB      037H
+0065 1B                DB      01BH
+0066 00                DB      00H
+                                           ; SOURCE LINE # 152
+0067 22                RET     
+                                           ; SOURCE LINE # 153
+                                           ; SOURCE LINE # 157
+C51 COMPILER V9.51   F3XX_INITIALIZE                                                       06/26/2015 13:32:25 PAGE 12  
+
+0068         ?C0014:
+                                           ; SOURCE LINE # 158
+0068 900000      R     MOV     DPTR,#gSysClkFreq
+006B 120000      E     LCALL   ?C?LSTKXDATA
+006E 4B                DB      04BH
+006F B7                DB      0B7H
+0070 1B                DB      01BH
+0071 00                DB      00H
+                                           ; SOURCE LINE # 159
+0072 22                RET     
+                                           ; SOURCE LINE # 160
+0073         ?C0015:
+                                           ; SOURCE LINE # 161
+0073         ?C0073:
+0073 900000      R     MOV     DPTR,#gSysClkFreq
+0076 120000      E     LCALL   ?C?LSTKXDATA
+0079 00                DB      00H
+007A 00                DB      00H
+007B 00                DB      00H
+007C 00                DB      00H
+                                           ; SOURCE LINE # 162
+                                           ; SOURCE LINE # 163
+007D         ?C0016:
+007D 22                RET     
+             ; FUNCTION Sysclk_Init (END)
+
+             ; FUNCTION Port_Init (BEGIN)
+                                           ; SOURCE LINE # 176
+                                           ; SOURCE LINE # 177
+                                           ; SOURCE LINE # 225
+0000 75D403            MOV     P0SKIP,#03H
+                                           ; SOURCE LINE # 230
+0003 75A606            MOV     P2MDOUT,#06H
+                                           ; SOURCE LINE # 233
+0006 75E104            MOV     XBR0,#04H
+                                           ; SOURCE LINE # 235
+0009 75E240            MOV     XBR1,#040H
+                                           ; SOURCE LINE # 273
+000C 22                RET     
+             ; FUNCTION Port_Init (END)
+
+             ; FUNCTION SMBus_Init (BEGIN)
+                                           ; SOURCE LINE # 284
+                                           ; SOURCE LINE # 285
+                                           ; SOURCE LINE # 286
+0000 75C1CD            MOV     SMB0CF,#0CDH
+                                           ; SOURCE LINE # 287
+0003 43E601            ORL     EIE1,#01H
+                                           ; SOURCE LINE # 288
+0006 43F601            ORL     EIP1,#01H
+                                           ; SOURCE LINE # 289
+0009 22                RET     
+             ; FUNCTION SMBus_Init (END)
+
+             ; FUNCTION Usb_Init (BEGIN)
+                                           ; SOURCE LINE # 304
+                                           ; SOURCE LINE # 305
+0000         ?C0019:
+                                           ; SOURCE LINE # 306
+0000 E596              MOV     A,USB0ADR
+0002 20E7FB            JB      ACC.7,?C0019
+0005         ?C0020:
+C51 COMPILER V9.51   F3XX_INITIALIZE                                                       06/26/2015 13:32:25 PAGE 13  
+
+0005 759601            MOV     USB0ADR,#01H
+0008 759708            MOV     USB0DAT,#08H
+000B         ?C0021:
+                                           ; SOURCE LINE # 307
+000B E596              MOV     A,USB0ADR
+000D 20E7FB            JB      ACC.7,?C0021
+0010         ?C0022:
+0010 759607            MOV     USB0ADR,#07H
+0013 759707            MOV     USB0DAT,#07H
+0016         ?C0023:
+                                           ; SOURCE LINE # 308
+0016 E596              MOV     A,USB0ADR
+0018 20E7FB            JB      ACC.7,?C0023
+001B         ?C0024:
+001B 759609            MOV     USB0ADR,#09H
+001E 759707            MOV     USB0DAT,#07H
+0021         ?C0025:
+                                           ; SOURCE LINE # 309
+0021 E596              MOV     A,USB0ADR
+0023 20E7FB            JB      ACC.7,?C0025
+0026         ?C0026:
+0026 75960B            MOV     USB0ADR,#0BH
+0029 759707            MOV     USB0DAT,#07H
+                                           ; SOURCE LINE # 310
+002C 75D7E0            MOV     USB0XCN,#0E0H
+002F         ?C0027:
+                                           ; SOURCE LINE # 311
+002F E596              MOV     A,USB0ADR
+0031 20E7FB            JB      ACC.7,?C0027
+0034         ?C0028:
+0034 75960F            MOV     USB0ADR,#0FH
+0037 759780            MOV     USB0DAT,#080H
+                                           ; SOURCE LINE # 312
+003A 43E602            ORL     EIE1,#02H
+                                           ; SOURCE LINE # 313
+003D D2AF              SETB    EA
+003F         ?C0029:
+                                           ; SOURCE LINE # 316
+003F E596              MOV     A,USB0ADR
+0041 20E7FB            JB      ACC.7,?C0029
+0044         ?C0030:
+0044 759601            MOV     USB0ADR,#01H
+0047 759701            MOV     USB0DAT,#01H
+                                           ; SOURCE LINE # 317
+004A 22                RET     
+             ; FUNCTION Usb_Init (END)
+
+             ; FUNCTION _Timer0_Init (BEGIN)
+                                           ; SOURCE LINE # 332
+0000 900000      R     MOV     DPTR,#delayUnitsAreMicroseconds
+0003 EF                MOV     A,R7
+0004 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 334
+                                           ; SOURCE LINE # 336
+0005 5388CF            ANL     TCON,#0CFH
+                                           ; SOURCE LINE # 337
+0008 5389F0            ANL     TMOD,#0F0H
+                                           ; SOURCE LINE # 338
+000B 438902            ORL     TMOD,#02H
+                                           ; SOURCE LINE # 339
+000E 538EF8            ANL     CKCON,#0F8H
+                                           ; SOURCE LINE # 340
+C51 COMPILER V9.51   F3XX_INITIALIZE                                                       06/26/2015 13:32:25 PAGE 14  
+
+0011 E0                MOVX    A,@DPTR
+0012 6004              JZ      ?C0032
+0014 7F04              MOV     R7,#04H
+0016 8002              SJMP    ?C0033
+0018         ?C0032:
+0018 7F02              MOV     R7,#02H
+001A         ?C0033:
+001A EF                MOV     A,R7
+001B 428E              ORL     CKCON,A
+                                           ; SOURCE LINE # 343
+001D 7B01              MOV     R3,#01H
+001F 7A00        R     MOV     R2,#HIGH timer0ClkFreq
+0021 7900        R     MOV     R1,#LOW timer0ClkFreq
+0023 E4                CLR     A
+0024 FF                MOV     R7,A
+0025 120000      R     LCALL   _getTimer0or1ClkFreq
+                                           ; SOURCE LINE # 344
+0028 900000      R     MOV     DPTR,#timer0ClkFreq
+002B E0                MOVX    A,@DPTR
+002C FC                MOV     R4,A
+002D A3                INC     DPTR
+002E E0                MOVX    A,@DPTR
+002F FD                MOV     R5,A
+0030 A3                INC     DPTR
+0031 E0                MOVX    A,@DPTR
+0032 FE                MOV     R6,A
+0033 A3                INC     DPTR
+0034 E0                MOVX    A,@DPTR
+0035 FF                MOV     R7,A
+0036 120000      E     LCALL   ?C?CASTF
+0039 900000      R     MOV     DPTR,#delayUnitsAreMicroseconds
+003C E0                MOVX    A,@DPTR
+003D 600A              JZ      ?C0034
+003F 7B40              MOV     R3,#040H
+0041 7A42              MOV     R2,#042H
+0043 790F              MOV     R1,#0FH
+0045 7800              MOV     R0,#00H
+0047 8007              SJMP    ?C0035
+0049         ?C0034:
+0049 E4                CLR     A
+004A 7BE8              MOV     R3,#0E8H
+004C 7A03              MOV     R2,#03H
+004E F9                MOV     R1,A
+004F F8                MOV     R0,A
+0050         ?C0035:
+0050 120000      E     LCALL   ?C?ULDIV
+0053 120000      E     LCALL   ?C?LNEG
+0056 8F8C              MOV     TH0,R7
+                                           ; SOURCE LINE # 347
+0058 22                RET     
+             ; FUNCTION _Timer0_Init (END)
+
+             ; FUNCTION _T0_Wait (BEGIN)
+                                           ; SOURCE LINE # 349
+;---- Variable 'delayCount' assigned to Register 'R6/R7' ----
+                                           ; SOURCE LINE # 350
+                                           ; SOURCE LINE # 351
+0000 C3                CLR     C
+0001 EF                MOV     A,R7
+0002 9405              SUBB    A,#05H
+0004 EE                MOV     A,R6
+0005 9400              SUBB    A,#00H
+C51 COMPILER V9.51   F3XX_INITIALIZE                                                       06/26/2015 13:32:25 PAGE 15  
+
+0007 401F              JC      ?C0038
+                                           ; SOURCE LINE # 353
+0009         ?C0037:
+                                           ; SOURCE LINE # 354
+0009 858C8A            MOV     TL0,TH0
+                                           ; SOURCE LINE # 355
+000C C28D              CLR     TF0
+                                           ; SOURCE LINE # 356
+000E D28C              SETB    TR0
+0010         ?C0039:
+                                           ; SOURCE LINE # 357
+0010 EF                MOV     A,R7
+0011 24FB              ADD     A,#0FBH
+0013 FD                MOV     R5,A
+0014 EE                MOV     A,R6
+0015 34FF              ADDC    A,#0FFH
+0017 4D                ORL     A,R5
+0018 600C              JZ      ?C0040
+                                           ; SOURCE LINE # 358
+001A         ?C0041:
+                                           ; SOURCE LINE # 359
+001A 308DFD            JNB     TF0,?C0041
+001D         ?C0042:
+                                           ; SOURCE LINE # 360
+001D C28D              CLR     TF0
+                                           ; SOURCE LINE # 361
+001F EF                MOV     A,R7
+0020 1F                DEC     R7
+0021 70ED              JNZ     ?C0039
+0023 1E                DEC     R6
+0024         ?C0070:
+                                           ; SOURCE LINE # 362
+0024 80EA              SJMP    ?C0039
+0026         ?C0040:
+                                           ; SOURCE LINE # 363
+0026 C28C              CLR     TR0
+                                           ; SOURCE LINE # 364
+0028         ?C0038:
+0028 22                RET     
+             ; FUNCTION _T0_Wait (END)
+
+             ; FUNCTION _getTimer0or1ClkFreq (BEGIN)
+                                           ; SOURCE LINE # 366
+0000 900000      R     MOV     DPTR,#timer0or1ClkFreq
+0003 EB                MOV     A,R3
+0004 F0                MOVX    @DPTR,A
+0005 A3                INC     DPTR
+0006 EA                MOV     A,R2
+0007 F0                MOVX    @DPTR,A
+0008 A3                INC     DPTR
+0009 E9                MOV     A,R1
+000A F0                MOVX    @DPTR,A
+;---- Variable 'timer' assigned to Register 'R7' ----
+                                           ; SOURCE LINE # 367
+                                           ; SOURCE LINE # 370
+000B EF                MOV     A,R7
+000C 14                DEC     A
+000D 600F              JZ      ?C0045
+000F 04                INC     A
+0010 7016              JNZ     ?C0043
+                                           ; SOURCE LINE # 371
+                                           ; SOURCE LINE # 372
+C51 COMPILER V9.51   F3XX_INITIALIZE                                                       06/26/2015 13:32:25 PAGE 16  
+
+0012         ?C0044:
+                                           ; SOURCE LINE # 373
+0012 900000      R     MOV     DPTR,#mask
+0015 7404              MOV     A,#04H
+0017 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 374
+0018 A3                INC     DPTR
+0019 7402              MOV     A,#02H
+001B F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 375
+001C 800A              SJMP    ?C0043
+                                           ; SOURCE LINE # 376
+001E         ?C0045:
+                                           ; SOURCE LINE # 377
+001E 900000      R     MOV     DPTR,#mask
+0021 7408              MOV     A,#08H
+0023 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 378
+0024 A3                INC     DPTR
+0025 7403              MOV     A,#03H
+0027 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 379
+                                           ; SOURCE LINE # 380
+0028         ?C0043:
+                                           ; SOURCE LINE # 381
+0028 900000      R     MOV     DPTR,#mask
+002B E0                MOVX    A,@DPTR
+002C 558E              ANL     A,CKCON
+002E FF                MOV     R7,A
+002F A3                INC     DPTR
+0030 E0                MOVX    A,@DPTR
+0031 FE                MOV     R6,A
+0032 EF                MOV     A,R7
+0033 A806              MOV     R0,AR6
+0035 08                INC     R0
+0036 8002              SJMP    ?C0072
+0038         ?C0071:
+0038 C3                CLR     C
+0039 13                RRC     A
+003A         ?C0072:
+003A D8FC              DJNZ    R0,?C0071
+003C 14                DEC     A
+003D 603D              JZ      ?C0053
+003F 04                INC     A
+0040 7056              JNZ     ?C0054
+                                           ; SOURCE LINE # 382
+                                           ; SOURCE LINE # 383
+0042         ?C0047:
+                                           ; SOURCE LINE # 384
+0042 E58E              MOV     A,CKCON
+0044 5403              ANL     A,#03H
+0046 14                DEC     A
+0047 6010              JZ      ?C0050
+0049 14                DEC     A
+004A 6016              JZ      ?C0051
+004C 2402              ADD     A,#02H
+004E 7048              JNZ     ?C0077
+                                           ; SOURCE LINE # 385
+                                           ; SOURCE LINE # 386
+0050         ?C0049:
+                                           ; SOURCE LINE # 387
+0050 E4                CLR     A
+C51 COMPILER V9.51   F3XX_INITIALIZE                                                       06/26/2015 13:32:25 PAGE 17  
+
+0051 FB                MOV     R3,A
+0052 FA                MOV     R2,A
+0053 7940              MOV     R1,#040H
+0055 7841              MOV     R0,#041H
+                                           ; SOURCE LINE # 388
+0057 8010              SJMP    ?C0075
+                                           ; SOURCE LINE # 389
+0059         ?C0050:
+                                           ; SOURCE LINE # 390
+0059 E4                CLR     A
+005A FB                MOV     R3,A
+005B FA                MOV     R2,A
+005C 7980              MOV     R1,#080H
+005E 7840              MOV     R0,#040H
+0060         ?C0074:
+                                           ; SOURCE LINE # 391
+0060 8007              SJMP    ?C0075
+                                           ; SOURCE LINE # 392
+0062         ?C0051:
+                                           ; SOURCE LINE # 393
+0062 E4                CLR     A
+0063 FB                MOV     R3,A
+0064 FA                MOV     R2,A
+0065 7940              MOV     R1,#040H
+0067 7842              MOV     R0,#042H
+0069         ?C0075:
+0069 900000      R     MOV     DPTR,#gSysClkFreq
+006C E0                MOVX    A,@DPTR
+006D FC                MOV     R4,A
+006E A3                INC     DPTR
+006F E0                MOVX    A,@DPTR
+0070 FD                MOV     R5,A
+0071 A3                INC     DPTR
+0072 E0                MOVX    A,@DPTR
+0073 FE                MOV     R6,A
+0074 A3                INC     DPTR
+0075 E0                MOVX    A,@DPTR
+0076 FF                MOV     R7,A
+0077 120000      E     LCALL   ?C?FPDIV
+                                           ; SOURCE LINE # 394
+007A 800E              SJMP    ?C0076
+                                           ; SOURCE LINE # 395
+                                           ; SOURCE LINE # 399
+007C         ?C0053:
+                                           ; SOURCE LINE # 400
+007C 900000      R     MOV     DPTR,#gSysClkFreq
+007F E0                MOVX    A,@DPTR
+0080 FC                MOV     R4,A
+0081 A3                INC     DPTR
+0082 E0                MOVX    A,@DPTR
+0083 FD                MOV     R5,A
+0084 A3                INC     DPTR
+0085 E0                MOVX    A,@DPTR
+0086 FE                MOV     R6,A
+0087 A3                INC     DPTR
+0088 E0                MOVX    A,@DPTR
+0089 FF                MOV     R7,A
+008A         ?C0076:
+008A 900000      R     MOV     DPTR,#timer0or1ClkFreq
+008D E0                MOVX    A,@DPTR
+008E FB                MOV     R3,A
+008F A3                INC     DPTR
+C51 COMPILER V9.51   F3XX_INITIALIZE                                                       06/26/2015 13:32:25 PAGE 18  
+
+0090 E0                MOVX    A,@DPTR
+0091 FA                MOV     R2,A
+0092 A3                INC     DPTR
+0093 E0                MOVX    A,@DPTR
+0094 F9                MOV     R1,A
+0095 020000      E     LJMP    ?C?LSTPTR
+                                           ; SOURCE LINE # 401
+                                           ; SOURCE LINE # 402
+0098         ?C0054:
+                                           ; SOURCE LINE # 403
+0098         ?C0077:
+0098 900000      R     MOV     DPTR,#timer0or1ClkFreq
+009B E0                MOVX    A,@DPTR
+009C FB                MOV     R3,A
+009D A3                INC     DPTR
+009E E0                MOVX    A,@DPTR
+009F FA                MOV     R2,A
+00A0 A3                INC     DPTR
+00A1 E0                MOVX    A,@DPTR
+00A2 F9                MOV     R1,A
+00A3 120000      E     LCALL   ?C?LSTKPTR
+00A6 00                DB      00H
+00A7 00                DB      00H
+00A8 00                DB      00H
+00A9 00                DB      00H
+                                           ; SOURCE LINE # 404
+                                           ; SOURCE LINE # 405
+00AA         ?C0055:
+00AA 22                RET     
+             ; FUNCTION _getTimer0or1ClkFreq (END)
+
+             ; FUNCTION Timer1_Init (BEGIN)
+                                           ; SOURCE LINE # 420
+                                           ; SOURCE LINE # 421
+                                           ; SOURCE LINE # 424
+0000 438E08            ORL     CKCON,#08H
+                                           ; SOURCE LINE # 425
+0003 53890F            ANL     TMOD,#0FH
+                                           ; SOURCE LINE # 426
+0006 438920            ORL     TMOD,#020H
+                                           ; SOURCE LINE # 427
+0009 7B01              MOV     R3,#01H
+000B 7A00        R     MOV     R2,#HIGH gTimer1ClkFreq
+000D 7900        R     MOV     R1,#LOW gTimer1ClkFreq
+000F 7F01              MOV     R7,#01H
+0011 120000      R     LCALL   _getTimer0or1ClkFreq
+                                           ; SOURCE LINE # 429
+0014 900000      R     MOV     DPTR,#gSMBusClkFreq
+0017 E0                MOVX    A,@DPTR
+0018 F8                MOV     R0,A
+0019 A3                INC     DPTR
+001A E0                MOVX    A,@DPTR
+001B F9                MOV     R1,A
+001C A3                INC     DPTR
+001D E0                MOVX    A,@DPTR
+001E FA                MOV     R2,A
+001F A3                INC     DPTR
+0020 E0                MOVX    A,@DPTR
+0021 FB                MOV     R3,A
+0022 900000      R     MOV     DPTR,#gTimer1ClkFreq
+0025 E0                MOVX    A,@DPTR
+0026 FC                MOV     R4,A
+C51 COMPILER V9.51   F3XX_INITIALIZE                                                       06/26/2015 13:32:25 PAGE 19  
+
+0027 A3                INC     DPTR
+0028 E0                MOVX    A,@DPTR
+0029 FD                MOV     R5,A
+002A A3                INC     DPTR
+002B E0                MOVX    A,@DPTR
+002C FE                MOV     R6,A
+002D A3                INC     DPTR
+002E E0                MOVX    A,@DPTR
+002F FF                MOV     R7,A
+0030 120000      E     LCALL   ?C?FPDIV
+0033 E4                CLR     A
+0034 FB                MOV     R3,A
+0035 FA                MOV     R2,A
+0036 7940              MOV     R1,#040H
+0038 7840              MOV     R0,#040H
+003A 120000      E     LCALL   ?C?FPDIV
+003D E4                CLR     A
+003E FB                MOV     R3,A
+003F FA                MOV     R2,A
+0040 797F              MOV     R1,#07FH
+0042 7843              MOV     R0,#043H
+0044 120000      E     LCALL   ?C?FPCMP3
+0047 6035              JZ      ?C0056
+0049 4033              JC      ?C0056
+                                           ; SOURCE LINE # 430
+004B 900000      R     MOV     DPTR,#gSMBusClkFreq
+004E E0                MOVX    A,@DPTR
+004F F8                MOV     R0,A
+0050 A3                INC     DPTR
+0051 E0                MOVX    A,@DPTR
+0052 F9                MOV     R1,A
+0053 A3                INC     DPTR
+0054 E0                MOVX    A,@DPTR
+0055 FA                MOV     R2,A
+0056 A3                INC     DPTR
+0057 E0                MOVX    A,@DPTR
+0058 FB                MOV     R3,A
+0059 900000      R     MOV     DPTR,#gTimer1ClkFreq
+005C E0                MOVX    A,@DPTR
+005D FC                MOV     R4,A
+005E A3                INC     DPTR
+005F E0                MOVX    A,@DPTR
+0060 FD                MOV     R5,A
+0061 A3                INC     DPTR
+0062 E0                MOVX    A,@DPTR
+0063 FE                MOV     R6,A
+0064 A3                INC     DPTR
+0065 E0                MOVX    A,@DPTR
+0066 FF                MOV     R7,A
+0067 120000      E     LCALL   ?C?FPDIV
+006A E4                CLR     A
+006B FB                MOV     R3,A
+006C FA                MOV     R2,A
+006D 7940              MOV     R1,#040H
+006F 7840              MOV     R0,#040H
+0071 120000      E     LCALL   ?C?FPDIV
+0074 120000      E     LCALL   ?C?FPNEG
+0077 120000      E     LCALL   ?C?CASTF
+007A 8F8D              MOV     TH1,R7
+007C 8003              SJMP    ?C0057
+007E         ?C0056:
+                                           ; SOURCE LINE # 432
+C51 COMPILER V9.51   F3XX_INITIALIZE                                                       06/26/2015 13:32:25 PAGE 20  
+
+007E E4                CLR     A
+007F F58D              MOV     TH1,A
+0081         ?C0057:
+                                           ; SOURCE LINE # 433
+0081 858D8B            MOV     TL1,TH1
+                                           ; SOURCE LINE # 434
+0084 D28E              SETB    TR1
+                                           ; SOURCE LINE # 435
+0086 22                RET     
+             ; FUNCTION Timer1_Init (END)
+
+             ; FUNCTION Timer3_Init (BEGIN)
+                                           ; SOURCE LINE # 452
+                                           ; SOURCE LINE # 453
+                                           ; SOURCE LINE # 455
+0000 E4                CLR     A
+0001 F591              MOV     TMR3CN,A
+                                           ; SOURCE LINE # 456
+0003 538EBF            ANL     CKCON,#0BFH
+                                           ; SOURCE LINE # 457
+0006 7B01              MOV     R3,#01H
+0008 7A00        R     MOV     R2,#HIGH timer3ClkFreq
+000A 7900        R     MOV     R1,#LOW timer3ClkFreq
+000C 120000      R     LCALL   _getTimer3ClkFreq
+                                           ; SOURCE LINE # 458
+000F E4                CLR     A
+0010 FB                MOV     R3,A
+0011 FA                MOV     R2,A
+0012 7920              MOV     R1,#020H
+0014 7842              MOV     R0,#042H
+0016 900000      R     MOV     DPTR,#timer3ClkFreq
+0019 E0                MOVX    A,@DPTR
+001A FC                MOV     R4,A
+001B A3                INC     DPTR
+001C E0                MOVX    A,@DPTR
+001D FD                MOV     R5,A
+001E A3                INC     DPTR
+001F E0                MOVX    A,@DPTR
+0020 FE                MOV     R6,A
+0021 A3                INC     DPTR
+0022 E0                MOVX    A,@DPTR
+0023 FF                MOV     R7,A
+0024 120000      E     LCALL   ?C?FPDIV
+0027 120000      E     LCALL   ?C?FPNEG
+002A 120000      E     LCALL   ?C?CASTF
+002D 8E93              MOV     TMR3RL+01H,R6
+002F 8F92              MOV     TMR3RL,R7
+                                           ; SOURCE LINE # 459
+0031 859395            MOV     TMR3+01H,TMR3RL+01H
+0034 859294            MOV     TMR3,TMR3RL
+                                           ; SOURCE LINE # 461
+0037 43E680            ORL     EIE1,#080H
+                                           ; SOURCE LINE # 462
+003A 439104            ORL     TMR3CN,#04H
+                                           ; SOURCE LINE # 463
+003D 22                RET     
+             ; FUNCTION Timer3_Init (END)
+
+             ; FUNCTION _getTimer3ClkFreq (BEGIN)
+                                           ; SOURCE LINE # 465
+0000 900000      R     MOV     DPTR,#timer3ClkFreq
+0003 EB                MOV     A,R3
+C51 COMPILER V9.51   F3XX_INITIALIZE                                                       06/26/2015 13:32:25 PAGE 21  
+
+0004 F0                MOVX    @DPTR,A
+0005 A3                INC     DPTR
+0006 EA                MOV     A,R2
+0007 F0                MOVX    @DPTR,A
+0008 A3                INC     DPTR
+0009 E9                MOV     A,R1
+000A F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 466
+                                           ; SOURCE LINE # 467
+000B E58E              MOV     A,CKCON
+000D 5440              ANL     A,#040H
+000F 24C0              ADD     A,#0C0H
+0011 6024              JZ      ?C0065
+0013 2440              ADD     A,#040H
+0015 703C              JNZ     ?C0066
+                                           ; SOURCE LINE # 468
+                                           ; SOURCE LINE # 469
+0017         ?C0061:
+                                           ; SOURCE LINE # 470
+0017 E591              MOV     A,TMR3CN
+0019 5401              ANL     A,#01H
+001B 7036              JNZ     ?C0079
+                                           ; SOURCE LINE # 471
+                                           ; SOURCE LINE # 472
+001D         ?C0063:
+                                           ; SOURCE LINE # 473
+001D E4                CLR     A
+001E FB                MOV     R3,A
+001F FA                MOV     R2,A
+0020 7940              MOV     R1,#040H
+0022 7841              MOV     R0,#041H
+0024 900000      R     MOV     DPTR,#gSysClkFreq
+0027 E0                MOVX    A,@DPTR
+0028 FC                MOV     R4,A
+0029 A3                INC     DPTR
+002A E0                MOVX    A,@DPTR
+002B FD                MOV     R5,A
+002C A3                INC     DPTR
+002D E0                MOVX    A,@DPTR
+002E FE                MOV     R6,A
+002F A3                INC     DPTR
+0030 E0                MOVX    A,@DPTR
+0031 FF                MOV     R7,A
+0032 120000      E     LCALL   ?C?FPDIV
+                                           ; SOURCE LINE # 474
+0035 800E              SJMP    ?C0078
+                                           ; SOURCE LINE # 475
+                                           ; SOURCE LINE # 479
+0037         ?C0065:
+                                           ; SOURCE LINE # 480
+0037 900000      R     MOV     DPTR,#gSysClkFreq
+003A E0                MOVX    A,@DPTR
+003B FC                MOV     R4,A
+003C A3                INC     DPTR
+003D E0                MOVX    A,@DPTR
+003E FD                MOV     R5,A
+003F A3                INC     DPTR
+0040 E0                MOVX    A,@DPTR
+0041 FE                MOV     R6,A
+0042 A3                INC     DPTR
+0043 E0                MOVX    A,@DPTR
+0044 FF                MOV     R7,A
+C51 COMPILER V9.51   F3XX_INITIALIZE                                                       06/26/2015 13:32:25 PAGE 22  
+
+0045         ?C0078:
+0045 900000      R     MOV     DPTR,#timer3ClkFreq
+0048 E0                MOVX    A,@DPTR
+0049 FB                MOV     R3,A
+004A A3                INC     DPTR
+004B E0                MOVX    A,@DPTR
+004C FA                MOV     R2,A
+004D A3                INC     DPTR
+004E E0                MOVX    A,@DPTR
+004F F9                MOV     R1,A
+0050 020000      E     LJMP    ?C?LSTPTR
+                                           ; SOURCE LINE # 481
+                                           ; SOURCE LINE # 482
+0053         ?C0066:
+                                           ; SOURCE LINE # 483
+0053         ?C0079:
+0053 900000      R     MOV     DPTR,#timer3ClkFreq
+0056 E0                MOVX    A,@DPTR
+0057 FB                MOV     R3,A
+0058 A3                INC     DPTR
+0059 E0                MOVX    A,@DPTR
+005A FA                MOV     R2,A
+005B A3                INC     DPTR
+005C E0                MOVX    A,@DPTR
+005D F9                MOV     R1,A
+005E 120000      E     LCALL   ?C?LSTKPTR
+0061 00                DB      00H
+0062 00                DB      00H
+0063 00                DB      00H
+0064 00                DB      00H
+                                           ; SOURCE LINE # 484
+                                           ; SOURCE LINE # 485
+0065         ?C0067:
+0065 22                RET     
+             ; FUNCTION _getTimer3ClkFreq (END)
+
+             ; FUNCTION Timer3_ISR (BEGIN)
+                                           ; SOURCE LINE # 493
+                                           ; SOURCE LINE # 495
+0000 53C17F            ANL     SMB0CF,#07FH
+                                           ; SOURCE LINE # 496
+0003 43C180            ORL     SMB0CF,#080H
+                                           ; SOURCE LINE # 497
+0006 53917F            ANL     TMR3CN,#07FH
+                                           ; SOURCE LINE # 498
+0009 C200        E     CLR     gSMBbusy
+                                           ; SOURCE LINE # 499
+000B 32                RETI    
+             ; FUNCTION Timer3_ISR (END)
+
+             ; FUNCTION INT0_Init (BEGIN)
+                                           ; SOURCE LINE # 501
+                                           ; SOURCE LINE # 502
+                                           ; SOURCE LINE # 503
+0000 438805            ORL     TCON,#05H
+                                           ; SOURCE LINE # 505
+0003 D2A8              SETB    EX0
+                                           ; SOURCE LINE # 507
+0005 22                RET     
+             ; FUNCTION INT0_Init (END)
+
+
+C51 COMPILER V9.51   F3XX_INITIALIZE                                                       06/26/2015 13:32:25 PAGE 23  
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    866    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =     76      17
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

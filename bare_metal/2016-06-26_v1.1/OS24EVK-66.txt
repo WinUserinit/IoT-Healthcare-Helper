@@ -1,0 +1,434 @@
+﻿feature branch checklist [mku rev 0.2]
+
+JIRA ticket ID:	OS24EVK-66
+TODO: https://jira.maxim-ic.com/browse/OS24EVK-66 accelerometer support add to FW
+
+from trunk URL	https://svn.maxim-ic.com/svn/evkits/MAX30101/firmware/Uxx/trunk
+revision range	14383-HEAD
+
+branch URL	https://svn.maxim-ic.com/svn/evkits/MAX30101/firmware/Uxx/branches/OS24EVK-66
+
+----------------------------------------------------------------------------------------------------
+OS24EVK-66 (2015-04-09_rev1.1) Reading LIS2DH X Y Z directly from registers, not from FIFO. Seems to be working.
+Merge back into trunk
+
+----------------------------------------------------------------------------------------------------
+OS24EVK-66 baseline 2015-03-31_v1.1_max30101only
+
+After regression testing and merging to trunk, re-enabled many improvements but kept the LIS2DH Accelerometer disabled (in trunk).
+
+Continue to use branch OS24EVK-66 to further develop LIS2DH support and work out how to get the HID reports to work right.
+
+----------------------------------------------------------------------------------------------------
+Instructions reference: starting work on a new feature branch
+----------------------------------------------------------------------------------------------------
+in the trunk working copy,
+	Edit this feature branch checklist find/replace JIRA ticket ID and project URL
+	Save this feature branch checklist into the trunk as filename OS24EVK-66.txt
+	TortoiseSVN Branch/Tag...	change end of URL from MAX30101/.../trunk to MAX30101/.../branches/OS24EVK-66
+		commit message include the JIRA ticket ID
+in C:\FeatureBranch,
+	TortoiseSVN SVN Checkout...  from branch URL
+		this becomes the feature branch working copy
+	Perform "Merge from trunk" procedure
+	JIRA: start progress
+
+----------------------------------------------------------------------------------------------------
+Instructions reference: Merge from trunk
+----------------------------------------------------------------------------------------------------
+in the feature branch working copy,
+	TortoiseSVN Merge | Merge a range of revisions...	from trunk URL
+		revision range can be found from the feature branch working copy's Show Log; where first split from trunk
+		trial merge, resolve conflicts as needed
+	TortoiseSVN Commit
+
+----------------------------------------------------------------------------------------------------
+Instructions reference: Reintegrate branch into trunk (project owner's job)
+----------------------------------------------------------------------------------------------------
+in the feature branch working copy,
+	TortoiseSVN Commit ... make sure all new changes are committed to repos
+	perform "Merge from trunk" procedure
+in the trunk working copy,
+	TortoiseSVN Update
+	TortoiseSVN Merge | Reintegrate a branch... 	from branch URL
+		trial merge, resolve conflicts as needed
+	TEST that the project can still be built and the feature is integrated successfully
+		if merge fails: SVN Cleanup | Revert all changes recursively, Delete unversioned, Delete ignored, Refresh shell overlays
+	TortoiseSVN Commit ... commit message include the JIRA ticket ID 
+	JIRA: issue resolved
+
+----------------------------------------------------------------------------------------------------
+project notes and commit message scratchpad
+----------------------------------------------------------------------------------------------------
+☐ U+2610 ballot box
+☑ U+2611 ballot box with check
+☒ U+2612 ballot box with X
+----------------------------------------------------------------------------------------------------
+TODO: https://jira.maxim-ic.com/browse/OS24EVK-66 accelerometer support add to FW
+----------------------------------------------------------------------------------------------------
+Add support for optional accelerometer (STMicro LIS2DH)
+
+The "classic" MAX30101EVKIT rev A does not have the accelerometer, so software and firmware must support the accelerometer if present, but tolerate missing accelerometer.
+
+See OS24EVK-57 for the GUI changes.
+
+Hardware additions to EV kit (MAX30101ACCELEVKIT)
+ - ☑ accelerometer must use same I2C bus as OS24 (different device address)
+ - ☐ operate at 1.8V
+ - ☐ support 100Hz sample rate
+ -- ☐ STMicro LIS2DH sample rates 1Hz, 10Hz, 25Hz, 50Hz, *100Hz*, *200Hz*, *400Hz*, 1620Hz?, 1344Hz?, 5376Hz?
+ - ☑ connect LIS2DH INT1 interrupt pin to C8051F321 port P0.0
+ -- STMicro LIS2DH has two interrupt output pins INT1 and INT2
+ -- INT1 and INT2 can each be configured to detect X/Y/Z movement or orientation
+ -- INT1 is push-pull, initially configured **ACTIVE-HIGH**
+ -- ☐ reconfigure INT1 Active-Low by writing 0x25 CTRL_REG6 bit 0x02 H_LACTIVE=1
+ -- I don't think we will actually need to use accelerometer interrupt?
+ -- ☐ FIFO overflow can be configured to interrupt (watermark)
+ -- ☐ accelerometer FIFO read will be triggered by OS24 FIFO almost full interrupt (same sample rate) 
+ - ☑ Connect to C8051F321 as follows:
+ -- ☑ P0.0 = STMicro LIS2DH INT1
+ -- ☑ P0.1 = MAX30101 INT
+ -- ☑ P0.2 = MAX30101 SDA, STMicro LIS2DH SDA
+ -- ☑ P0.3 = MAX30101 SCL, STMicro LIS2DH SCL
+ -- ☑ P2.1 = diagnostic LED driver DS2
+ -- ☑ P2.2 = diagnostic LED driver DS1
+
+Firmware redesign:
+ - HID REPORT_ID(1) (alias SHORT_REPORT_ID) is currently defined for 60 bytes of OS24 MAX30101 FIFO data
+ - ☐ new HID report REPORT_ID(2) would be used to send up to 60 bytes of raw accelerometer data to the GUI
+ -- STMicro LIS2DH has a 10 bit, 32-level FIFO. (6 bytes per X/Y/Z sample x 32 FIFO levels = 192 bytes)
+ -- ☐ one 60-byte HID report can pack 10 X/Y/Z samples
+ - ☐ Should send *approximately* the same number of accelerometer time samples, to avoid the need for costly resampling algorithms
+ --- Per Larry, LIS2DH and MAX30101 internal clocks are not synchronous, so could have different FIFO levels.
+ --- Per Larry, Algorithms will low-pass filter etc. so don't care if output data rates are not exactly equal/synchronous
+ - ☐ update *F3xx_USB0_Descriptor.c* hid_report_descriptor to define HID REPORT_ID(2) format
+ - ☐ update *F3xx_USB0_ReportHandler.c* Interrupt Service Routine readOS21() to acquire accelerometer data and send a second HID report. 
+ - ☐ *Hazard: ensure the accelerometer HID SendPacket() finishes well before the next OS24 interrupt! This may limit the maximum sampling rate that can be supported.*
+
+|| device || mode || channels || bytes per channel || bytes per sample || samples per HID report REPORT_ID(1) ||
+| MAX30101 | LED  |   1        | 3                  | 3                | 20  |
+| MAX30101 | LED  |   2        | 3                  | 6                | 10  |
+| MAX30101 | HR   |   2        | 3                  | 6                | 10  |
+| MAX30101 | SPO2 |   2        | 3                  | 6                | 10  |
+| MAX30101 | LED  |   3        | 3                  | 9                | 6 (truncated from 6 2/3)  |
+| MAX30101 | LED  |   4 *      | 3                  | 12               | would be 5 if supported by device |
+|| device || mode || channels || bytes per channel || bytes per sample || samples per HID report REPORT_ID(2) ||
+| STMicro LIS2DH | X/Y/Z | 3 | 2 | 6 | 10 |
+
+At the default sample rate 100 samples per second, for *MAX30101* in *SPO2 mode* (10 samples per HID report), that requires processing 10 HID REPORT_ID(1) reports per second, or 100ms per HID REPORT_ID(1) report. (Verified on oscilloscope; 400kHz SCL active for 2.3ms after INT) *Additionally, the accelerometer's HID REPORT_ID(2) reports are interleaved with the MAX30101's HID REPORT_ID(1) reports.*
+
+----------------------------------------------------------------------------------------------------
+☑ OS24EVK-66 Update Version Information v1.1 2015-03-18
+☑ OS24EVK-66 Product ID String "MAX30101"
+☑ OS24EVK-66 Manufacturer String "maximintegrated.com"
+
+OS24EVK-66 flashing diagnostic LEDs on C8051F321 init
+☑ OS24EVK-66 Global LIS2DH device address gLIS2DHdeviceAddress
+☑ OS24EVK-66 Init: Search LIS2DH device address 0x30, 0x32 gLIS2DHdeviceAddress
+☑ OS24EVK-66 Init: if LIS2DH present, indicate by flashing one of the diagnostic LEDs.
+   red-green "east" x 2 then red+green simultaneous blink 3 times if LIS2DH was detected
+☑ OS24EVK-66 define uint8_t as unsigned char
+☑ OS24EVK-66 LIS2DH Accelerometer Register Write
+☐ VERIFY: OS24EVK-66 Init: if LIS2DH present, initialize (100Hz, 12-bits) 
+☐ VERIFY: OS24EVK-66 LIS2DH Accelerometer Register Read 16-bit pair
+☐ VERIFY: OS24EVK-66 LIS2DH Accelerometer Read XYZ vector
+☐ VERIFY: OS24EVK-66 Init: if LIS2DH present, initialize INT1 Active-Low by writing 0x25 CTRL_REG6 bit 0x02 H_LACTIVE=1
+
+----------------------------------------------------------------------------------------------------
+Firmware v1.1 2015-03-22 to be tested
+☐ VERIFY: OS24EVK-66 *F3xx_USB0_ReportHandler.c* firmware diagnostic Mock HID report #2 
+   gLIS2DHnumIntServiced = 0; // TODO1: OS24EVK-66 global counter for lis2dh numReportsSent
+   gMockHIDreport2 = 0; // TODO1: OS24EVK-66 firmware diagnostic Mock HID REPORT_ID(2)
+   firmware diagnostic to generate Mock HID REPORT_ID(2) data
+   Send HID REPORT_ID(2) from blockArr[2..]
+   OS24EVK-66 define HID REPORT_ID(2) #define HID_REPORT_ID_2 2
+
+OS24EVK-57 OS24EVK-66 Firmware v1.1 2015-03-24 mock HID report #2 is working
+Do I need to change the HID descriptors to describe this second HID report?
+☑ OS24EVK-66 update *F3xx_USB0_Descriptor.c* hid_report_descriptor to define HID REPORT_ID(2) format
+   // new HID report REPORT_ID(2) will be used to send up to 60 bytes of raw accelerometer data to the GUI.
+   // STMicro LIS2DH has a 10 bit, 32-level FIFO. (6 bytes per X/Y/Z sample x 32 FIFO levels = 192 bytes).
+   // one 60-byte HID report can pack 10 X/Y/Z samples.
+OS24EVK-66 Firmware v1.1 2015-03-24 mock HID report #2 myHID.INT0Enable(EX0) reset mock XYZ counters
+
+☑ OS24EVK-66 Firmware v1.1 2015-03-29 scope check; i2c_smbus_read_byte_data i2c_read with numDataBytes = 1 instead of 2.
+i2c_smbus_read_byte_data i2c_read with numDataBytes = 1 instead of 2, avoid unnecessary extra byte readout
+i2c_smbus_read_bytes_data(uint8_t deviceAddress, uint8_t regAddress, uint8_t count, uint8_t *pRegValue)
+TODO1: if (gMAX30101deviceAddress == 0) should we still send HID report 1?
+
+Changes needed on the GUI to test Firmware v1.1 2015-03-22:
+   myHID.INT0Enable(6) Mock HID REPORT_ID(2) x3 channels (X,Y,Z)
+   Tolerate HID report #2
+   Verify firmware generates only HID report #1 if lis2dh is absent
+   Verify firmware generates HID report #1 and #2 if lis2dh is attached
+   Extract the report #2 data and plotting on GUI
+
+----------------------------------------------------------------------------------------------------
+OS24EVK-66 revert to Firmware v1.1 2015-03-24 hex code
+OS24EVK-66 Firmware v1.1 2015-03-24 initial gOffset=0, but changed to 1 in OUT_REPORT_HANDLER() EXPLICIT_REPORT_ID
+
+Things that didn't seem to work right yesterday:
+
+F3xx_USB0_ReportHandler.c in readOS21()
+OS24EVK-66 if MAX30101 absent but (gMockHIDFIFOChannels > 0), still send HID report 1
+    Ineffective. Nothing ever triggers the interrupt in this case,
+    so streaming data just hangs up without doing anything.
+
+F3xx_USB0_ReportHandler.c in i2c_smbus_read_byte_data()
+OS24EVK-66 i2c_smbus_read_byte_data i2c_read with numDataBytes = 1 instead of 2, avoid unnecessary extra byte readout?
+    Broken; firmware was unable to find any device addresses
+    although the GUI was able to find them (i2c_read).
+    Streaming data was solidly broken by this attempted fix.
+   todo1: OS24EVK-66 shouldn't gOffset initial value be 1 because of EXPLICIT_REPORT_ID ?
+   OS24EVK-66 Firmware v1.1 2015-03-26 initial gOffset=1 EXPLICIT_REPORT_ID
+
+F3xx_USB0_ReportHandler.c new function i2c_smbus_read_bytes_data()
+    Not sure if this got a fair test; encapsulates an i2c_read call.
+    Was trying to make the bottom level "device driver" interface
+    look more like standard linux i2c commands.
+
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+Once the GUI is able to receive the dummy test data, return to the firmware and implement the lis2dh initialization and FIFO read.
+☐ TODO: OS24EVK-66 read LIS2DH FIFO into blockArr[2..]
+
+☐ TODO: OS24EVK-66 Initialize INT2 (C8051F321 P0.0 = STMicro LIS2DH INT1)
+☑ OS24EVK-66 stub ISR for INT2 (C8051F321 P0.0 = STMicro LIS2DH INT1)
+
+☐ TODO: OS24EVK-66 update *F3xx_USB0_ReportHandler.c* Interrupt Service Routine readOS21() to acquire accelerometer data and send a second HID report. 
+
+☐ TODO: OS24EVK-66 Init: if LIS2DH present, initialize FIFO overflow (watermark)
+
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+2015-04-01 OS24EVK-66 investigating HID2 issue
+SendPacket() doesn't appear to wait for INPRDY (IN packet ready) to be cleared?
+So then does that sometimes cause HID2 report to be lost?
+
+☐ TODO: OS24EVK-66 POLL_READ_BYTE EINCSR1 test for rbInINPRDY=0 (IN packet ready) status clear before start of SendPacket()? (Any issue with first packet?)
+
+C8051F321 only has 128 bytes for EP1,
+but does it get split into 64 bytes EP1IN / 64 bytes EP1OUT?
+OS24EVK-66 CONFIMED when Set_Configuration() is called, we do reach the statement
+         POLL_WRITE_BYTE (EINCSR2, rbInSPLIT);
+so EP1IN is limited to a single 64 byte buffer.
+
+Can the HID class be configured to use EP3 instead of EP1?
+C8051F321 has 512 bytes for EP3. Even if split that's still 256 bytes EP3IN.
+// TODO: OS24EVK-66 can we use EP2IN or EP3IN instead of EP1IN INTERRUPT endpoint?
+TODO: OS24EVK-66 USB_writeReadHID_EP1OUT_EP1IN=1; can I use EP3IN/EP3OUT instead of EP1IN/EP1OUT? Want larger than 64 byte buffer.
+OS24EVK-66 USB_EP_INDEX 1 for EP_STATUS[USB_EP_INDEX] and POLL_WRITE_BYTE (INDEX, USB_EP_INDEX)
+
+VERIFY: OS24EVK-66 implement void Handle_Out2() for USB_writeReadHID_EP2OUT_EP2IN=1
+VERIFY: OS24EVK-66 implement void Handle_Out3() for USB_writeReadHID_EP3OUT_EP3IN=1
+TODO1: OS24EVK-66 USB_writeReadHID_EP2OUT_EP2IN 128 byte packets?
+TODO1: OS24EVK-66 USB_writeReadHID_EP3OUT_EP3IN 256 byte packets?
+----------------------------------------------------------------------------------------------------
+
+// TODO: OS24EVK-66 can we omit EP1OUT INTERRUPT endpoint? This would conserve USB FIFO memory and allow double buffering.
+   NO. Removing the EP1OUT breaks the writeReadHID() commands.
+
+----------------------------------------------------------------------------------------------------
+CONFIMED when Set_Configuration() is called, we do reach the statement
+
+firmware Set_Configuration() function breakpoint
+         POLL_WRITE_BYTE (EINCSR2, rbInSPLIT);
+so EP1IN is limited to a single 64 byte buffer.
+
+Despite the C8051F321 having 1kbyte of XRAM dedicated to USB, the hardware allocates at most 128 bytes to endpoint EP1 – and that is further split between EP1IN (to host PC) and EP1OUT (from host PC), a single 64-byte INTERRUPT packet for each. No double-buffering.
+
+Furthermore the firmware's SendPacket() function does not appear to guard the INPRDY In Packet Ready status bit before overwriting the buffer.
+
+So these two factors – EP1IN limited to single 64-byte FIFO, and SendPacket() always assuming the FIFO is empty – this is most likely the root cause of the HID2 reports getting lost.
+
+1. I need to see if I can adapt the SendPacket() function to optionally poll for INPRDY=0 before copying into the USB EP1IN FIFO buffer.
+1.1. Not my code, so need to avoid risk of breaking existing functionality.
+☑ 1.2. Maybe copy/paste modify new SendPacketWaitEP1INready() as SendPacket() with polling for INPRTY=0.
+☑ TODO1: OS24EVK-66 USB_SUPPORT_SendPacketWaitEP1INready=1 SendPacketWaitEP1INready() as SendPacket() with polling for INPRTY=0.
+☑ OS24EVK-66 (2015-04-09_rev1.1) This might actually...be...WORKING!
+   Note: reading LIS2DH X Y Z directly from registers, not from FIFO.
+
+☐ 1.3. Affects readOS21() interrupt handler timing, as it now will have to wait until asynchronous USB Host requests EP1 INPUT, wait for USB transfer to complete, before the firmware may load the next packet into the USB EP1 IN FIFO buffer.
+
+☑  2. I need to see whether it's possible to configure the HID class to use a different endpoint. EP3 FIFO is much larger, 256 bytes dedicated to EP3IN or 512 bytes EP3 if I suppress the IN/OUT split.
+☑  2.1. Affects configuration descriptors
+☑  2.2. Affects SendPacket() INDEX register = EP3 instead of EP1
+☑  2.3. Should not affect the PC software... I hope?
+☑  (2015-04-09) Successfully communicated using EP3OUT EP3IN, but still have the issue of intermittently dropping HID2 packets.
+
+----------------------------------------------------------------------------------------------------
+TODO1: OS24EVK-66 SUPPORT_i2c_smbus_read_bytes_data=1 breaks the data streaming. (2014-04-09)
+
+----------------------------------------------------------------------------------------------------
+OS24EVK-66 (2015-04-09_rev1.1) firmware is working with Kien's MAX30101ACCEVKIT evaluation system hardware.
+Using 6 individual calls to lis2dh_RegRead() in lis2dh_Read_XYZ(), Accelerometer X channel looks like it's kind of glitchy, maybe there's a firmware data integrity issue in lis2dh_Read_XYZ() ? What happens if the X value changes between the readout of OUT_X_H and OUT_X_L ? The firmware is asynchronous to the LIS2DH sample clock. Classic 16-bit-on-8-bit-machine data integrity issue.
+
+☑ VERIFY: OS24EVK-66 Restore the HID2 mock data diagnostic, verify no missing HID2 reports
+   When HID1 is in HR mode (3 bytes per optical sample), HID2 is too slow
+      HID1 in HR mode has 20 points per report
+      HID2 has 10 points per report, can't possibly keep up
+   When HID1 is in SPO2 mode (6 bytes per optical sample), HID2 is same rate (3ch x 2bytes = 6 bytes per XYZ sample)
+      HID1 in SPO2 mode has 10 points per report
+      HID2 has 10 points per report
+   When HID1 is in LEDx3 mode (9 bytes per optical sample), HID2 is too fast (3ch x 2bytes = 6 bytes per XYZ sample)
+      HID1 in LEDx3 mode has 6 points per report
+      HID2 has 10 points per report
+☐ TODO: OS24EVK-66 throttle HID2 mock data diagnostic to 6 points per report if HID1 has 3 channels enabled
+
+☑ VERIFY: OS24EVK-66 Read LIS2DH XYZ using a single 6-byte I2C read operation in lis2dh_Read_XYZ()
+*** Note this raw XYZ data is LITTLE-ENDIAN (least significant byte first)
+2015-04-16 Firmware vesrion is reported at "2015-04-12_v1.1", I'm trying to conserve version numbers...
+
+// TODO1: OS24EVK-66 Read LIS2DH XYZ FIFO using a single 60-byte I2C read operation in readOS21() // read LIS2DH FIFO into blockArr[2..]
+   2015-04-16 OS24EVK-66 OS24EVK-57 LIS2DH multiple-byte read requires (regAddress | 0x80)
+   // LIS2DH data sheet pg 25 5.1.1 I2C operation (near last paragraph)
+   // In order to read multiple bytes, it is necessary to assert the most significant bit of the subaddress
+   // field. In other words, SUB(7) must be equal to 1 while SUB(6-0) represents the
+   // address of first register to be read.
+
+FIFO data is read through OUT_X (Addr reg 29h), OUT_Y (Addr reg 2Bh) and OUT_Z (Addr
+reg 2Dh). When the FIFO is in stream, Trigger or FIFO mode, a read operation to the
+OUT_X, OUT_Y or OUT_Z regiters provides the data stored into the FIFO. Each time data
+is read from the FIFO, the oldest X, Y and Z data are placed into the OUT_X, OUT_Y and
+OUT_Z registers and both single read and read_burst operations can be used.
+The reading address is automatically updated by the device and it rolls back to 0x28 when
+register 0x2D is reached. In order to read all FIFO levels in a multiple byte reading,192 bytes
+(6 output registers by 32 levels) have to be read.
+
+☐ TODO1: OS24EVK-66 Configure LIS2DH to issue FIFO watermark interrupt
+
+☐ TODO1: OS24EVK-66 Configure LIS2DH to enable FIFO buffer (get out of "bypass mode")
+2015-04-11_v1.1 attempting... but taking FIFO out of mode 0 "bypass mode" seems to shut down the XYZ data entirely?
+OS24EVK-66 lis2dh_configure_FIFO GOTCHA! need lis2dh_CTRL_REG5 bit 0x40 FIFO_EN, and maybe lis2dh_CTRL_REG3 bit 0x04 I1_WTM
+
+Tried FIFO modes 1, 2, 3 (0x40, 0x80, 0xC0) and all three of these modes seem to have FIFO data stuck.
+lis2dh_configure_FIFO(/* fifoModeFM10 1:FIFO mode */ 1, /* fifoTR */ 0, /* fifoWatermarkLevelFTH40 */ 0);
+   looked like it had something initially, but doesn't restart FIFO.
+lis2dh_configure_FIFO(/* fifoModeFM10 2:Stream mode */ 2, /* fifoTR */ 0, /* fifoWatermarkLevelFTH40 */ 0);
+lis2dh_configure_FIFO(/* fifoModeFM10 3:Trigger mode */ 3, /* fifoTR */ 0, /* fifoWatermarkLevelFTH40 */ 0);
+
+FAILED: (2015-04-13_v1.1) OS24EVK-66 ISR explicitly re-enable FIFO mode by lis2dh_configure_FIFO(/* fifoModeFM10 1:FIFO mode */ 1, /* fifoTR */ 0, /* fifoWatermarkLevelFTH40 */ 0);
+
+----------------------------------------------------------------------------------------------------
+2015-04-20 OS24EVK-66 (2015-04-15_v1.1) LIS2DH Accel FIFO working...?
+On mockup prototype, FIFO works continuously, shows no sign of problem.
+On one MAX30101ACCEVKIT system, FIFO works for awhile, then gets stuck (constant XYZ data even though HID2 continues to send reports).
+   Not sure yet what state the FIFO is in, suspect FIFO overflowed.
+   Stop monitoring (FIFO bypass) followed by Start Monitoring, resets the FIFO back to working state again.
+
+☐ VERIFY: OS24EVK-66 lis2dh_configure_FIFO(/* fifoModeFM10 1:FIFO mode */ 1, /* fifoTR */ 0, /* fifoWatermarkLevelFTH40 */ 0);
+☐ VERIFY: OS24EVK-66 ISR Poll for 0x27 STATUS_REG bit 0x08 ZYXDA new data available when reading X,Y,Z
+☐ VERIFY: OS24EVK-66 INT0Enable() handler call lis2dh_configure_FIFO()
+   tried manually at lowest data rate (1Hz), saw FIFO_SRC_REG FSS[4:0] credible.
+   Not sure what happens if the FIFO overflows, maybe it still needs a kick to restart...
+
+☒ FAILED: OS24EVK-66 P2.0 button diagnostic: debug what's happening when FIFO seems to be stuck?
+   Can't get this to work. USB2OSMB EVKIT doesn't have clean way to trigger; debugger seems to interfere with host.
+   Disabling SUPPORT_P20BTN_DIAGNOSTIC P2.0 diagnostic.
+
+☐ TODO1: OS24EVK-66 throttle HID2 mock data diagnostic to 6 points per report if HID1 has 3 channels enabled
+☐ TODO1: OS24EVK-66 Recover from FIFO overflow = 0x2F FIFO_SRC_REG bit OVRN_FIFO
+☐ TODO1: OS24EVK-66 HID2 LIS2DH ptrdelta = 0x2F FIFO_SRC_REG bits FFS4:0
+☐ TODO1: OS24EVK-66 Configure LIS2DH to issue FIFO watermark interrupt
+☐ TODO1: OS24EVK-66 Configure C8051F321 INT2 (P0.0) interrupt handler same as the INT1 interrupt handler
+☐ TODO1: OS24EVK-66 Configure LIS2DH INT1 Active-Low by writing 0x25 CTRL_REG6 bit 0x02 H_LACTIVE=1
+
+----------------------------------------------------------------------------------------------------
+OS24EVK-66 Firmware regresssion 2015-04-16_v1.1 (svn r=15232) vs 2015-04-15_v1.1 (svn r=15222): crashes GUI and Console program on connect (API ReadFile error).
+
+Declaration uint8_t lis2dh_FIFO_SRC_REG_value = 0; is enough to break the firmware.
+Declaration uint8_t lis2dh_FIFO_SRC_REG_value /* = 0 */ ; is enough to break the firmware.
+Why? xdata=486 (01E5H) doesn't seem anywhere close to the C8051F321 0x03FF 1Kbyte xdata limit.
+OS24EVK-66 2015-04-23 restored allocation of lis2dh_FIFO_SRC_REG_value in readOS21(), after compacting xdata by 6 bytes...
+   //   2015-04-15_v1.1 (svn r=15222) Program Size: data=10.5 xdata=484 code=12705
+   //   2015-04-16_v1.1 (svn r=15306) Program Size: data=10.5 xdata=478 code=12687
+   // So that could mean the dragon still lurks, 5 bytes away...
+
+Restored os24.hex to match https://svn.maxim-ic.com/svn/evkits/MAX30101/firmware/Uxx/tags/2015-04-15_v1.1_accel
+ - ☑ cleared: P20Btn_Pressed() handler in main(void) while loop
+ - ☑ FIXED: uint8_t lis2dh_FIFO_SRC_REG_value in readOS21()
+ 
+OS24EVK-66 Replace int with uint8_t where applicable; conserve xdata space
+   uint8_t lis2dh_configure_outputDataRateHz(uint16_t outputDataRateHz);
+   uint8_t lis2dh_configure_resolutionBits(uint8_t resolutionBits);
+   uint8_t lis2dh_configure_selfTest(uint8_t selfTest);
+   uint8_t lis2dh_configure_BDU(uint8_t bduBlockDataUpdate);
+   uint8_t lis2dh_configure_FIFO(uint8_t fifoModeFM10, uint8_t fifoTR, uint8_t fifoWatermarkLevelFTH40);
+   int8_t i2c_smbus_read_byte_data(...) return -1 on NACK, 1 on ACK
+   int8_t max30100_RegRead(...)
+   int8_t max30101_RegRead(...)
+   int8_t lis2dh_RegRead(...)
+   int8_t max7311_RegRead(...)
+   inside max30100_open(), max30101_open(), lis2dh_open(), max7311_open()
+      int16_t i2cAddressIndex;
+      int16_t DeviceID_regAddr;
+      int16_t DeviceID_expect;
+      int16_t DeviceID_actual;
+      logic change if (lis2dh_RegRead(DeviceID_regAddr, &DeviceID_actual) < 0) NACK
+   int8_t i2c_smbus_write_byte_data(...)
+   int8_t max30100_RegWrite(...)
+   int8_t max30101_RegWrite(...)
+   int8_t lis2dh_RegWrite(...)
+   int8_t max7311_RegWrite(...)
+   uint8_t numBytesToRequestFromOpticalFIFO
+
+OS24EVK-66 Replace uint8_t with bit where applicable; conserve xdata space
+
+OS24EVK-66 remove unused global varaibles; conserve xdata space
+
+OS24EVK-66 could gOS21ready be a bit instead of uint8_t ? conserve xdata space
+   // uint16_t gTH0;
+   // uint16_t gTL0;
+
+----------------------------------------------------------------------------------------------------
+OS24EVK-66 2015-04-23: firmware 2015-04-21_v1.1
+OS24EVK-66 ProjectDefines.h define LIS2DH_DEFAULT_FIFOMODE for lis2dh_configure_FIFO
+   LIS2DH_DEFAULT_FIFOMODE 2 for Stream mode
+   This mode seems to work best -- works on the board that previously was getting stuck.
+
+----------------------------------------------------------------------------------------------------
+OS24EVK-66 2015-04-29: firmware 2015-04-22_v1.1
+OS24EVK-66 HID2 IO_BUFFER.Ptr[2] = lis2dh_FIFO_SRC_REG_value; ptrDelta = bits FFS4:0
+OS24EVK-66 HID2 IO_BUFFER.Ptr[3] = lis2dh_reserved_HID2_03
+OS24EVK-57 lis2dh_FIFO_SRC_REG_value = myHID.IOBuf[iobufBaseIndex + 2];
+   int WTM = ((lis2dh_FIFO_SRC_REG_value >> 7) & 0x01);
+   int OVRN_FIFO = ((lis2dh_FIFO_SRC_REG_value >> 6) & 0x01);
+   int EMPTY = ((lis2dh_FIFO_SRC_REG_value >> 5) & 0x01);
+   int ptrDelta = ((lis2dh_FIFO_SRC_REG_value >> 0) & 0x1F);
+
+----------------------------------------------------------------------------------------------------
+OS24EVK-66 2015-05-01: firmware version 2015-04-23_v1.1
+OS24EVK-58 Software Toolkit - bare metal device driver 
+   max30101.c  max30101.h
+   lis2dh.c    lis2dh.h
+   max7311.c   max7311.h
+
+----------------------------------------------------------------------------------------------------
+// VERIFY: OS24EVK-72 HID report 1 byte 3 = MAX30101_InterruptStatus1 (not MAX30101_OverFlowCounter)
+
+Modify HID report ID 1 data format: replace byte [3] with Device Register 0 MAX30101_InterruptStatus1 (instead of Device Register 5 MAX30101_OverFlowCounter).
+
+This change makes it possible for the MAX30101.cs library to observe the status of the interrupt register, otherwise this information would be lost within the firmware interrupt service routine.
+
+Kien needs this done soon to support OS24 road test / validating Proximity mode feature.
+
+Affects Firmware F3xx_USB0_ReportHandler.c readOS21()
+- firmware 2015-04-24_v1.1 in branch OS24EVK-66
+- ☑ replace ovf with MAX30101_InterruptStatus1_value
+- ☑ merge into firmware trunk and tag as 2015-04-24_v1.1
+
+----------------------------------------------------------------------------------------------------
+OS24EVK-66 2015-05-20: firmware 2015-04-25_v1.1 gSMBrepeatedStart 
+   Issue with I2C i2c_read not generating repeated start...
+   SMBus.c gSMBrepeatedStart = gI2Cflags & 1;
+   Looks like default gI2Cflags = 0, should be 1.
+
+gI2Cflags bit 0x01 gSMBrepeatedStart  Use I2C repeated start between write and read
+gI2Cflags bit 0x02 debug: jungo emulation
+gI2Cflags bit 0x04 gSMBackPoll Enable Acknowledge Polling
+
+This was needed for HSP mock MAX31725 (Arduino)
+☑ VERIFY: does this still work with MAX30101?
+
+
+----------------------------------------------------------------------------------------------------

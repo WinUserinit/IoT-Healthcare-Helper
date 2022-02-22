@@ -1,0 +1,17 @@
+
+BL51 BANKED LINKER/LOCATER V6.22 - SN: K1RIC-Y065IZ
+COPYRIGHT KEIL ELEKTRONIK GmbH 1987 - 2009
+"C:\svn\MAX30101\firmware\Uxx\trunk\F3xx_USB0_InterruptServiceRoutine.obj",
+"C:\svn\MAX30101\firmware\Uxx\trunk\F3xx_USB0_Standard_Requests.obj",
+"C:\svn\MAX30101\firmware\Uxx\trunk\F3xx_USB0_Main.obj",
+"C:\svn\MAX30101\firmware\Uxx\trunk\F3xx_USB0_ReportHandler.obj",
+"C:\svn\MAX30101\firmware\Uxx\trunk\F3xx_USB0_Descriptor.obj",
+"C:\svn\MAX30101\firmware\Uxx\trunk\F3xx_Initialize.obj",
+"C:\svn\MAX30101\firmware\Uxx\trunk\SMBus.obj",
+"C:\svn\MAX30101\firmware\Uxx\trunk\SPI.obj",
+"C:\svn\MAX30101\firmware\Uxx\trunk\lis2dh.obj",
+"C:\svn\MAX30101\firmware\Uxx\trunk\max30101.obj",
+"C:\svn\MAX30101\firmware\Uxx\trunk\max7311.obj"  TO "C:\svn\MAX30101\firmware\Uxx\trunk\os24" RS(256) PL(68) PW(132) NOOL IX 
+
+Program Size: data=10.5 xdata=473 code=12635
+LINK/LOCATE RUN COMPLETE.  0 WARNING(S),  0 ERROR(S)

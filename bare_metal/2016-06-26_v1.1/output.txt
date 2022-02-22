@@ -1,0 +1,172 @@
+Rebuilding... 
+ 
+ Compiling F3xx_Initialize.c 
+c:\keil\C51\BIN\C51.exe "F3xx_Initialize.c" DB OE Large CD 
+
+C51 COMPILER V9.51 - SN: K1RIC-Y065IZ
+COPYRIGHT Copyright (C) 2012 ARM Ltd and ARM Germany GmbH. All rights reserved.
+*** MESSAGE C286 IN LINE 169 OF ProjectDefines.h: writeReadHID() EP3OUT 256-byte buffer
+*** MESSAGE C286 IN LINE 170 OF ProjectDefines.h: writeReadHID() EP3IN 256-byte buffer
+*** MESSAGE C286 IN LINE 171 OF ProjectDefines.h: USB_EP_INDEX 3 for EP_STATUS[USB_EP_INDEX] and POLL_WRITE_BYTE (INDEX, USB_EP_INDEX);
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
+ 
+ Compiling F3xx_USB0_Descriptor.c 
+c:\keil\C51\BIN\C51.exe "F3xx_USB0_Descriptor.c" DB OE Large CD 
+
+C51 COMPILER V9.51 - SN: K1RIC-Y065IZ
+COPYRIGHT Copyright (C) 2012 ARM Ltd and ARM Germany GmbH. All rights reserved.
+*** MESSAGE C286 IN LINE 169 OF ProjectDefines.h: writeReadHID() EP3OUT 256-byte buffer
+*** MESSAGE C286 IN LINE 170 OF ProjectDefines.h: writeReadHID() EP3IN 256-byte buffer
+*** MESSAGE C286 IN LINE 171 OF ProjectDefines.h: USB_EP_INDEX 3 for EP_STATUS[USB_EP_INDEX] and POLL_WRITE_BYTE (INDEX, USB_EP_INDEX);
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
+ 
+ Compiling F3xx_USB0_InterruptServiceRoutine.c 
+c:\keil\C51\BIN\C51.exe "F3xx_USB0_InterruptServiceRoutine.c" DB OE Large CD 
+
+C51 COMPILER V9.51 - SN: K1RIC-Y065IZ
+COPYRIGHT Copyright (C) 2012 ARM Ltd and ARM Germany GmbH. All rights reserved.
+*** MESSAGE C286 IN LINE 169 OF ProjectDefines.h: writeReadHID() EP3OUT 256-byte buffer
+*** MESSAGE C286 IN LINE 170 OF ProjectDefines.h: writeReadHID() EP3IN 256-byte buffer
+*** MESSAGE C286 IN LINE 171 OF ProjectDefines.h: USB_EP_INDEX 3 for EP_STATUS[USB_EP_INDEX] and POLL_WRITE_BYTE (INDEX, USB_EP_INDEX);
+*** MESSAGE C286 IN LINE 449 OF F3xx_USB0_InterruptServiceRoutine.c: Handle_In3() EP3IN 256-byte buffer
+*** MESSAGE C286 IN LINE 546 OF F3xx_USB0_InterruptServiceRoutine.c: Handle_Out3() EP3OUT 256-byte buffer
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
+ 
+ Compiling F3xx_USB0_Main.c 
+c:\keil\C51\BIN\C51.exe "F3xx_USB0_Main.c" DB OE Large CD 
+
+C51 COMPILER V9.51 - SN: K1RIC-Y065IZ
+COPYRIGHT Copyright (C) 2012 ARM Ltd and ARM Germany GmbH. All rights reserved.
+*** MESSAGE C286 IN LINE 169 OF ProjectDefines.h: writeReadHID() EP3OUT 256-byte buffer
+*** MESSAGE C286 IN LINE 170 OF ProjectDefines.h: writeReadHID() EP3IN 256-byte buffer
+*** MESSAGE C286 IN LINE 171 OF ProjectDefines.h: USB_EP_INDEX 3 for EP_STATUS[USB_EP_INDEX] and POLL_WRITE_BYTE (INDEX, USB_EP_INDEX);
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
+ 
+ Compiling F3xx_USB0_ReportHandler.c 
+c:\keil\C51\BIN\C51.exe "F3xx_USB0_ReportHandler.c" DB OE Large CD 
+
+C51 COMPILER V9.51 - SN: K1RIC-Y065IZ
+COPYRIGHT Copyright (C) 2012 ARM Ltd and ARM Germany GmbH. All rights reserved.
+*** MESSAGE C286 IN LINE 169 OF ProjectDefines.h: writeReadHID() EP3OUT 256-byte buffer
+*** MESSAGE C286 IN LINE 170 OF ProjectDefines.h: writeReadHID() EP3IN 256-byte buffer
+*** MESSAGE C286 IN LINE 171 OF ProjectDefines.h: USB_EP_INDEX 3 for EP_STATUS[USB_EP_INDEX] and POLL_WRITE_BYTE (INDEX, USB_EP_INDEX);
+*** WARNING C329 IN LINE 1064 OF F3xx_USB0_ReportHandler.c: single-line comment contains line-continuation
+*** WARNING C329 IN LINE 1065 OF F3xx_USB0_ReportHandler.c: single-line comment contains line-continuation
+*** WARNING C329 IN LINE 1066 OF F3xx_USB0_ReportHandler.c: single-line comment contains line-continuation
+*** WARNING C329 IN LINE 1067 OF F3xx_USB0_ReportHandler.c: single-line comment contains line-continuation
+*** WARNING C329 IN LINE 1068 OF F3xx_USB0_ReportHandler.c: single-line comment contains line-continuation
+*** WARNING C329 IN LINE 1069 OF F3xx_USB0_ReportHandler.c: single-line comment contains line-continuation
+*** WARNING C329 IN LINE 1070 OF F3xx_USB0_ReportHandler.c: single-line comment contains line-continuation
+*** WARNING C182 IN LINE 1271 OF F3xx_USB0_ReportHandler.c: pointer to different objects
+*** WARNING C182 IN LINE 1271 OF F3xx_USB0_ReportHandler.c: pointer to different objects
+*** WARNING C182 IN LINE 1271 OF F3xx_USB0_ReportHandler.c: pointer to different objects
+*** WARNING C316 IN LINE 1509 OF F3xx_USB0_ReportHandler.c: unterminated conditionals
+
+C51 COMPILATION COMPLETE.  11 WARNING(S),  0 ERROR(S)
+ 
+ Compiling F3xx_USB0_Standard_Requests.c 
+c:\keil\C51\BIN\C51.exe "F3xx_USB0_Standard_Requests.c" DB OE Large CD 
+
+C51 COMPILER V9.51 - SN: K1RIC-Y065IZ
+COPYRIGHT Copyright (C) 2012 ARM Ltd and ARM Germany GmbH. All rights reserved.
+*** MESSAGE C286 IN LINE 169 OF ProjectDefines.h: writeReadHID() EP3OUT 256-byte buffer
+*** MESSAGE C286 IN LINE 170 OF ProjectDefines.h: writeReadHID() EP3IN 256-byte buffer
+*** MESSAGE C286 IN LINE 171 OF ProjectDefines.h: USB_EP_INDEX 3 for EP_STATUS[USB_EP_INDEX] and POLL_WRITE_BYTE (INDEX, USB_EP_INDEX);
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
+ 
+ Compiling lis2dh.c 
+c:\keil\C51\BIN\C51.exe "lis2dh.c" DB OE Large CD 
+
+C51 COMPILER V9.51 - SN: K1RIC-Y065IZ
+COPYRIGHT Copyright (C) 2012 ARM Ltd and ARM Germany GmbH. All rights reserved.
+*** MESSAGE C286 IN LINE 169 OF ProjectDefines.h: writeReadHID() EP3OUT 256-byte buffer
+*** MESSAGE C286 IN LINE 170 OF ProjectDefines.h: writeReadHID() EP3IN 256-byte buffer
+*** MESSAGE C286 IN LINE 171 OF ProjectDefines.h: USB_EP_INDEX 3 for EP_STATUS[USB_EP_INDEX] and POLL_WRITE_BYTE (INDEX, USB_EP_INDEX);
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
+ 
+ Compiling max30100.c 
+c:\keil\C51\BIN\C51.exe "max30100.c" DB OE Large CD 
+
+C51 COMPILER V9.51 - SN: K1RIC-Y065IZ
+COPYRIGHT Copyright (C) 2012 ARM Ltd and ARM Germany GmbH. All rights reserved.
+*** MESSAGE C286 IN LINE 169 OF ProjectDefines.h: writeReadHID() EP3OUT 256-byte buffer
+*** MESSAGE C286 IN LINE 170 OF ProjectDefines.h: writeReadHID() EP3IN 256-byte buffer
+*** MESSAGE C286 IN LINE 171 OF ProjectDefines.h: USB_EP_INDEX 3 for EP_STATUS[USB_EP_INDEX] and POLL_WRITE_BYTE (INDEX, USB_EP_INDEX);
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
+ 
+ Compiling max30101.c 
+c:\keil\C51\BIN\C51.exe "max30101.c" DB OE Large CD 
+
+C51 COMPILER V9.51 - SN: K1RIC-Y065IZ
+COPYRIGHT Copyright (C) 2012 ARM Ltd and ARM Germany GmbH. All rights reserved.
+*** MESSAGE C286 IN LINE 169 OF ProjectDefines.h: writeReadHID() EP3OUT 256-byte buffer
+*** MESSAGE C286 IN LINE 170 OF ProjectDefines.h: writeReadHID() EP3IN 256-byte buffer
+*** MESSAGE C286 IN LINE 171 OF ProjectDefines.h: USB_EP_INDEX 3 for EP_STATUS[USB_EP_INDEX] and POLL_WRITE_BYTE (INDEX, USB_EP_INDEX);
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
+ 
+ Compiling max7311.c 
+c:\keil\C51\BIN\C51.exe "max7311.c" DB OE Large CD 
+
+C51 COMPILER V9.51 - SN: K1RIC-Y065IZ
+COPYRIGHT Copyright (C) 2012 ARM Ltd and ARM Germany GmbH. All rights reserved.
+*** MESSAGE C286 IN LINE 169 OF ProjectDefines.h: writeReadHID() EP3OUT 256-byte buffer
+*** MESSAGE C286 IN LINE 170 OF ProjectDefines.h: writeReadHID() EP3IN 256-byte buffer
+*** MESSAGE C286 IN LINE 171 OF ProjectDefines.h: USB_EP_INDEX 3 for EP_STATUS[USB_EP_INDEX] and POLL_WRITE_BYTE (INDEX, USB_EP_INDEX);
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
+ 
+ Compiling SMBus.c 
+c:\keil\C51\BIN\C51.exe "SMBus.c" DB OE Large CD 
+
+C51 COMPILER V9.51 - SN: K1RIC-Y065IZ
+COPYRIGHT Copyright (C) 2012 ARM Ltd and ARM Germany GmbH. All rights reserved.
+*** MESSAGE C286 IN LINE 169 OF ProjectDefines.h: writeReadHID() EP3OUT 256-byte buffer
+*** MESSAGE C286 IN LINE 170 OF ProjectDefines.h: writeReadHID() EP3IN 256-byte buffer
+*** MESSAGE C286 IN LINE 171 OF ProjectDefines.h: USB_EP_INDEX 3 for EP_STATUS[USB_EP_INDEX] and POLL_WRITE_BYTE (INDEX, USB_EP_INDEX);
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
+ 
+ Compiling SPI.c 
+c:\keil\C51\BIN\C51.exe "SPI.c" DB OE Large CD 
+
+C51 COMPILER V9.51 - SN: K1RIC-Y065IZ
+COPYRIGHT Copyright (C) 2012 ARM Ltd and ARM Germany GmbH. All rights reserved.
+*** MESSAGE C286 IN LINE 169 OF ProjectDefines.h: writeReadHID() EP3OUT 256-byte buffer
+*** MESSAGE C286 IN LINE 170 OF ProjectDefines.h: writeReadHID() EP3IN 256-byte buffer
+*** MESSAGE C286 IN LINE 171 OF ProjectDefines.h: USB_EP_INDEX 3 for EP_STATUS[USB_EP_INDEX] and POLL_WRITE_BYTE (INDEX, USB_EP_INDEX);
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
+c:\keil\C51\BIN\bl51.exe @".\cyglink.txt" 
+
+BL51 BANKED LINKER/LOCATER V6.22 - SN: K1RIC-Y065IZ
+COPYRIGHT KEIL ELEKTRONIK GmbH 1987 - 2009
+"C:\svn\MAX30101\firmware\Uxx\trunk\F3xx_USB0_InterruptServiceRoutine.obj",
+"C:\svn\MAX30101\firmware\Uxx\trunk\F3xx_USB0_Standard_Requests.obj",
+"C:\svn\MAX30101\firmware\Uxx\trunk\F3xx_USB0_Main.obj",
+"C:\svn\MAX30101\firmware\Uxx\trunk\F3xx_USB0_ReportHandler.obj",
+"C:\svn\MAX30101\firmware\Uxx\trunk\F3xx_USB0_Descriptor.obj",
+"C:\svn\MAX30101\firmware\Uxx\trunk\F3xx_Initialize.obj",
+"C:\svn\MAX30101\firmware\Uxx\trunk\SMBus.obj",
+"C:\svn\MAX30101\firmware\Uxx\trunk\SPI.obj",
+"C:\svn\MAX30101\firmware\Uxx\trunk\lis2dh.obj",
+"C:\svn\MAX30101\firmware\Uxx\trunk\max30101.obj",
+"C:\svn\MAX30101\firmware\Uxx\trunk\max7311.obj"  TO "C:\svn\MAX30101\firmware\Uxx\trunk\os24" RS(256) PL(68) PW(132) NOOL IX 
+
+Program Size: data=10.7 xdata=451 code=11577
+LINK/LOCATE RUN COMPLETE.  0 WARNING(S),  0 ERROR(S)
+c:\keil\C51\BIN\oh51.exe ".\os24" 
+
+OBJECT TO HEX FILE CONVERTER OH51 V2.6
+COPYRIGHT KEIL ELEKTRONIK GmbH 1991 - 2001
+
+GENERATING INTEL HEX FILE: .\os24.hex
+
+OBJECT TO HEX CONVERSION COMPLETED.

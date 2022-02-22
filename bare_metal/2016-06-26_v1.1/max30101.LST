@@ -1,0 +1,373 @@
+C51 COMPILER V9.51   MAX30101                                                              06/26/2015 13:32:25 PAGE 1   
+
+
+C51 COMPILER V9.51, COMPILATION OF MODULE MAX30101
+OBJECT MODULE PLACED IN max30101.OBJ
+COMPILER INVOKED BY: c:\keil\C51\BIN\C51.exe max30101.c DB OE LARGE CD
+
+line level    source
+
+   1          /*******************************************************************************
+   2          * Copyright (C) 2015 Maxim Integrated Products, Inc., All rights Reserved.
+   3          * * This software is protected by copyright laws of the United States and
+   4          * of foreign countries. This material may also be protected by patent laws
+   5          * and technology transfer regulations of the United States and of foreign
+   6          * countries. This software is furnished under a license agreement and/or a
+   7          * nondisclosure agreement and may only be used or reproduced in accordance
+   8          * with the terms of those agreements. Dissemination of this information to
+   9          * any party or parties not specified in the license agreement and/or
+  10          * nondisclosure agreement is expressly prohibited.
+  11          *
+  12          * The above copyright notice and this permission notice shall be included
+  13          * in all copies or substantial portions of the Software.
+  14          *
+  15          * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+  16          * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+  17          * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+  18          * IN NO EVENT SHALL MAXIM INTEGRATED BE LIABLE FOR ANY CLAIM, DAMAGES
+  19          * OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+  20          * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+  21          * OTHER DEALINGS IN THE SOFTWARE.
+  22          *
+  23          * Except as contained in this notice, the name of Maxim Integrated
+  24          * Products, Inc. shall not be used except as stated in the Maxim Integrated
+  25          * Products, Inc. Branding Policy.
+  26          *
+  27          * The mere transfer of this software does not imply any licenses
+  28          * of trade secrets, proprietary technology, copyrights, patents,
+  29          * trademarks, maskwork rights, or any other form of intellectual
+  30          * property whatsoever. Maxim Integrated Products, Inc. retains all
+  31          * ownership rights.
+  32          *******************************************************************************
+  33          */
+  34          
+  35          //*******************************************************************************
+  36          //
+  37          // This source code file is under the same NDA terms as the IC data sheet.
+  38          //
+  39          //*******************************************************************************
+  40          
+  41          // ----------------------------------------------------------------------------
+  42          // Header files
+  43          // ----------------------------------------------------------------------------
+  44          
+  45          // Project-level preprocessor #defines effective across all *.c files
+  46          #include "ProjectDefines.h"
+*** MESSAGE C286 IN LINE 169 OF ProjectDefines.h: writeReadHID() EP3OUT 256-byte buffer
+*** MESSAGE C286 IN LINE 170 OF ProjectDefines.h: writeReadHID() EP3IN 256-byte buffer
+*** MESSAGE C286 IN LINE 171 OF ProjectDefines.h: USB_EP_INDEX 3 for EP_STATUS[USB_EP_INDEX] and POLL_WRITE_BYTE (INDEX,
+             - USB_EP_INDEX);
+  47          
+  48          // OS24EVK-58 Software Toolkit - bare metal device driver
+  49          #if SUPPORT_MAX30101
+  50          #include "max30101.h"
+  51          #endif // SUPPORT_MAX30101
+C51 COMPILER V9.51   MAX30101                                                              06/26/2015 13:32:25 PAGE 2   
+
+  52          
+  53          #if 1 // TODO: lis2dh_configure_FIFO(LIS2DH_DEFAULT_FIFOMODE) when max30101_RegWrite(RegAddressEnum.ModeCo
+             -nfiguration,...)
+  54          #if SUPPORT_LIS2DH
+  55          #include "lis2dh.h"
+  56          #endif // SUPPORT_LIS2DH
+  57          #endif // TODO: lis2dh_configure_FIFO(LIS2DH_DEFAULT_FIFOMODE) when max30101_RegWrite(RegAddressEnum.ModeC
+             -onfiguration,...)
+  58          
+  59          #if SUPPORT_MAX30101
+  60          uint8_t gMAX30101deviceAddress = 0x00; //!< (default 0xAE) = MAX30101 I2C device address (slave address on
+             - I2C bus), 8-bits, LEFT-justified.
+  61          code uint8_t searchMAX30101deviceAddressList[] = {
+  62             0xAE, //!< MAX30101 I2C device address (slave address on I2C bus), 8-bits, LEFT-justified.
+  63             0 //<! end of list
+  64          }; //!< MAX30101 I2C device address (slave address on I2C bus), 8-bits, LEFT-justified.
+  65          
+  66          // TODO: 2015-05-02 cache value of MAX30101_ModeConfiguration in gMAX30101_ModeConfiguration_value
+  67          uint8_t gMAX30101_ModeConfiguration_value = 0;
+  68          
+  69          #else // SUPPORT_MAX30101
+              // regression test: gI2CreadBurstSlaveAddress was the old name for gMAX30101deviceAddresss
+              // between gOffset and blockArr
+              uint8_t gMAX30101deviceAddress = 0xAE; //!< (default 0xAE) = MAX30101 I2C device address (slave address on
+             - I2C bus), 8-bits, LEFT-justified.
+              #endif // SUPPORT_MAX30101
+  74          
+  75          // OS24EVK-66 MAX30101 Present?
+  76          // @post gMAX30101deviceAddress = 0 if MAX30101 not connected,
+  77          //       gMAX30101deviceAddress = MAX30101 device address if present
+  78          #if SUPPORT_MAX30101
+  79          void max30101_open()
+  80          {
+  81   1         // OS24EVK-66 Init: max30101_open() Search MAX30101 device address 0x30, 0x32 gMAX30101deviceAddress
+  82   1         //
+  83   1         int8_t i2cAddressIndex;
+  84   1         int8_t DeviceID_regAddr;
+  85   1         int8_t DeviceID_expect;
+  86   1         int8_t DeviceID_actual;
+  87   1         //
+  88   1         // C not C++, so all local variables must be declared before any statements
+  89   1         //
+  90   1         // loop through list of deviceAddress to search
+  91   1         // static uint8_t searchMAX30101deviceAddressList[] = {0xAE, 0};
+  92   1         //
+  93   1         // // example: max30101_RegRead NACK status
+  94   1         // gMAX30101deviceAddress = 0x44; // MAX30101 0xAE
+  95   1         //    DeviceID_regAddr = 0xFF; // MAX30101 register DeviceId (constant 0x15) Device identification regi
+             -ster.
+  96   1         //    DeviceID_expect = 0x15;
+  97   1         //    DeviceID_actual = max30101_RegRead(DeviceID_regAddr, 0); // MAX30101
+  98   1         //
+  99   1         // // example: max30101_RegRead NACK status
+ 100   1         // gMAX30101deviceAddress = 0xAE; // MAX30101 0xAE
+ 101   1         //    DeviceID_regAddr = 0xFF; // MAX30101 register DeviceId (constant 0x15) Device identification regi
+             -ster.
+ 102   1         //    DeviceID_expect = 0x15;
+ 103   1         //    DeviceID_actual = max30101_RegRead(DeviceID_regAddr, 0); // MAX30101
+ 104   1         //
+ 105   1         // // example: max30101_RegRead NACK status
+ 106   1         // gMAX30101deviceAddress = 0x32; // MAX30101
+ 107   1         //    DeviceID_regAddr = 0x0F; // MAX30101 register WHO_AM_I (constant 0x33) Device identification regi
+C51 COMPILER V9.51   MAX30101                                                              06/26/2015 13:32:25 PAGE 3   
+
+             -ster.
+ 108   1         //    DeviceID_expect = 0x33;
+ 109   1         //    DeviceID_actual = max30101_RegRead(DeviceID_regAddr, 0); // MAX30101
+ 110   1         //
+ 111   1         // Search the i2c address list for possible devices
+ 112   1         for (i2cAddressIndex = 0; searchMAX30101deviceAddressList[i2cAddressIndex] != 0; i2cAddressIndex++)
+ 113   1         {
+ 114   2            gMAX30101deviceAddress = searchMAX30101deviceAddressList[i2cAddressIndex];
+ 115   2            //
+ 116   2            //~ blockArr[5] = DeviceID_regAddr;
+ 117   2            //~ i2c_read(gMAX30101deviceAddress & 0xFE, blockArr, 1, 1);      
+ 118   2            //        blockArr[2+0] = value read from Device Register
+ 119   2            //
+ 120   2            DeviceID_regAddr = MAX30101_DeviceID; // (constant 0x15) Device identification register.
+ 121   2            DeviceID_expect = 0x15;
+ 122   2            // DeviceID_actual = max30101_RegRead(DeviceID_regAddr, 0);
+ 123   2            if (max30101_RegRead(DeviceID_regAddr, &DeviceID_actual) < 0) {
+ 124   3               // typically for NACK, errno=5 and return value = -1
+ 125   3               //~ flash_Led1Led2_Blink();
+ 126   3               //~ flash_Led1Led2_East();
+ 127   3               continue;
+ 128   3            } else if ((DeviceID_actual & 0xFF) != (DeviceID_expect & 0xFF)) {
+ 129   3               //~ printf("\n""max30101_open(): i2c address 0x%2.2X (8-bit 0x%2.2X) ACK"
+ 130   3               //~ "\n""                but reg 0x%2.2X %s=0x%2.2X not 0x%2.2X so wrong device",
+ 131   3               //~ global_max30101_device_data.i2cDeviceAddress7bits,
+ 132   3               //~ global_max30101_device_data.i2cDeviceAddress7bits * 2,
+ 133   3               //~ (DeviceID_regAddr & 0xFF),
+ 134   3               //~ max30101_RegisterAddressName((uint8_t)DeviceID_regAddr, 0, 0),
+ 135   3               //~ (DeviceID_actual & 0xFF),
+ 136   3               //~ (DeviceID_expect & 0xFF)
+ 137   3               //~ );
+ 138   3               //~ flash_Led1Led2_Blink();
+ 139   3               //~ flash_Led1Led2_Blink();
+ 140   3               //~ flash_Led1Led2_East();
+ 141   3               continue;
+ 142   3            } else {
+ 143   3               //~ printf("\n""max30101_open(): i2c address 0x%2.2X (8-bit 0x%2.2X) ACK; %s=0x%2.2X OK",
+ 144   3               //~ global_max30101_device_data.i2cDeviceAddress7bits,
+ 145   3               //~ global_max30101_device_data.i2cDeviceAddress7bits * 2,
+ 146   3               //~ max30101_RegisterAddressName((uint8_t)DeviceID_regAddr, 0, 0),
+ 147   3               //~ (DeviceID_actual & 0xFF)
+ 148   3               //~ );
+ 149   3               //
+ 150   3               // TODO: OS24EVK-66 Init: if MAX30101 present, initialize 
+ 151   3               // TODO: OS24EVK-66 Init: if MAX30101 present, initialize INT1 Active-Low by writing 0x25 CTRL_RE
+             -G6 bit 0x02 H_LACTIVE=1
+ 152   3               //max30101_RegWrite(max30101_CTRL_REG6, 0x02);
+ 153   3               //max30101_configure_outputDataRateHz(100);
+ 154   3               //max30101_configure_resolutionBits(12);
+ 155   3               //~ max30101_configure_selfTest(0);
+ 156   3               // TODO: OS24EVK-66 Init: if MAX30101 present, initialize FIFO overflow (watermark)
+ 157   3               //
+ 158   3               //~ flash_Led1Led2_Blink();
+ 159   3               //~ flash_Led1Led2_Blink();
+ 160   3               //~ flash_Led1Led2_Blink();
+ 161   3               //~ flash_Led1Led2_East();
+ 162   3               return; //  1; // success
+ 163   3            }
+ 164   2         }
+ 165   1         gMAX30101deviceAddress = 0; // MAX30101 not found
+ 166   1      #if 0
+                 // TODO1: OS24EVK-66 if MAX30101 absent but (gMockHIDFIFOChannels > 0), still send HID report 1
+C51 COMPILER V9.51   MAX30101                                                              06/26/2015 13:32:25 PAGE 4   
+
+                 // This still isn't meaningful; streaming start fails because of other device regster writes.
+                 gMockHIDFIFOChannels = 3;
+              #endif
+ 171   1      }
+ 172          #endif // SUPPORT_MAX30101
+ 173          
+ 174          // OS24EVK-66 MAX30101 Register Write
+ 175          #if SUPPORT_MAX30101
+ 176          int8_t max30101_RegRead(uint8_t regAddress, uint8_t *pRegValue)
+ 177          {
+ 178   1         return i2c_smbus_read_byte_data(gMAX30101deviceAddress, regAddress, pRegValue);
+ 179   1      }
+ 180          #endif // SUPPORT_MAX30101
+ 181          
+ 182          #if SUPPORT_MAX30101
+ 183          // OS24EVK-66 MAX30101 Register Write
+ 184          int8_t max30101_RegWrite(uint8_t regAddress, uint8_t regValue)
+ 185          {
+ 186   1         // TODO: 2015-05-02 cache value of MAX30101_ModeConfiguration in gMAX30101_ModeConfiguration_value
+ 187   1         if (regAddress == MAX30101_ModeConfiguration) {
+ 188   2            gMAX30101_ModeConfiguration_value = regValue;
+ 189   2      #if 0 // TODO: lis2dh_configure_FIFO(LIS2DH_DEFAULT_FIFOMODE) when max30101_RegWrite(RegAddressEnum.ModeCo
+             -nfiguration,...)
+              # ifdef LIS2DH_DEFAULT_FIFOMODE
+                    lis2dh_configure_FIFO(/* fifoModeFM10 1:FIFO mode */ LIS2DH_DEFAULT_FIFOMODE, /* fifoTR */ 0, LIS2DH
+             -_DEFAULT_FIFOWATERMARKLEVEL);
+              # endif
+              #endif // TODO: lis2dh_configure_FIFO(LIS2DH_DEFAULT_FIFOMODE) when max30101_RegWrite(RegAddressEnum.ModeC
+             -onfiguration,...)
+ 194   2         }
+ 195   1         return i2c_smbus_write_byte_data(gMAX30101deviceAddress, regAddress, regValue);
+ 196   1      }
+ 197          #endif // SUPPORT_MAX30101
+ 198          
+C51 COMPILER V9.51   MAX30101                                                              06/26/2015 13:32:25 PAGE 5   
+
+ASSEMBLY LISTING OF GENERATED OBJECT CODE
+
+
+             ; FUNCTION max30101_open (BEGIN)
+                                           ; SOURCE LINE # 79
+                                           ; SOURCE LINE # 80
+                                           ; SOURCE LINE # 112
+0000 E4                CLR     A
+0001 900000      R     MOV     DPTR,#i2cAddressIndex
+0004 F0                MOVX    @DPTR,A
+0005         ?C0001:
+0005 900000      R     MOV     DPTR,#i2cAddressIndex
+0008 E0                MOVX    A,@DPTR
+0009 FF                MOV     R7,A
+000A 33                RLC     A
+000B 95E0              SUBB    A,ACC
+000D FE                MOV     R6,A
+000E 7400        R     MOV     A,#LOW searchMAX30101deviceAddressList
+0010 2F                ADD     A,R7
+0011 F582              MOV     DPL,A
+0013 7400        R     MOV     A,#HIGH searchMAX30101deviceAddressList
+0015 3E                ADDC    A,R6
+0016 F583              MOV     DPH,A
+0018 E4                CLR     A
+0019 93                MOVC    A,@A+DPTR
+001A 6034              JZ      ?C0002
+                                           ; SOURCE LINE # 113
+                                           ; SOURCE LINE # 114
+001C 900000      R     MOV     DPTR,#gMAX30101deviceAddress
+001F F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 120
+;---- Variable 'DeviceID_regAddr' assigned to Register 'R7' ----
+0020 7FFF              MOV     R7,#0FFH
+                                           ; SOURCE LINE # 121
+0022 900000      R     MOV     DPTR,#DeviceID_expect
+0025 7415              MOV     A,#015H
+0027 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 123
+0028 7B01              MOV     R3,#01H
+002A 7A00        R     MOV     R2,#HIGH DeviceID_actual
+002C 7900        R     MOV     R1,#LOW DeviceID_actual
+002E 120000      R     LCALL   _max30101_RegRead
+0031 C3                CLR     C
+0032 EF                MOV     A,R7
+0033 6480              XRL     A,#080H
+0035 9480              SUBB    A,#080H
+0037 5002              JNC     ?C0004
+                                           ; SOURCE LINE # 127
+0039 800D              SJMP    ?C0003
+                                           ; SOURCE LINE # 128
+003B         ?C0004:
+003B 900000      R     MOV     DPTR,#DeviceID_expect
+003E E0                MOVX    A,@DPTR
+003F FF                MOV     R7,A
+0040 A3                INC     DPTR
+0041 E0                MOVX    A,@DPTR
+0042 6F                XRL     A,R7
+0043 7001              JNZ     ?C0012
+0045 E4                CLR     A
+0046         ?C0012:
+0046 600D              JZ      ?C0008
+                                           ; SOURCE LINE # 141
+C51 COMPILER V9.51   MAX30101                                                              06/26/2015 13:32:25 PAGE 6   
+
+                                           ; SOURCE LINE # 142
+                                           ; SOURCE LINE # 163
+                                           ; SOURCE LINE # 164
+0048         ?C0003:
+0048 900000      R     MOV     DPTR,#i2cAddressIndex
+004B E0                MOVX    A,@DPTR
+004C 04                INC     A
+004D F0                MOVX    @DPTR,A
+004E 80B5              SJMP    ?C0001
+0050         ?C0002:
+                                           ; SOURCE LINE # 165
+0050 E4                CLR     A
+0051 900000      R     MOV     DPTR,#gMAX30101deviceAddress
+0054 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 171
+0055         ?C0008:
+0055 22                RET     
+             ; FUNCTION max30101_open (END)
+
+             ; FUNCTION _max30101_RegRead (BEGIN)
+                                           ; SOURCE LINE # 176
+;---- Variable 'pRegValue' assigned to Register 'R1/R2/R3' ----
+;---- Variable 'regAddress' assigned to Register 'R6' ----
+0000 AE07              MOV     R6,AR7
+                                           ; SOURCE LINE # 177
+                                           ; SOURCE LINE # 178
+0002 900000      R     MOV     DPTR,#gMAX30101deviceAddress
+0005 E0                MOVX    A,@DPTR
+0006 FF                MOV     R7,A
+0007 AD06              MOV     R5,AR6
+0009 120000      E     LCALL   _i2c_smbus_read_byte_data
+                                           ; SOURCE LINE # 179
+000C         ?C0009:
+000C 22                RET     
+             ; FUNCTION _max30101_RegRead (END)
+
+             ; FUNCTION _max30101_RegWrite (BEGIN)
+                                           ; SOURCE LINE # 184
+;---- Variable 'regValue' assigned to Register 'R6' ----
+0000 AE05              MOV     R6,AR5
+;---- Variable 'regAddress' assigned to Register 'R5' ----
+0002 AD07              MOV     R5,AR7
+                                           ; SOURCE LINE # 185
+                                           ; SOURCE LINE # 187
+0004 ED                MOV     A,R5
+0005 B40905            CJNE    A,#09H,?C0010
+                                           ; SOURCE LINE # 188
+0008 900000      R     MOV     DPTR,#gMAX30101_ModeConfiguration_value
+000B EE                MOV     A,R6
+000C F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 194
+000D         ?C0010:
+                                           ; SOURCE LINE # 195
+000D 900000      R     MOV     DPTR,#gMAX30101deviceAddress
+0010 E0                MOVX    A,@DPTR
+0011 FF                MOV     R7,A
+0012 AB06              MOV     R3,AR6
+0014 120000      E     LCALL   _i2c_smbus_write_byte_data
+                                           ; SOURCE LINE # 196
+0017         ?C0011:
+0017 22                RET     
+             ; FUNCTION _max30101_RegWrite (END)
+C51 COMPILER V9.51   MAX30101                                                              06/26/2015 13:32:25 PAGE 7   
+
+
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    123    ----
+   CONSTANT SIZE    =      2    ----
+   XDATA SIZE       =      2       3
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

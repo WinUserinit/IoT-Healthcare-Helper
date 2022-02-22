@@ -1,0 +1,11 @@
+"C:\svn\MAX30101\firmware\Uxx\trunk\F3xx_USB0_InterruptServiceRoutine.obj",
+"C:\svn\MAX30101\firmware\Uxx\trunk\F3xx_USB0_Standard_Requests.obj",
+"C:\svn\MAX30101\firmware\Uxx\trunk\F3xx_USB0_Main.obj",
+"C:\svn\MAX30101\firmware\Uxx\trunk\F3xx_USB0_ReportHandler.obj",
+"C:\svn\MAX30101\firmware\Uxx\trunk\F3xx_USB0_Descriptor.obj",
+"C:\svn\MAX30101\firmware\Uxx\trunk\F3xx_Initialize.obj",
+"C:\svn\MAX30101\firmware\Uxx\trunk\SMBus.obj",
+"C:\svn\MAX30101\firmware\Uxx\trunk\SPI.obj",
+"C:\svn\MAX30101\firmware\Uxx\trunk\lis2dh.obj",
+"C:\svn\MAX30101\firmware\Uxx\trunk\max30101.obj",
+"C:\svn\MAX30101\firmware\Uxx\trunk\max7311.obj"  TO "C:\svn\MAX30101\firmware\Uxx\trunk\os24" RS(256) PL(68) PW(132) NOOL IX 

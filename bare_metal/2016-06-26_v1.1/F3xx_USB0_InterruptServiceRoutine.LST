@@ -1,0 +1,2391 @@
+C51 COMPILER V9.51   F3XX_USB0_INTERRUPTSERVICEROUTINE                                     06/26/2015 13:32:25 PAGE 1   
+
+
+C51 COMPILER V9.51, COMPILATION OF MODULE F3XX_USB0_INTERRUPTSERVICEROUTINE
+OBJECT MODULE PLACED IN F3xx_USB0_InterruptServiceRoutine.OBJ
+COMPILER INVOKED BY: c:\keil\C51\BIN\C51.exe F3xx_USB0_InterruptServiceRoutine.c DB OE LARGE CD
+
+line level    source
+
+   1          //-----------------------------------------------------------------------------
+   2          // F3xx_USB0_InterruptServiceRoutine.c
+   3          //-----------------------------------------------------------------------------
+   4          // Copyright 2014
+   5          //
+   6          // Program Description:
+   7          //
+   8          // Source file for USB firmware. Includes top level ISR with SETUP,
+   9          // and Endpoint data handlers.  Also includes routine for USB suspend,
+  10          // reset, and procedural stall.
+  11          //
+  12          //
+  13          // FID:            3XX000005
+  14          // Target:         C8051F32x
+  15          // Tool chain:     Keil C51 7.50 / Keil EVAL C51
+  16          //                 Silicon Laboratories IDE version 2.6
+  17          // Project Name:   generic
+  18          //
+  19          //
+  20          // Release 1.0
+  21          //    -140401 Initial Revision (Tushar Mazumder)
+  22          //
+  23          // Other than bug fixes or implementation changes, this file should not need to be updated.
+  24          
+  25          
+  26          //-----------------------------------------------------------------------------
+  27          // Includes
+  28          //-----------------------------------------------------------------------------
+  29          #include "c8051f3xx.h"
+  30          #include "F3xx_USB0_Register.h"
+  31          #include "F3xx_USB0_InterruptServiceRoutine.h"
+*** MESSAGE C286 IN LINE 169 OF ProjectDefines.h: writeReadHID() EP3OUT 256-byte buffer
+*** MESSAGE C286 IN LINE 170 OF ProjectDefines.h: writeReadHID() EP3IN 256-byte buffer
+*** MESSAGE C286 IN LINE 171 OF ProjectDefines.h: USB_EP_INDEX 3 for EP_STATUS[USB_EP_INDEX] and POLL_WRITE_BYTE (INDEX,
+             - USB_EP_INDEX);
+  32          #include "F3xx_USB0_Descriptor.h"
+  33          #include "F3xx_USB0_ReportHandler.h"
+  34          
+  35          
+  36          //-----------------------------------------------------------------------------
+  37          // Global Variable Definitions
+  38          //-----------------------------------------------------------------------------
+  39          uint8_t USB0_STATE;              // Holds the current USB State
+  40                                                 // def. in F3xx_USB0_InterruptServiceRoutine.h
+  41          
+  42          setup_buffer SETUP;                    // Buffer for current device
+  43                                                 // request information
+  44          
+  45          uint16_t DATASIZE;                 // Size of data to return
+  46          uint16_t DATASENT;                 // Amount of data sent so far
+  47          uint8_t* DATAPTR;                // Pointer to data to return
+  48          
+  49          uint8_t EP_STATUS[3] = {EP_IDLE, EP_HALT, EP_HALT};
+  50                                                 // Holds the status for each endpoint
+  51          
+C51 COMPILER V9.51   F3XX_USB0_INTERRUPTSERVICEROUTINE                                     06/26/2015 13:32:25 PAGE 2   
+
+  52          //-----------------------------------------------------------------------------
+  53          // Local Function Definitions
+  54          //-----------------------------------------------------------------------------
+  55          void Usb_Resume (void);                // Resumes USB operation
+  56          void Usb_Reset (void);                 // Called after USB bus reset
+  57          void Handle_Control (void);            // Handle SETUP packet on EP 0
+  58          #if USB_writeReadHID_EP1OUT_EP1IN
+                 // VERIFY: OS24EVK-66 Support USB_writeReadHID_EP3OUT_EP3IN use EP3IN/EP3OUT for writeReadHID() command
+             -s
+                 // # pragma message("writeReadHID() EP1OUT 64-byte buffer")
+                 // # pragma message("writeReadHID() EP1IN  64-byte buffer")
+              void Handle_In1 (void);                // Handle EP1IN in packet on EP 1
+              void Handle_Out1 (void);               // Handle EP1OUT out packet on EP 1
+              #elif USB_writeReadHID_EP2OUT_EP2IN
+                 // # pragma message("writeReadHID() EP2OUT 128-byte buffer")
+                 // # pragma message("writeReadHID() EP2IN  128-byte buffer")
+              void Handle_In2 (void);                // Handle EP2IN in packet on EP 2
+              void Handle_Out2 (void);               // Handle EP2OUT out packet on EP 2
+              #elif USB_writeReadHID_EP3OUT_EP3IN
+  70             // # pragma message("writeReadHID() EP3OUT 256-byte buffer")
+  71             // # pragma message("writeReadHID() EP3IN  256-byte buffer")
+  72          void Handle_In3 (void);                // Handle EP3IN in packet on EP 3
+  73          void Handle_Out3 (void);               // Handle EP3OUT out packet on EP 3
+  74          #endif // USB_writeReadHID_EP1OUT_EP1IN
+  75          
+  76          void Usb_Suspend (void);               // This routine called when
+  77                                                 // Suspend signalling on bus
+  78          void Fifo_Read (uint8_t, uint16_t, uint8_t *);
+  79                                                 // Used for multiple byte reads
+  80                                                 // of Endpoint fifos
+  81          void Fifo_Write_Foreground (uint8_t, uint16_t, uint8_t *);
+  82                                                 // Used for multiple byte writes
+  83                                                 // of Endpoint fifos in foreground
+  84          void Fifo_Write_InterruptServiceRoutine (uint8_t, uint16_t,
+  85                                                                                           uint8_t *);
+  86                                                 // Used for multiple byte
+  87                                                 // writes of Endpoint fifos
+  88          
+  89          
+  90          //-----------------------------------------------------------------------------
+  91          // USB Interface Interrupt Service Routine (ISR)
+  92          //-----------------------------------------------------------------------------
+  93          // Called after any USB type interrupt, this handler determines which type
+  94          // of interrupt occurred, and calls the specific routine to handle it.
+  95          //
+  96          void Usb_ISR (void) interrupt INTERRUPT_USB0 /* interrupt 8 */  // Top-level USB ISR
+  97          {
+  98   1         uint8_t bCommon, bIn, bOut;
+  99   1         POLL_READ_BYTE (CMINT, bCommon);    // Read all interrupt registers
+ 100   1         POLL_READ_BYTE (IN1INT, bIn);       // this read also clears the register (EP0IN EP1IN EP2IN EP3IN)
+ 101   1         POLL_READ_BYTE (OUT1INT, bOut);     // (EP1OUT EP2OUT EP3OUT)
+ 102   1         {
+ 103   2            if (bCommon & rbRSUINT)          // Handle Resume interrupt
+ 104   2            {
+ 105   3               Usb_Resume ();
+ 106   3            }
+ 107   2            if (bCommon & rbRSTINT)          // Handle Reset interrupt
+ 108   2            {
+ 109   3               Usb_Reset ();
+ 110   3            }
+ 111   2            if (bIn & rbEP0)                 // Handle SETUP packet received
+ 112   2            {                                // or packet transmitted if Endpoint 0
+C51 COMPILER V9.51   F3XX_USB0_INTERRUPTSERVICEROUTINE                                     06/26/2015 13:32:25 PAGE 3   
+
+ 113   3               Handle_Control();             // is in transmit mode
+ 114   3            }
+ 115   2      #if USB_writeReadHID_EP1OUT_EP1IN
+                    // VERIFY: OS24EVK-66 Support USB_writeReadHID_EP3OUT_EP3IN use EP3IN/EP3OUT for writeReadHID() comm
+             -ands
+                    // # pragma message("writeReadHID() EP1OUT 64-byte buffer")
+                    // # pragma message("writeReadHID() EP1IN  64-byte buffer")
+                    if (bIn & rbIN1)                 // Handle In Packet sent, put new data
+                    {                                // on endpoint 1 fifo
+                       Handle_In1 ();    // EP1IN send data to host
+                    }
+                    if (bOut & rbOUT1)               // Handle Out packet received, take
+                    {                                // data off endpoint 2 fifo - should say endpoint 1 
+                                                     //   [mku]: <WTF> USB has unambiguous way to refer to endpoints.
+                                                     //   Why are they calling EP1OUT "endpoint 2"? </WTF>
+                       Handle_Out1 ();   // EP1OUT receive data from host
+                    }
+              #elif USB_writeReadHID_EP2OUT_EP2IN
+                    // # pragma message("writeReadHID() EP2OUT 128-byte buffer")
+                    // # pragma message("writeReadHID() EP2IN  128-byte buffer")
+                    if (bIn & rbIN2)                 // Handle In Packet sent, put new data into EP2IN FIFO
+                    {
+                       Handle_In2 ();    // EP2IN send data to host
+                    }
+                    if (bOut & rbOUT2)               // Handle Out packet received, take data from EP2OUT FIFO
+                    {                                
+                       Handle_Out2 ();   // EP2OUT receive data from host
+                    }
+              #elif USB_writeReadHID_EP3OUT_EP3IN
+ 141   2            // # pragma message("writeReadHID() EP3OUT 256-byte buffer")
+ 142   2            // # pragma message("writeReadHID() EP3IN  256-byte buffer")
+ 143   2            if (bIn & rbIN3)                 // Handle In Packet sent, put new data into EP3IN FIFO
+ 144   2            {
+ 145   3               Handle_In3 ();    // EP3IN send data to host
+ 146   3            }
+ 147   2            if (bOut & rbOUT3)               // Handle Out packet received, take data from EP3OUT FIFO
+ 148   2            {                                
+ 149   3               Handle_Out3 ();   // EP3OUT receive data from host
+ 150   3            }
+ 151   2      #endif // USB_writeReadHID_EP1OUT_EP1IN
+ 152   2            if (bCommon & rbSUSINT)          // Handle Suspend interrupt
+ 153   2            {
+ 154   3               Usb_Suspend ();
+ 155   3            }
+ 156   2         }
+ 157   1      }
+ 158          
+ 159          //-----------------------------------------------------------------------------
+ 160          // Support Routines
+ 161          //-----------------------------------------------------------------------------
+ 162          
+ 163          //-----------------------------------------------------------------------------
+ 164          // Usb_Reset
+ 165          //-----------------------------------------------------------------------------
+ 166          //
+ 167          // Return Value : None
+ 168          // Parameters   : None
+ 169          //
+ 170          // - Set state to default
+ 171          // - Clear Usb Inhibit bit
+ 172          //
+ 173          //-----------------------------------------------------------------------------
+C51 COMPILER V9.51   F3XX_USB0_INTERRUPTSERVICEROUTINE                                     06/26/2015 13:32:25 PAGE 4   
+
+ 174          
+ 175          void Usb_Reset (void)
+ 176          {
+ 177   1         USB0_STATE = DEV_DEFAULT;           // Set device state to default
+ 178   1      
+ 179   1         POLL_WRITE_BYTE (POWER, 0x01);      // Clear usb inhibit bit to enable USB
+ 180   1                                             // suspend detection
+ 181   1      
+ 182   1         EP_STATUS[0] = EP_IDLE;             // Set default Endpoint Status
+ 183   1         EP_STATUS[1] = EP_HALT;
+ 184   1         EP_STATUS[2] = EP_HALT;
+ 185   1      }
+ 186          
+ 187          
+ 188          
+ 189          //-----------------------------------------------------------------------------
+ 190          // Usb_Resume
+ 191          //-----------------------------------------------------------------------------
+ 192          //
+ 193          // Return Value : None
+ 194          // Parameters   : None
+ 195          //
+ 196          // Resume normal USB operation
+ 197          //
+ 198          //-----------------------------------------------------------------------------
+ 199          
+ 200          void Usb_Resume(void)
+ 201          {
+ 202   1         volatile int16_t k;
+ 203   1      
+ 204   1         k++;
+ 205   1      
+ 206   1         // Add code for resume
+ 207   1      }
+ 208          
+ 209          
+ 210          //-----------------------------------------------------------------------------
+ 211          // Handle_Control
+ 212          //-----------------------------------------------------------------------------
+ 213          //
+ 214          // Return Value : None
+ 215          // Parameters   : None
+ 216          //
+ 217          // - Decode Incoming SETUP requests
+ 218          // - Load data packets on fifo while in transmit mode
+ 219          //
+ 220          //-----------------------------------------------------------------------------
+ 221          
+ 222          void Handle_Control (void)
+ 223          {
+ 224   1         uint8_t ControlReg;           // Temporary storage for EP control
+ 225   1                                             // register
+ 226   1      
+ 227   1         POLL_WRITE_BYTE (INDEX, 0);         // Set Index to Endpoint Zero
+ 228   1         POLL_READ_BYTE (E0CSR, ControlReg); // Read control register
+ 229   1      
+ 230   1         if (EP_STATUS[0] == EP_ADDRESS)     // Handle Status Phase of Set Address
+ 231   1                                             // command
+ 232   1         {
+ 233   2            POLL_WRITE_BYTE (FADDR, SETUP.wValue.c[LSB]);
+ 234   2            EP_STATUS[0] = EP_IDLE;
+ 235   2         }
+C51 COMPILER V9.51   F3XX_USB0_INTERRUPTSERVICEROUTINE                                     06/26/2015 13:32:25 PAGE 5   
+
+ 236   1      
+ 237   1         if (ControlReg & rbSTSTL)           // If last packet was a sent stall,
+ 238   1         {                                   // reset STSTL bit and return EP0
+ 239   2                                             // to idle state
+ 240   2            POLL_WRITE_BYTE (E0CSR, 0);
+ 241   2            EP_STATUS[0] = EP_IDLE;
+ 242   2            return;
+ 243   2         }
+ 244   1      
+ 245   1         if (ControlReg & rbSUEND)           // If last SETUP transaction was
+ 246   1         {                                   // ended prematurely then set
+ 247   2            POLL_WRITE_BYTE (E0CSR, rbDATAEND);
+ 248   2            // Serviced SETUP End bit and return EP0
+ 249   2            POLL_WRITE_BYTE (E0CSR, rbSSUEND);
+ 250   2            EP_STATUS[0] = EP_IDLE;          // To idle state
+ 251   2         }
+ 252   1      
+ 253   1         if (EP_STATUS[0] == EP_IDLE)        // If Endpoint 0 is in idle mode
+ 254   1         {
+ 255   2            if (ControlReg & rbOPRDY)        // Make sure that EP 0 has an Out Packet
+ 256   2            {                                // ready from host although if EP0
+ 257   3                                             // is idle, this should always be the
+ 258   3                                             // case
+ 259   3               Fifo_Read (FIFO_EP0, 8, (uint8_t *)&SETUP);
+ 260   3                                             // Get SETUP Packet off of Fifo,
+ 261   3                                             // it is currently Big-Endian
+ 262   3      
+ 263   3                                             // Compiler Specific - these next three
+ 264   3                                             // statements swap the bytes of the
+ 265   3                                             // SETUP packet words to Big Endian so
+ 266   3                                             // they can be compared to other 16-bit
+ 267   3                                             // values elsewhere properly
+ 268   3               SETUP.wValue.i = SETUP.wValue.c[MSB] + 256*SETUP.wValue.c[LSB];
+ 269   3               SETUP.wIndex.i = SETUP.wIndex.c[MSB] + 256*SETUP.wIndex.c[LSB];
+ 270   3               SETUP.wLength.i = SETUP.wLength.c[MSB] + 256*SETUP.wLength.c[LSB];
+ 271   3      
+ 272   3                      // Intercept HID class-specific requests
+ 273   3                      if( (SETUP.bmRequestType & ~0x80) == DSC_HID) {
+ 274   4                              switch (SETUP.bRequest) {
+ 275   5                                      case GET_REPORT:
+ 276   5                                              Get_Report ();
+ 277   5                                              break;
+ 278   5                                      case SET_REPORT:
+ 279   5                                              Set_Report ();
+ 280   5                                              break;
+ 281   5                                      case GET_IDLE:
+ 282   5                                              Get_Idle ();
+ 283   5                                              break;
+ 284   5                                      case SET_IDLE:
+ 285   5                                              Set_Idle ();
+ 286   5                                              break;
+ 287   5                                      case GET_PROTOCOL:
+ 288   5                                              Get_Protocol ();
+ 289   5                                              break;
+ 290   5                                      case SET_PROTOCOL:
+ 291   5                                              Set_Protocol ();
+ 292   5                                              break;
+ 293   5                          default:
+ 294   5                        Force_Stall ();      // Send stall to host if invalid
+ 295   5                          break;                  // request
+ 296   5                              }
+ 297   4                      } else
+C51 COMPILER V9.51   F3XX_USB0_INTERRUPTSERVICEROUTINE                                     06/26/2015 13:32:25 PAGE 6   
+
+ 298   3      
+ 299   3               switch (SETUP.bRequest)       // Call correct subroutine to handle
+ 300   3               {                             // each kind of standard request
+ 301   4                  case GET_STATUS:
+ 302   4                     Get_Status ();
+ 303   4                     break;
+ 304   4                  case CLEAR_FEATURE:
+ 305   4                     Clear_Feature ();
+ 306   4                     break;
+ 307   4                  case SET_FEATURE:
+ 308   4                     Set_Feature ();
+ 309   4                     break;
+ 310   4                  case SET_ADDRESS:
+ 311   4                     Set_Address ();
+ 312   4                     break;
+ 313   4                  case GET_DESCRIPTOR:
+ 314   4                     Get_Descriptor ();
+ 315   4                     break;
+ 316   4                  case GET_CONFIGURATION:
+ 317   4                     Get_Configuration ();
+ 318   4                     break;
+ 319   4                  case SET_CONFIGURATION:
+ 320   4                     Set_Configuration ();
+ 321   4                     break;
+ 322   4                  case GET_INTERFACE:
+ 323   4                     Get_Interface ();
+ 324   4                     break;
+ 325   4                  case SET_INTERFACE:
+ 326   4                     Set_Interface ();
+ 327   4                     break;
+ 328   4                  default:
+ 329   4                     Force_Stall ();         // Send stall to host if invalid request
+ 330   4                     break;
+ 331   4               }
+ 332   3            }
+ 333   2         }
+ 334   1      
+ 335   1         if (EP_STATUS[0] == EP_TX)          // See if endpoint should transmit
+ 336   1         {
+ 337   2            if (!(ControlReg & rbINPRDY) )   // Don't overwrite last packet
+ 338   2            {
+ 339   3               // Read control register
+ 340   3               POLL_READ_BYTE (E0CSR, ControlReg);
+ 341   3      
+ 342   3               // Check to see if SETUP End or Out Packet received, if so do not put
+ 343   3               // any new data on FIFO
+ 344   3               if ((!(ControlReg & rbSUEND)) || (!(ControlReg & rbOPRDY)))
+ 345   3               {
+ 346   4                  // Add In Packet ready flag to E0CSR bitmask
+ 347   4                  ControlReg = rbINPRDY;
+ 348   4                  if (DATASIZE >= EP0_PACKET_SIZE)
+ 349   4                  {
+ 350   5                     // Break Data into multiple packets if larger than Max Packet
+ 351   5                     Fifo_Write_InterruptServiceRoutine (FIFO_EP0, EP0_PACKET_SIZE,
+ 352   5                                                                                        (uint8_t*)DATAPTR);
+ 353   5                     // Advance data pointer
+ 354   5                     DATAPTR  += EP0_PACKET_SIZE;
+ 355   5                     // Decrement data size
+ 356   5                     DATASIZE -= EP0_PACKET_SIZE;
+ 357   5                     // Increment data sent counter
+ 358   5                     DATASENT += EP0_PACKET_SIZE;
+ 359   5                  }
+C51 COMPILER V9.51   F3XX_USB0_INTERRUPTSERVICEROUTINE                                     06/26/2015 13:32:25 PAGE 7   
+
+ 360   4                  else
+ 361   4                  {
+ 362   5                     // If data is less than Max Packet size or zero
+ 363   5                     Fifo_Write_InterruptServiceRoutine (FIFO_EP0, DATASIZE,
+ 364   5                                                                                        (uint8_t*)DATAPTR);
+ 365   5                     ControlReg |= rbDATAEND;// Add Data End bit to bitmask
+ 366   5                     EP_STATUS[0] = EP_IDLE; // Return EP 0 to idle state
+ 367   5                  }
+ 368   4                  if (DATASENT == SETUP.wLength.i)
+ 369   4                  {
+ 370   5                     // This case exists when the host requests an even multiple of
+ 371   5                     // your endpoint zero max packet size, and you need to exit
+ 372   5                     // transmit mode without sending a zero length packet
+ 373   5                     ControlReg |= rbDATAEND;// Add Data End bit to mask
+ 374   5                     EP_STATUS[0] = EP_IDLE; // Return EP 0 to idle state
+ 375   5                  }
+ 376   4                  // Write mask to E0CSR
+ 377   4                  POLL_WRITE_BYTE(E0CSR, ControlReg);
+ 378   4               }
+ 379   3            }
+ 380   2         }
+ 381   1      
+ 382   1         if (EP_STATUS[0] == EP_RX)          // See if endpoint should transmit
+ 383   1         {
+ 384   2            // Read control register
+ 385   2            POLL_READ_BYTE (E0CSR, ControlReg);
+ 386   2            if (ControlReg & rbOPRDY)        // Verify packet was received
+ 387   2            {
+ 388   3               ControlReg = rbSOPRDY;
+ 389   3                      if (DATASIZE >= EP0_PACKET_SIZE)
+ 390   3                      {
+ 391   4                  Fifo_Read(FIFO_EP0, EP0_PACKET_SIZE, (uint8_t*)DATAPTR);
+ 392   4                  // Advance data pointer
+ 393   4                  DATAPTR  += EP0_PACKET_SIZE;
+ 394   4                  // Decrement data size
+ 395   4                  DATASIZE -= EP0_PACKET_SIZE;
+ 396   4                  // Increment data sent counter
+ 397   4                  DATASENT += EP0_PACKET_SIZE;
+ 398   4                      }
+ 399   3                      else
+ 400   3                      {
+ 401   4                  // read bytes from FIFO
+ 402   4                  Fifo_Read (FIFO_EP0, DATASIZE, (uint8_t*) DATAPTR);
+ 403   4      
+ 404   4                  ControlReg |= rbDATAEND;   // Signal end of data
+ 405   4                  EP_STATUS[0] = EP_IDLE;    // set Endpoint to IDLE
+ 406   4                      }
+ 407   3                      if (DATASENT == SETUP.wLength.i)
+ 408   3                      {
+ 409   4                              ControlReg |= rbDATAEND;
+ 410   4                              EP_STATUS[0] = EP_IDLE;
+ 411   4                      }
+ 412   3               // If EP_RX mode was entered through a SET_REPORT request,
+ 413   3               // call the ReportHandler_OUT function and pass the Report
+ 414   3               // ID, which is the first by the of DATAPTR's buffer
+ 415   3               if ( (EP_STATUS[0] == EP_IDLE) && (SETUP.bRequest == SET_REPORT) )
+ 416   3               {
+ 417   4                  OUT_REPORT_HANDLER ( /* internalCall */ 1); // internal request
+ 418   4               }
+ 419   3      
+ 420   3               if (EP_STATUS[0] != EP_STALL) POLL_WRITE_BYTE (E0CSR, ControlReg);
+ 421   3            }
+C51 COMPILER V9.51   F3XX_USB0_INTERRUPTSERVICEROUTINE                                     06/26/2015 13:32:25 PAGE 8   
+
+ 422   2         }
+ 423   1      
+ 424   1      }
+ 425          
+ 426          //-----------------------------------------------------------------------------
+ 427          // Handle_In1
+ 428          //-----------------------------------------------------------------------------
+ 429          //
+ 430          // Handler will be entered after the endpoint's buffer has been
+ 431          // transmitted to the host.  In1_StateMachine is set to Idle, which
+ 432          // signals the foreground routine SendPacket that the Endpoint
+ 433          // is ready to transmit another packet.
+ 434          //-----------------------------------------------------------------------------
+ 435          #if USB_writeReadHID_EP1OUT_EP1IN
+                 // VERIFY: OS24EVK-66 Support USB_writeReadHID_EP3OUT_EP3IN use EP3IN/EP3OUT for writeReadHID() command
+             -s
+              # pragma message("Handle_In1() EP1IN  64-byte buffer")
+              void Handle_In1 ()
+              {
+                      EP_STATUS[1] = EP_IDLE;
+              }
+              #elif USB_writeReadHID_EP2OUT_EP2IN
+              # pragma message("Handle_In2() EP2IN  128-byte buffer")
+              void Handle_In2 ()
+              {
+                      EP_STATUS[2] = EP_IDLE;
+              }
+              #elif USB_writeReadHID_EP3OUT_EP3IN
+ 449          # pragma message("Handle_In3() EP3IN  256-byte buffer")
+*** MESSAGE C286 IN LINE 449 OF F3xx_USB0_InterruptServiceRoutine.c: Handle_In3() EP3IN 256-byte buffer
+ 450          void Handle_In3 ()
+ 451          {
+ 452   1              EP_STATUS[3] = EP_IDLE;
+ 453   1      }
+ 454          #endif // USB_writeReadHID_EP1OUT_EP1IN
+ 455          
+ 456          //-----------------------------------------------------------------------------
+ 457          // Handle_Out1
+ 458          //-----------------------------------------------------------------------------
+ 459          // Take the received packet from the host off the fifo and put it into
+ 460          // the IO_PACKET array.
+ 461          //
+ 462          //-----------------------------------------------------------------------------
+ 463          #if USB_writeReadHID_EP1OUT_EP1IN
+                 // VERIFY: OS24EVK-66 Support USB_writeReadHID_EP3OUT_EP3IN use EP3IN/EP3OUT for writeReadHID() command
+             -s
+              # pragma message("Handle_Out1() EP1OUT 64-byte buffer")
+              void Handle_Out1 ()
+              {
+              
+                 uint8_t Count = 0;
+                 uint8_t ControlReg;
+              
+                 POLL_WRITE_BYTE (INDEX, 1);         // Set index to endpoint 2 registers; should be enpoint 1
+                 POLL_READ_BYTE (EOUTCSR1, ControlReg);
+              
+                 if (EP_STATUS[1] == EP_HALT)        // If endpoint is halted, send a stall
+                 {
+                    POLL_WRITE_BYTE (EOUTCSR1, rbOutSDSTL);
+                 }
+              
+                 else                                // Otherwise read received packet
+C51 COMPILER V9.51   F3XX_USB0_INTERRUPTSERVICEROUTINE                                     06/26/2015 13:32:25 PAGE 9   
+
+                                                     // from host
+                 {
+                    if (ControlReg & rbOutSTSTL)     // Clear sent stall bit if last
+                                                     // packet was a stall
+                    {
+                       POLL_WRITE_BYTE (EOUTCSR1, rbOutCLRDT);
+                    }
+              
+                    Setup_IO_BUFFER ();             // Configure buffer to save
+                                                     // received data
+                    Fifo_Read(FIFO_EP1, IO_BUFFER.Length, IO_BUFFER.Ptr);
+                        
+              
+                    // Process data according to received Report ID.
+                    // In systems with Report Descriptors that do not define report IDs,
+                    // the host will still format OUT packets with a prefix byte
+                    // of '0x00'.
+              
+                    OUT_REPORT_HANDLER ( /* internalCall */ 0); // external request
+              
+                    POLL_WRITE_BYTE (EOUTCSR1, 0);   // Clear Out Packet ready bit
+                 }
+              }
+              #elif USB_writeReadHID_EP2OUT_EP2IN
+              # pragma message("Handle_Out2() EP2OUT 128-byte buffer")
+              // VERIFY: OS24EVK-66 implement void Handle_Out2() for USB_writeReadHID_EP2OUT_EP2IN=1
+              void Handle_Out2 ()
+              {
+              
+                 uint8_t Count = 0;
+                 uint8_t ControlReg;
+              
+                 POLL_WRITE_BYTE (INDEX, 2);         // Set index to endpoint 2 registers; should be enpoint 1
+                 POLL_READ_BYTE (EOUTCSR1, ControlReg);
+              
+                 if (EP_STATUS[2] == EP_HALT)        // If endpoint is halted, send a stall
+                 {
+                    POLL_WRITE_BYTE (EOUTCSR1, rbOutSDSTL);
+                 }
+              
+                 else                                // Otherwise read received packet
+                                                     // from host
+                 {
+                    if (ControlReg & rbOutSTSTL)     // Clear sent stall bit if last
+                                                     // packet was a stall
+                    {
+                       POLL_WRITE_BYTE (EOUTCSR1, rbOutCLRDT);
+                    }
+              
+                    Setup_IO_BUFFER ();             // Configure buffer to save
+                                                     // received data
+                    Fifo_Read(FIFO_EP2, IO_BUFFER.Length, IO_BUFFER.Ptr);
+                        
+              
+                    // Process data according to received Report ID.
+                    // In systems with Report Descriptors that do not define report IDs,
+                    // the host will still format OUT packets with a prefix byte
+                    // of '0x00'.
+              
+                    OUT_REPORT_HANDLER ( /* internalCall */ 0); // external request
+              
+                    POLL_WRITE_BYTE (EOUTCSR1, 0);   // Clear Out Packet ready bit
+C51 COMPILER V9.51   F3XX_USB0_INTERRUPTSERVICEROUTINE                                     06/26/2015 13:32:25 PAGE 10  
+
+                 }
+              }
+              #elif USB_writeReadHID_EP3OUT_EP3IN
+ 546          # pragma message("Handle_Out3() EP3OUT 256-byte buffer")
+*** MESSAGE C286 IN LINE 546 OF F3xx_USB0_InterruptServiceRoutine.c: Handle_Out3() EP3OUT 256-byte buffer
+ 547          // VERIFY: OS24EVK-66 implement void Handle_Out3() for USB_writeReadHID_EP3OUT_EP3IN=1
+ 548          void Handle_Out3 ()
+ 549          {
+ 550   1      
+ 551   1         uint8_t Count = 0;
+ 552   1         uint8_t ControlReg;
+ 553   1      
+ 554   1         POLL_WRITE_BYTE (INDEX, 3);         // Set index to endpoint 2 registers; should be enpoint 1
+ 555   1         POLL_READ_BYTE (EOUTCSR1, ControlReg);
+ 556   1      
+ 557   1         if (EP_STATUS[3] == EP_HALT)        // If endpoint is halted, send a stall
+ 558   1         {
+ 559   2            POLL_WRITE_BYTE (EOUTCSR1, rbOutSDSTL);
+ 560   2         }
+ 561   1      
+ 562   1         else                                // Otherwise read received packet
+ 563   1                                             // from host
+ 564   1         {
+ 565   2            if (ControlReg & rbOutSTSTL)     // Clear sent stall bit if last
+ 566   2                                             // packet was a stall
+ 567   2            {
+ 568   3               POLL_WRITE_BYTE (EOUTCSR1, rbOutCLRDT);
+ 569   3            }
+ 570   2      
+ 571   2            Setup_IO_BUFFER ();             // Configure buffer to save
+ 572   2                                             // received data
+ 573   2            Fifo_Read(FIFO_EP3, IO_BUFFER.Length, IO_BUFFER.Ptr);
+ 574   2                
+ 575   2      
+ 576   2            // Process data according to received Report ID.
+ 577   2            // In systems with Report Descriptors that do not define report IDs,
+ 578   2            // the host will still format OUT packets with a prefix byte
+ 579   2            // of '0x00'.
+ 580   2      
+ 581   2            OUT_REPORT_HANDLER ( /* internalCall */ 0); // external request
+ 582   2      
+ 583   2            POLL_WRITE_BYTE (EOUTCSR1, 0);   // Clear Out Packet ready bit
+ 584   2         }
+ 585   1      }
+ 586          #endif // USB_writeReadHID_EP1OUT_EP1IN
+ 587          
+ 588          //-----------------------------------------------------------------------------
+ 589          // Usb_Suspend
+ 590          //-----------------------------------------------------------------------------
+ 591          // Enter suspend mode after suspend signalling is present on the bus
+ 592          //
+ 593          void Usb_Suspend (void)
+ 594          {
+ 595   1         volatile int16_t k;
+ 596   1         k++;
+ 597   1      }
+ 598          
+ 599          //-----------------------------------------------------------------------------
+ 600          // Fifo_Read
+ 601          //-----------------------------------------------------------------------------
+ 602          //
+ 603          // Return Value : None
+C51 COMPILER V9.51   F3XX_USB0_INTERRUPTSERVICEROUTINE                                     06/26/2015 13:32:25 PAGE 11  
+
+ 604          // Parameters   :
+ 605          //                1) BYTE addr : target address
+ 606          //                2) uint16_t uNumBytes : number of bytes to unload
+ 607          //                3) BYTE * pData : read data destination
+ 608          //
+ 609          // Read from the selected endpoint FIFO
+ 610          //
+ 611          //-----------------------------------------------------------------------------
+ 612          void Fifo_Read (uint8_t addr, uint16_t uNumBytes,
+ 613                         uint8_t * pData)
+ 614          {
+ 615   1         int16_t i;
+ 616   1      
+ 617   1         if (uNumBytes)                      // Check if >0 bytes requested,
+ 618   1         {
+ 619   2            USB0ADR = (addr);                // Set address
+ 620   2            USB0ADR |= 0xC0;                 // Set auto-read and initiate
+ 621   2                                             // first read
+ 622   2      
+ 623   2            // Unload <NumBytes> from the selected FIFO
+ 624   2            for(i=0;i< (uNumBytes);i++)
+ 625   2            {
+ 626   3               while (USB0ADR & 0x80);       // Wait for BUSY->'0' (data ready)
+ 627   3               pData[i] = USB0DAT;           // Copy data byte
+ 628   3            }
+ 629   2      
+ 630   2            //while(USB0ADR & 0x80);         // Wait for BUSY->'0' (data ready)
+ 631   2            USB0ADR = 0;                     // Clear auto-read
+ 632   2         }
+ 633   1      }
+ 634          
+ 635          //-----------------------------------------------------------------------------
+ 636          // Fifo_Write
+ 637          //-----------------------------------------------------------------------------
+ 638          //
+ 639          // Return Value : None
+ 640          // Parameters   :
+ 641          //                1) BYTE addr : target address
+ 642          //                2) uint16_t uNumBytes : number of bytes to unload
+ 643          //                3) BYTE * pData : location of source data
+ 644          //
+ 645          // Write to the selected endpoint FIFO
+ 646          //
+ 647          // Fifo_Write_Foreground is used for function calls made in the foreground routines,
+ 648          // and Fifo_Write_InterruptServiceRoutine is used for calls made in an ISR.
+ 649          
+ 650          //-----------------------------------------------------------------------------
+ 651          
+ 652          void Fifo_Write_Foreground (uint8_t addr, uint16_t uNumBytes,
+ 653                              uint8_t * pData)
+ 654          {
+ 655   1         int16_t i;
+ 656   1      
+ 657   1         // If >0 bytes requested,
+ 658   1         if (uNumBytes)
+ 659   1         {
+ 660   2            while (USB0ADR & 0x80);          // Wait for BUSY->'0'
+ 661   2                                             // (register available)
+ 662   2            USB0ADR = (addr);                // Set address (mask out bits7-6)
+ 663   2      
+ 664   2            // Write <NumBytes> to the selected FIFO
+ 665   2            for(i=0;i<uNumBytes;i++)
+C51 COMPILER V9.51   F3XX_USB0_INTERRUPTSERVICEROUTINE                                     06/26/2015 13:32:25 PAGE 12  
+
+ 666   2            {
+ 667   3               USB0DAT = pData[i];
+ 668   3               while (USB0ADR & 0x80);       // Wait for BUSY->'0' (data ready)
+ 669   3            }
+ 670   2         }
+ 671   1      }
+ 672          
+ 673          void Fifo_Write_InterruptServiceRoutine (uint8_t addr,
+ 674                                                   uint16_t uNumBytes,
+ 675                                                   uint8_t * pData)
+ 676          {
+ 677   1         int16_t i;
+ 678   1      
+ 679   1         // If >0 bytes requested,
+ 680   1         if (uNumBytes)
+ 681   1         {
+ 682   2            while (USB0ADR & 0x80);          // Wait for BUSY->'0'
+ 683   2                                             // (register available)
+ 684   2            USB0ADR = (addr);                // Set address (mask out bits7-6)
+ 685   2      
+ 686   2            // Write <NumBytes> to the selected FIFO
+ 687   2            for (i=0; i<uNumBytes; i++)
+ 688   2            {
+ 689   3               USB0DAT = pData[i];
+ 690   3               while (USB0ADR & 0x80);       // Wait for BUSY->'0' (data ready)
+ 691   3            }
+ 692   2         }
+ 693   1      }
+ 694          
+ 695          //-----------------------------------------------------------------------------
+ 696          // Force_Stall
+ 697          //-----------------------------------------------------------------------------
+ 698          //
+ 699          // Return Value : None
+ 700          // Parameters   : None
+ 701          //
+ 702          // Force a procedural stall to be sent to the host
+ 703          //
+ 704          //-----------------------------------------------------------------------------
+ 705          
+ 706          void Force_Stall (void)
+ 707          {
+ 708   1         POLL_WRITE_BYTE (INDEX, 0);
+ 709   1         POLL_WRITE_BYTE (E0CSR, rbSDSTL);   // Set the send stall bit
+ 710   1         EP_STATUS[0] = EP_STALL;            // Put the endpoint in stall status
+ 711   1      }
+ 712          
+ 713          
+ 714          //-----------------------------------------------------------------------------
+ 715          // SendPacket
+ 716          //-----------------------------------------------------------------------------
+ 717          //
+ 718          // Return Value - None
+ 719          // Parameters - Report ID that's used to call the appropriate IN handler
+ 720          //
+ 721          // This function can be called by other routines to force an IN packet
+ 722          // transmit.  It takes as an input the Report ID of the packet to be
+ 723          // transmitted.
+ 724          //-----------------------------------------------------------------------------
+ 725          void SendPacket (void)
+ 726          {
+ 727   1         bit EAState;
+C51 COMPILER V9.51   F3XX_USB0_INTERRUPTSERVICEROUTINE                                     06/26/2015 13:32:25 PAGE 13  
+
+ 728   1         uint8_t ControlReg;
+ 729   1      
+ 730   1         EAState = EA;
+ 731   1         EA = 0;
+ 732   1      
+ 733   1         POLL_WRITE_BYTE (INDEX, USB_EP_INDEX); // index 1 for EP1IN to host, 2 for EP2IN to host, 3 for EP3IN t
+             -o host
+ 734   1      
+ 735   1         // Read contol register for EP <INDEX>
+ 736   1         POLL_READ_BYTE (EINCSR1, ControlReg);
+ 737   1         
+ 738   1         // If endpoint is currently halted, send a stall
+ 739   1         if (EP_STATUS[USB_EP_INDEX] == EP_HALT)
+ 740   1         {
+ 741   2            POLL_WRITE_BYTE (EINCSR1, rbInSDSTL);
+ 742   2         }
+ 743   1         else if(EP_STATUS[USB_EP_INDEX] == EP_IDLE)
+ 744   1         {
+ 745   2            // the state will be updated inside the ISR handler
+ 746   2            EP_STATUS[USB_EP_INDEX] = EP_TX;
+ 747   2      
+ 748   2            // Clear sent stall if last packet returned a stall
+ 749   2            if (ControlReg & rbInSTSTL)
+ 750   2            {
+ 751   3               POLL_WRITE_BYTE (EINCSR1, rbInCLRDT);
+ 752   3            }
+ 753   2      
+ 754   2            // Clear underrun bit if it was set
+ 755   2            if (ControlReg & rbInUNDRUN)
+ 756   2            {
+ 757   3               POLL_WRITE_BYTE (EINCSR1, 0x00);
+ 758   3            }
+ 759   2      
+ 760   2            //ReportHandler_IN_Foreground (ReportID);
+ 761   2            // Put new data on Fifo
+ 762   2      #if USB_writeReadHID_EP1OUT_EP1IN
+                 // VERIFY: OS24EVK-66 Support USB_writeReadHID_EP3OUT_EP3IN use EP3IN/EP3OUT for writeReadHID() command
+             -s
+                 // # pragma message("writeReadHID() EP1OUT 64-byte buffer")
+                 // # pragma message("writeReadHID() EP1IN  64-byte buffer")
+                    Fifo_Write_Foreground (FIFO_EP1, IO_BUFFER.Length,
+                                  (uint8_t *)IO_BUFFER.Ptr);
+              #elif USB_writeReadHID_EP2OUT_EP2IN
+                 // # pragma message("writeReadHID() EP2OUT 128-byte buffer")
+                 // # pragma message("writeReadHID() EP2IN  128-byte buffer")
+                    Fifo_Write_Foreground (FIFO_EP2, IO_BUFFER.Length,
+                                  (uint8_t *)IO_BUFFER.Ptr);
+              #elif USB_writeReadHID_EP3OUT_EP3IN
+ 774   2         // # pragma message("writeReadHID() EP3OUT 256-byte buffer")
+ 775   2         // # pragma message("writeReadHID() EP3IN  256-byte buffer")
+ 776   2            Fifo_Write_Foreground (FIFO_EP3, IO_BUFFER.Length,
+ 777   2                          (uint8_t *)IO_BUFFER.Ptr);
+ 778   2      #endif // USB_writeReadHID_EP1OUT_EP1IN
+ 779   2            
+ 780   2            // Set In Packet ready bit,
+ 781   2            // indicating fresh data on FIFO 1
+ 782   2            POLL_WRITE_BYTE (EINCSR1, rbInINPRDY);
+ 783   2         }
+ 784   1      
+ 785   1         EA = EAState;
+ 786   1      }
+ 787          
+C51 COMPILER V9.51   F3XX_USB0_INTERRUPTSERVICEROUTINE                                     06/26/2015 13:32:25 PAGE 14  
+
+ 788          // VERIFY: OS24EVK-66 USB_SUPPORT_SendPacketWaitEP1INready=1 SendPacketWaitEP1INready() as SendPacket() wi
+             -th polling for INPRTY=0.
+ 789          #if USB_SUPPORT_SendPacketWaitEP1INready
+ 790          void SendPacketWaitEP1INready (void)
+ 791          {
+ 792   1         bit EAState;
+ 793   1         uint8_t ControlReg;
+ 794   1      
+ 795   1         EAState = EA;
+ 796   1         EA = 0;
+ 797   1      
+ 798   1         POLL_WRITE_BYTE (INDEX, USB_EP_INDEX); // index 1 for EP1IN to host, 2 for EP2IN to host, 3 for EP3IN t
+             -o host
+ 799   1      
+ 800   1         // Read contol register for EP <INDEX>
+ 801   1         POLL_READ_BYTE (EINCSR1, ControlReg);
+ 802   1         
+ 803   1      #if 1
+ 804   1         // VERIFY: OS24EVK-66 SendPacketWaitEP1INready() POLL_READ_BYTE EINCSR1 test for rbInINPRDY=0 (IN packe
+             -t ready) status clear before start of SendPacket()? (Any issue with first packet?)
+ 805   1         while ((ControlReg & rbInINPRDY) != 0)
+ 806   1         {
+ 807   2            POLL_READ_BYTE (EINCSR1, ControlReg);
+ 808   2         }
+ 809   1      #endif   
+ 810   1         
+ 811   1         // If endpoint is currently halted, send a stall
+ 812   1         if (EP_STATUS[USB_EP_INDEX] == EP_HALT)
+ 813   1         {
+ 814   2            POLL_WRITE_BYTE (EINCSR1, rbInSDSTL);
+ 815   2         }
+ 816   1         else if(EP_STATUS[USB_EP_INDEX] == EP_IDLE)
+ 817   1         {
+ 818   2            // the state will be updated inside the ISR handler
+ 819   2            EP_STATUS[USB_EP_INDEX] = EP_TX;
+ 820   2      
+ 821   2            // Clear sent stall if last packet returned a stall
+ 822   2            if (ControlReg & rbInSTSTL)
+ 823   2            {
+ 824   3               POLL_WRITE_BYTE (EINCSR1, rbInCLRDT);
+ 825   3            }
+ 826   2      
+ 827   2            // Clear underrun bit if it was set
+ 828   2            if (ControlReg & rbInUNDRUN)
+ 829   2            {
+ 830   3               POLL_WRITE_BYTE (EINCSR1, 0x00);
+ 831   3            }
+ 832   2      
+ 833   2            //ReportHandler_IN_Foreground (ReportID);
+ 834   2            // Put new data on Fifo
+ 835   2      #if USB_writeReadHID_EP1OUT_EP1IN
+                 // VERIFY: OS24EVK-66 Support USB_writeReadHID_EP3OUT_EP3IN use EP3IN/EP3OUT for writeReadHID() command
+             -s
+                 // # pragma message("writeReadHID() EP1OUT 64-byte buffer")
+                 // # pragma message("writeReadHID() EP1IN  64-byte buffer")
+                    Fifo_Write_Foreground (FIFO_EP1, IO_BUFFER.Length,
+                                  (uint8_t *)IO_BUFFER.Ptr);
+              #elif USB_writeReadHID_EP2OUT_EP2IN
+                 // # pragma message("writeReadHID() EP2OUT 128-byte buffer")
+                 // # pragma message("writeReadHID() EP2IN  128-byte buffer")
+                    Fifo_Write_Foreground (FIFO_EP2, IO_BUFFER.Length,
+                                  (uint8_t *)IO_BUFFER.Ptr);
+C51 COMPILER V9.51   F3XX_USB0_INTERRUPTSERVICEROUTINE                                     06/26/2015 13:32:25 PAGE 15  
+
+              #elif USB_writeReadHID_EP3OUT_EP3IN
+ 847   2         // # pragma message("writeReadHID() EP3OUT 256-byte buffer")
+ 848   2         // # pragma message("writeReadHID() EP3IN  256-byte buffer")
+ 849   2            Fifo_Write_Foreground (FIFO_EP3, IO_BUFFER.Length,
+ 850   2                          (uint8_t *)IO_BUFFER.Ptr);
+ 851   2      #endif // USB_writeReadHID_EP1OUT_EP1IN
+ 852   2            
+ 853   2            // Set In Packet ready bit,
+ 854   2            // indicating fresh data on FIFO 1
+ 855   2            POLL_WRITE_BYTE (EINCSR1, rbInINPRDY);
+ 856   2         }
+ 857   1      
+ 858   1         EA = EAState;
+ 859   1      }
+ 860          #endif
+ 861          
+C51 COMPILER V9.51   F3XX_USB0_INTERRUPTSERVICEROUTINE                                     06/26/2015 13:32:25 PAGE 16  
+
+ASSEMBLY LISTING OF GENERATED OBJECT CODE
+
+
+             ; FUNCTION Usb_ISR (BEGIN)
+0000 C0E0              PUSH    ACC
+0002 C0F0              PUSH    B
+0004 C083              PUSH    DPH
+0006 C082              PUSH    DPL
+0008 C0D0              PUSH    PSW
+000A 75D000            MOV     PSW,#00H
+000D C000              PUSH    AR0
+000F C001              PUSH    AR1
+0011 C002              PUSH    AR2
+0013 C003              PUSH    AR3
+0015 C004              PUSH    AR4
+0017 C005              PUSH    AR5
+0019 C006              PUSH    AR6
+001B C007              PUSH    AR7
+                                           ; SOURCE LINE # 96
+001D         ?C0001:
+                                           ; SOURCE LINE # 99
+001D E596              MOV     A,USB0ADR
+001F 20E7FB            JB      ACC.7,?C0001
+0022         ?C0002:
+0022 759686            MOV     USB0ADR,#086H
+0025         ?C0003:
+0025 E596              MOV     A,USB0ADR
+0027 20E7FB            JB      ACC.7,?C0003
+002A         ?C0004:
+002A 900000      R     MOV     DPTR,#bCommon
+002D E597              MOV     A,USB0DAT
+002F F0                MOVX    @DPTR,A
+0030         ?C0005:
+                                           ; SOURCE LINE # 100
+0030 E596              MOV     A,USB0ADR
+0032 20E7FB            JB      ACC.7,?C0005
+0035         ?C0006:
+0035 759682            MOV     USB0ADR,#082H
+0038         ?C0007:
+0038 E596              MOV     A,USB0ADR
+003A 20E7FB            JB      ACC.7,?C0007
+003D         ?C0008:
+003D 900000      R     MOV     DPTR,#bIn
+0040 E597              MOV     A,USB0DAT
+0042 F0                MOVX    @DPTR,A
+0043         ?C0009:
+                                           ; SOURCE LINE # 101
+0043 E596              MOV     A,USB0ADR
+0045 20E7FB            JB      ACC.7,?C0009
+0048         ?C0010:
+0048 759684            MOV     USB0ADR,#084H
+004B         ?C0011:
+004B E596              MOV     A,USB0ADR
+004D 20E7FB            JB      ACC.7,?C0011
+0050         ?C0012:
+0050 900000      R     MOV     DPTR,#bOut
+0053 E597              MOV     A,USB0DAT
+0055 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 102
+                                           ; SOURCE LINE # 103
+0056 900000      R     MOV     DPTR,#bCommon
+0059 E0                MOVX    A,@DPTR
+C51 COMPILER V9.51   F3XX_USB0_INTERRUPTSERVICEROUTINE                                     06/26/2015 13:32:25 PAGE 17  
+
+005A 30E103            JNB     ACC.1,?C0013
+                                           ; SOURCE LINE # 104
+                                           ; SOURCE LINE # 105
+005D 120000      R     LCALL   Usb_Resume
+                                           ; SOURCE LINE # 106
+0060         ?C0013:
+                                           ; SOURCE LINE # 107
+0060 900000      R     MOV     DPTR,#bCommon
+0063 E0                MOVX    A,@DPTR
+0064 30E203            JNB     ACC.2,?C0014
+                                           ; SOURCE LINE # 108
+                                           ; SOURCE LINE # 109
+0067 120000      R     LCALL   Usb_Reset
+                                           ; SOURCE LINE # 110
+006A         ?C0014:
+                                           ; SOURCE LINE # 111
+006A 900000      R     MOV     DPTR,#bIn
+006D E0                MOVX    A,@DPTR
+006E 30E003            JNB     ACC.0,?C0015
+                                           ; SOURCE LINE # 112
+                                           ; SOURCE LINE # 113
+0071 120000      R     LCALL   Handle_Control
+                                           ; SOURCE LINE # 114
+0074         ?C0015:
+                                           ; SOURCE LINE # 143
+0074 900000      R     MOV     DPTR,#bIn
+0077 E0                MOVX    A,@DPTR
+0078 30E303            JNB     ACC.3,?C0016
+                                           ; SOURCE LINE # 144
+                                           ; SOURCE LINE # 145
+007B 120000      R     LCALL   Handle_In3
+                                           ; SOURCE LINE # 146
+007E         ?C0016:
+                                           ; SOURCE LINE # 147
+007E 900000      R     MOV     DPTR,#bOut
+0081 E0                MOVX    A,@DPTR
+0082 30E303            JNB     ACC.3,?C0017
+                                           ; SOURCE LINE # 148
+                                           ; SOURCE LINE # 149
+0085 120000      R     LCALL   Handle_Out3
+                                           ; SOURCE LINE # 150
+0088         ?C0017:
+                                           ; SOURCE LINE # 152
+0088 900000      R     MOV     DPTR,#bCommon
+008B E0                MOVX    A,@DPTR
+008C 30E003            JNB     ACC.0,?C0019
+                                           ; SOURCE LINE # 153
+                                           ; SOURCE LINE # 154
+008F 120000      R     LCALL   Usb_Suspend
+                                           ; SOURCE LINE # 155
+                                           ; SOURCE LINE # 156
+                                           ; SOURCE LINE # 157
+0092         ?C0019:
+0092 D007              POP     AR7
+0094 D006              POP     AR6
+0096 D005              POP     AR5
+0098 D004              POP     AR4
+009A D003              POP     AR3
+009C D002              POP     AR2
+009E D001              POP     AR1
+00A0 D000              POP     AR0
+00A2 D0D0              POP     PSW
+C51 COMPILER V9.51   F3XX_USB0_INTERRUPTSERVICEROUTINE                                     06/26/2015 13:32:25 PAGE 18  
+
+00A4 D082              POP     DPL
+00A6 D083              POP     DPH
+00A8 D0F0              POP     B
+00AA D0E0              POP     ACC
+00AC 32                RETI    
+             ; FUNCTION Usb_ISR (END)
+
+             ; FUNCTION Usb_Reset (BEGIN)
+                                           ; SOURCE LINE # 175
+                                           ; SOURCE LINE # 176
+                                           ; SOURCE LINE # 177
+0000 900000      R     MOV     DPTR,#USB0_STATE
+0003 7402              MOV     A,#02H
+0005 F0                MOVX    @DPTR,A
+0006         ?C0020:
+                                           ; SOURCE LINE # 179
+0006 E596              MOV     A,USB0ADR
+0008 20E7FB            JB      ACC.7,?C0020
+000B         ?C0021:
+000B 759601            MOV     USB0ADR,#01H
+000E 759701            MOV     USB0DAT,#01H
+                                           ; SOURCE LINE # 182
+0011 E4                CLR     A
+0012 900000      R     MOV     DPTR,#EP_STATUS
+0015 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 183
+0016 A3                INC     DPTR
+0017 7403              MOV     A,#03H
+0019 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 184
+001A A3                INC     DPTR
+001B F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 185
+001C 22                RET     
+             ; FUNCTION Usb_Reset (END)
+
+             ; FUNCTION Usb_Resume (BEGIN)
+                                           ; SOURCE LINE # 200
+                                           ; SOURCE LINE # 201
+                                           ; SOURCE LINE # 204
+0000 900000      R     MOV     DPTR,#k+01H
+0003 E0                MOVX    A,@DPTR
+0004 04                INC     A
+0005 F0                MOVX    @DPTR,A
+0006 7006              JNZ     ?C0185
+0008 900000      R     MOV     DPTR,#k
+000B E0                MOVX    A,@DPTR
+000C 04                INC     A
+000D F0                MOVX    @DPTR,A
+000E         ?C0185:
+                                           ; SOURCE LINE # 207
+000E 22                RET     
+             ; FUNCTION Usb_Resume (END)
+
+             ; FUNCTION Handle_Control (BEGIN)
+                                           ; SOURCE LINE # 222
+                                           ; SOURCE LINE # 223
+0000         ?C0024:
+                                           ; SOURCE LINE # 227
+0000 E596              MOV     A,USB0ADR
+0002 20E7FB            JB      ACC.7,?C0024
+0005         ?C0025:
+C51 COMPILER V9.51   F3XX_USB0_INTERRUPTSERVICEROUTINE                                     06/26/2015 13:32:25 PAGE 19  
+
+0005 75960E            MOV     USB0ADR,#0EH
+0008 E4                CLR     A
+0009 F597              MOV     USB0DAT,A
+000B         ?C0026:
+                                           ; SOURCE LINE # 228
+000B E596              MOV     A,USB0ADR
+000D 20E7FB            JB      ACC.7,?C0026
+0010         ?C0027:
+0010 759691            MOV     USB0ADR,#091H
+0013         ?C0028:
+0013 E596              MOV     A,USB0ADR
+0015 20E7FB            JB      ACC.7,?C0028
+0018         ?C0029:
+0018 900000      R     MOV     DPTR,#ControlReg
+001B E597              MOV     A,USB0DAT
+001D F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 230
+001E 900000      R     MOV     DPTR,#EP_STATUS
+0021 E0                MOVX    A,@DPTR
+0022 B40513            CJNE    A,#05H,?C0030
+                                           ; SOURCE LINE # 232
+0025         ?C0031:
+                                           ; SOURCE LINE # 233
+0025 E596              MOV     A,USB0ADR
+0027 20E7FB            JB      ACC.7,?C0031
+002A         ?C0032:
+002A E4                CLR     A
+002B F596              MOV     USB0ADR,A
+002D 900000      R     MOV     DPTR,#SETUP+03H
+0030 E0                MOVX    A,@DPTR
+0031 F597              MOV     USB0DAT,A
+                                           ; SOURCE LINE # 234
+0033 E4                CLR     A
+0034 900000      R     MOV     DPTR,#EP_STATUS
+0037 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 235
+0038         ?C0030:
+                                           ; SOURCE LINE # 237
+0038 900000      R     MOV     DPTR,#ControlReg
+003B E0                MOVX    A,@DPTR
+003C FF                MOV     R7,A
+003D 30E210            JNB     ACC.2,?C0033
+                                           ; SOURCE LINE # 238
+0040         ?C0034:
+                                           ; SOURCE LINE # 240
+0040 E596              MOV     A,USB0ADR
+0042 20E7FB            JB      ACC.7,?C0034
+0045         ?C0035:
+0045 759611            MOV     USB0ADR,#011H
+0048 E4                CLR     A
+0049 F597              MOV     USB0DAT,A
+                                           ; SOURCE LINE # 241
+004B 900000      R     MOV     DPTR,#EP_STATUS
+004E F0                MOVX    @DPTR,A
+004F 22                RET     
+                                           ; SOURCE LINE # 243
+0050         ?C0033:
+                                           ; SOURCE LINE # 245
+0050 EF                MOV     A,R7
+0051 30E41B            JNB     ACC.4,?C0037
+                                           ; SOURCE LINE # 246
+0054         ?C0038:
+C51 COMPILER V9.51   F3XX_USB0_INTERRUPTSERVICEROUTINE                                     06/26/2015 13:32:25 PAGE 20  
+
+                                           ; SOURCE LINE # 247
+0054 E596              MOV     A,USB0ADR
+0056 20E7FB            JB      ACC.7,?C0038
+0059         ?C0039:
+0059 759611            MOV     USB0ADR,#011H
+005C 759708            MOV     USB0DAT,#08H
+005F         ?C0040:
+                                           ; SOURCE LINE # 249
+005F E596              MOV     A,USB0ADR
+0061 20E7FB            JB      ACC.7,?C0040
+0064         ?C0041:
+0064 759611            MOV     USB0ADR,#011H
+0067 759780            MOV     USB0DAT,#080H
+                                           ; SOURCE LINE # 250
+006A E4                CLR     A
+006B 900000      R     MOV     DPTR,#EP_STATUS
+006E F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 251
+006F         ?C0037:
+                                           ; SOURCE LINE # 253
+006F 900000      R     MOV     DPTR,#EP_STATUS
+0072 E0                MOVX    A,@DPTR
+0073 6003              JZ      $ + 5H
+0075 020000      R     LJMP    ?C0042
+                                           ; SOURCE LINE # 254
+                                           ; SOURCE LINE # 255
+0078 900000      R     MOV     DPTR,#ControlReg
+007B E0                MOVX    A,@DPTR
+007C 20E003            JB      ACC.0,$ + 6H
+007F 020000      R     LJMP    ?C0042
+                                           ; SOURCE LINE # 256
+                                           ; SOURCE LINE # 259
+0082 7B01              MOV     R3,#01H
+0084 7A00        R     MOV     R2,#HIGH SETUP
+0086 7900        R     MOV     R1,#LOW SETUP
+0088 7D08              MOV     R5,#08H
+008A 7C00              MOV     R4,#00H
+008C 7F20              MOV     R7,#020H
+008E 120000      R     LCALL   _Fifo_Read
+                                           ; SOURCE LINE # 268
+0091 900000      R     MOV     DPTR,#SETUP+03H
+0094 E0                MOVX    A,@DPTR
+0095 FE                MOV     R6,A
+0096 900000      R     MOV     DPTR,#SETUP+02H
+0099 E0                MOVX    A,@DPTR
+009A 7C00              MOV     R4,#00H
+009C 2400              ADD     A,#00H
+009E FF                MOV     R7,A
+009F EC                MOV     A,R4
+00A0 3E                ADDC    A,R6
+00A1 F0                MOVX    @DPTR,A
+00A2 A3                INC     DPTR
+00A3 EF                MOV     A,R7
+00A4 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 269
+00A5 900000      R     MOV     DPTR,#SETUP+05H
+00A8 E0                MOVX    A,@DPTR
+00A9 FE                MOV     R6,A
+00AA 900000      R     MOV     DPTR,#SETUP+04H
+00AD E0                MOVX    A,@DPTR
+00AE 2400              ADD     A,#00H
+00B0 FF                MOV     R7,A
+C51 COMPILER V9.51   F3XX_USB0_INTERRUPTSERVICEROUTINE                                     06/26/2015 13:32:25 PAGE 21  
+
+00B1 EC                MOV     A,R4
+00B2 3E                ADDC    A,R6
+00B3 F0                MOVX    @DPTR,A
+00B4 A3                INC     DPTR
+00B5 EF                MOV     A,R7
+00B6 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 270
+00B7 900000      R     MOV     DPTR,#SETUP+07H
+00BA E0                MOVX    A,@DPTR
+00BB FE                MOV     R6,A
+00BC 900000      R     MOV     DPTR,#SETUP+06H
+00BF E0                MOVX    A,@DPTR
+00C0 2400              ADD     A,#00H
+00C2 FF                MOV     R7,A
+00C3 EC                MOV     A,R4
+00C4 3E                ADDC    A,R6
+00C5 F0                MOVX    @DPTR,A
+00C6 A3                INC     DPTR
+00C7 EF                MOV     A,R7
+00C8 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 273
+00C9 900000      R     MOV     DPTR,#SETUP
+00CC E0                MOVX    A,@DPTR
+00CD 547F              ANL     A,#07FH
+00CF 6421              XRL     A,#021H
+00D1 7038              JNZ     ?C0044
+                                           ; SOURCE LINE # 274
+00D3 A3                INC     DPTR
+00D4 E0                MOVX    A,@DPTR
+00D5 24FE              ADD     A,#0FEH
+00D7 601C              JZ      ?C0048
+00D9 14                DEC     A
+00DA 6023              JZ      ?C0050
+00DC 24FA              ADD     A,#0FAH
+00DE 6010              JZ      ?C0047
+00E0 14                DEC     A
+00E1 6017              JZ      ?C0049
+00E3 14                DEC     A
+00E4 601E              JZ      ?C0051
+00E6 240A              ADD     A,#0AH
+00E8 701F              JNZ     ?C0052
+                                           ; SOURCE LINE # 275
+00EA         ?C0046:
+                                           ; SOURCE LINE # 276
+00EA 120000      E     LCALL   Get_Report
+                                           ; SOURCE LINE # 277
+00ED 020000      R     LJMP    ?C0042
+                                           ; SOURCE LINE # 278
+00F0         ?C0047:
+                                           ; SOURCE LINE # 279
+00F0 120000      E     LCALL   Set_Report
+                                           ; SOURCE LINE # 280
+00F3 807A              SJMP    ?C0042
+                                           ; SOURCE LINE # 281
+00F5         ?C0048:
+                                           ; SOURCE LINE # 282
+00F5 120000      E     LCALL   Get_Idle
+                                           ; SOURCE LINE # 283
+00F8 8075              SJMP    ?C0042
+                                           ; SOURCE LINE # 284
+00FA         ?C0049:
+                                           ; SOURCE LINE # 285
+C51 COMPILER V9.51   F3XX_USB0_INTERRUPTSERVICEROUTINE                                     06/26/2015 13:32:25 PAGE 22  
+
+00FA 120000      E     LCALL   Set_Idle
+                                           ; SOURCE LINE # 286
+00FD 8070              SJMP    ?C0042
+                                           ; SOURCE LINE # 287
+00FF         ?C0050:
+                                           ; SOURCE LINE # 288
+00FF 120000      E     LCALL   Get_Protocol
+                                           ; SOURCE LINE # 289
+0102 806B              SJMP    ?C0042
+                                           ; SOURCE LINE # 290
+0104         ?C0051:
+                                           ; SOURCE LINE # 291
+0104 120000      E     LCALL   Set_Protocol
+                                           ; SOURCE LINE # 292
+0107 8066              SJMP    ?C0042
+                                           ; SOURCE LINE # 293
+0109         ?C0052:
+                                           ; SOURCE LINE # 294
+                                           ; SOURCE LINE # 295
+0109 8061              SJMP    ?C0194
+                                           ; SOURCE LINE # 296
+                                           ; SOURCE LINE # 297
+010B         ?C0044:
+                                           ; SOURCE LINE # 299
+010B 900000      R     MOV     DPTR,#SETUP+01H
+010E E0                MOVX    A,@DPTR
+010F B40C00            CJNE    A,#0CH,?C0186
+0112         ?C0186:
+0112 5058              JNC     ?C0064
+0114 900000      R     MOV     DPTR,#?C0187
+0117 F8                MOV     R0,A
+0118 28                ADD     A,R0
+0119 28                ADD     A,R0
+011A 73                JMP     @A+DPTR
+011B         ?C0187:
+011B 020000      R     LJMP    ?C0055
+011E 020000      R     LJMP    ?C0056
+0121 020000      R     LJMP    ?C0064
+0124 020000      R     LJMP    ?C0057
+0127 020000      R     LJMP    ?C0064
+012A 020000      R     LJMP    ?C0058
+012D 020000      R     LJMP    ?C0059
+0130 020000      R     LJMP    ?C0064
+0133 020000      R     LJMP    ?C0060
+0136 020000      R     LJMP    ?C0061
+0139 020000      R     LJMP    ?C0062
+013C 020000      R     LJMP    ?C0063
+                                           ; SOURCE LINE # 300
+                                           ; SOURCE LINE # 301
+013F         ?C0055:
+                                           ; SOURCE LINE # 302
+013F 120000      E     LCALL   Get_Status
+                                           ; SOURCE LINE # 303
+0142 802B              SJMP    ?C0042
+                                           ; SOURCE LINE # 304
+0144         ?C0056:
+                                           ; SOURCE LINE # 305
+0144 120000      E     LCALL   Clear_Feature
+                                           ; SOURCE LINE # 306
+0147 8026              SJMP    ?C0042
+                                           ; SOURCE LINE # 307
+0149         ?C0057:
+C51 COMPILER V9.51   F3XX_USB0_INTERRUPTSERVICEROUTINE                                     06/26/2015 13:32:25 PAGE 23  
+
+                                           ; SOURCE LINE # 308
+0149 120000      E     LCALL   Set_Feature
+                                           ; SOURCE LINE # 309
+014C 8021              SJMP    ?C0042
+                                           ; SOURCE LINE # 310
+014E         ?C0058:
+                                           ; SOURCE LINE # 311
+014E 120000      E     LCALL   Set_Address
+                                           ; SOURCE LINE # 312
+0151 801C              SJMP    ?C0042
+                                           ; SOURCE LINE # 313
+0153         ?C0059:
+                                           ; SOURCE LINE # 314
+0153 120000      E     LCALL   Get_Descriptor
+                                           ; SOURCE LINE # 315
+0156 8017              SJMP    ?C0042
+                                           ; SOURCE LINE # 316
+0158         ?C0060:
+                                           ; SOURCE LINE # 317
+0158 120000      E     LCALL   Get_Configuration
+                                           ; SOURCE LINE # 318
+015B 8012              SJMP    ?C0042
+                                           ; SOURCE LINE # 319
+015D         ?C0061:
+                                           ; SOURCE LINE # 320
+015D 120000      E     LCALL   Set_Configuration
+                                           ; SOURCE LINE # 321
+0160 800D              SJMP    ?C0042
+                                           ; SOURCE LINE # 322
+0162         ?C0062:
+                                           ; SOURCE LINE # 323
+0162 120000      E     LCALL   Get_Interface
+                                           ; SOURCE LINE # 324
+0165 8008              SJMP    ?C0042
+                                           ; SOURCE LINE # 325
+0167         ?C0063:
+                                           ; SOURCE LINE # 326
+0167 120000      E     LCALL   Set_Interface
+                                           ; SOURCE LINE # 327
+016A 8003              SJMP    ?C0042
+                                           ; SOURCE LINE # 328
+016C         ?C0064:
+                                           ; SOURCE LINE # 329
+016C         ?C0194:
+016C 120000      R     LCALL   Force_Stall
+                                           ; SOURCE LINE # 330
+                                           ; SOURCE LINE # 331
+                                           ; SOURCE LINE # 332
+                                           ; SOURCE LINE # 333
+016F         ?C0042:
+                                           ; SOURCE LINE # 335
+016F 900000      R     MOV     DPTR,#EP_STATUS
+0172 E0                MOVX    A,@DPTR
+0173 6401              XRL     A,#01H
+0175 6003              JZ      $ + 5H
+0177 020000      R     LJMP    ?C0065
+                                           ; SOURCE LINE # 336
+                                           ; SOURCE LINE # 337
+017A 900000      R     MOV     DPTR,#ControlReg
+017D E0                MOVX    A,@DPTR
+017E 30E103            JNB     ACC.1,$ + 6H
+0181 020000      R     LJMP    ?C0065
+C51 COMPILER V9.51   F3XX_USB0_INTERRUPTSERVICEROUTINE                                     06/26/2015 13:32:25 PAGE 24  
+
+                                           ; SOURCE LINE # 338
+0184         ?C0067:
+                                           ; SOURCE LINE # 340
+0184 E596              MOV     A,USB0ADR
+0186 20E7FB            JB      ACC.7,?C0067
+0189         ?C0068:
+0189 759691            MOV     USB0ADR,#091H
+018C         ?C0069:
+018C E596              MOV     A,USB0ADR
+018E 20E7FB            JB      ACC.7,?C0069
+0191         ?C0070:
+0191 900000      R     MOV     DPTR,#ControlReg
+0194 E597              MOV     A,USB0DAT
+0196 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 344
+0197 E0                MOVX    A,@DPTR
+0198 30E406            JNB     ACC.4,?C0072
+019B 30E003            JNB     ACC.0,$ + 6H
+019E 020000      R     LJMP    ?C0065
+01A1         ?C0072:
+                                           ; SOURCE LINE # 345
+                                           ; SOURCE LINE # 347
+01A1 900000      R     MOV     DPTR,#ControlReg
+01A4 7402              MOV     A,#02H
+01A6 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 348
+01A7 C3                CLR     C
+01A8 900000      R     MOV     DPTR,#DATASIZE+01H
+01AB E0                MOVX    A,@DPTR
+01AC 9440              SUBB    A,#040H
+01AE 900000      R     MOV     DPTR,#DATASIZE
+01B1 E0                MOVX    A,@DPTR
+01B2 9400              SUBB    A,#00H
+01B4 403C              JC      ?C0073
+                                           ; SOURCE LINE # 349
+                                           ; SOURCE LINE # 352
+01B6 900000      R     MOV     DPTR,#DATAPTR
+01B9 E0                MOVX    A,@DPTR
+01BA FB                MOV     R3,A
+01BB A3                INC     DPTR
+01BC E0                MOVX    A,@DPTR
+01BD FA                MOV     R2,A
+01BE A3                INC     DPTR
+01BF E0                MOVX    A,@DPTR
+01C0 F9                MOV     R1,A
+01C1 7D40              MOV     R5,#040H
+01C3 7C00              MOV     R4,#00H
+01C5 7F20              MOV     R7,#020H
+01C7 120000      R     LCALL   _Fifo_Write_InterruptServiceRoutine
+                                           ; SOURCE LINE # 354
+01CA 900000      R     MOV     DPTR,#DATAPTR+01H
+01CD E4                CLR     A
+01CE 75F040            MOV     B,#040H
+01D1 120000      E     LCALL   ?C?IILDX
+                                           ; SOURCE LINE # 356
+01D4 900000      R     MOV     DPTR,#DATASIZE+01H
+01D7 E0                MOVX    A,@DPTR
+01D8 24C0              ADD     A,#0C0H
+01DA F0                MOVX    @DPTR,A
+01DB 900000      R     MOV     DPTR,#DATASIZE
+01DE E0                MOVX    A,@DPTR
+01DF 34FF              ADDC    A,#0FFH
+C51 COMPILER V9.51   F3XX_USB0_INTERRUPTSERVICEROUTINE                                     06/26/2015 13:32:25 PAGE 25  
+
+01E1 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 358
+01E2 900000      R     MOV     DPTR,#DATASENT+01H
+01E5 E0                MOVX    A,@DPTR
+01E6 2440              ADD     A,#040H
+01E8 F0                MOVX    @DPTR,A
+01E9 900000      R     MOV     DPTR,#DATASENT
+01EC E0                MOVX    A,@DPTR
+01ED 3400              ADDC    A,#00H
+01EF F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 359
+01F0 8024              SJMP    ?C0074
+01F2         ?C0073:
+                                           ; SOURCE LINE # 361
+                                           ; SOURCE LINE # 364
+01F2 900000      R     MOV     DPTR,#DATASIZE
+01F5 E0                MOVX    A,@DPTR
+01F6 FC                MOV     R4,A
+01F7 A3                INC     DPTR
+01F8 E0                MOVX    A,@DPTR
+01F9 FD                MOV     R5,A
+01FA 900000      R     MOV     DPTR,#DATAPTR
+01FD E0                MOVX    A,@DPTR
+01FE FB                MOV     R3,A
+01FF A3                INC     DPTR
+0200 E0                MOVX    A,@DPTR
+0201 FA                MOV     R2,A
+0202 A3                INC     DPTR
+0203 E0                MOVX    A,@DPTR
+0204 F9                MOV     R1,A
+0205 7F20              MOV     R7,#020H
+0207 120000      R     LCALL   _Fifo_Write_InterruptServiceRoutine
+                                           ; SOURCE LINE # 365
+020A 900000      R     MOV     DPTR,#ControlReg
+020D E0                MOVX    A,@DPTR
+020E 4408              ORL     A,#08H
+0210 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 366
+0211 E4                CLR     A
+0212 900000      R     MOV     DPTR,#EP_STATUS
+0215 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 367
+0216         ?C0074:
+                                           ; SOURCE LINE # 368
+0216 900000      R     MOV     DPTR,#SETUP+06H
+0219 E0                MOVX    A,@DPTR
+021A FE                MOV     R6,A
+021B A3                INC     DPTR
+021C E0                MOVX    A,@DPTR
+021D FF                MOV     R7,A
+021E A3                INC     DPTR
+021F E0                MOVX    A,@DPTR
+0220 B50611            CJNE    A,AR6,?C0076
+0223 A3                INC     DPTR
+0224 E0                MOVX    A,@DPTR
+0225 B5070C            CJNE    A,AR7,?C0076
+                                           ; SOURCE LINE # 369
+                                           ; SOURCE LINE # 373
+0228 900000      R     MOV     DPTR,#ControlReg
+022B E0                MOVX    A,@DPTR
+022C 4408              ORL     A,#08H
+022E F0                MOVX    @DPTR,A
+C51 COMPILER V9.51   F3XX_USB0_INTERRUPTSERVICEROUTINE                                     06/26/2015 13:32:25 PAGE 26  
+
+                                           ; SOURCE LINE # 374
+022F E4                CLR     A
+0230 900000      R     MOV     DPTR,#EP_STATUS
+0233 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 375
+0234         ?C0076:
+                                           ; SOURCE LINE # 377
+0234 E596              MOV     A,USB0ADR
+0236 20E7FB            JB      ACC.7,?C0076
+0239         ?C0077:
+0239 759611            MOV     USB0ADR,#011H
+023C 900000      R     MOV     DPTR,#ControlReg
+023F E0                MOVX    A,@DPTR
+0240 F597              MOV     USB0DAT,A
+                                           ; SOURCE LINE # 378
+                                           ; SOURCE LINE # 379
+                                           ; SOURCE LINE # 380
+0242         ?C0065:
+                                           ; SOURCE LINE # 382
+0242 900000      R     MOV     DPTR,#EP_STATUS
+0245 E0                MOVX    A,@DPTR
+0246 6402              XRL     A,#02H
+0248 6003              JZ      $ + 5H
+024A 020000      R     LJMP    ?C0036
+                                           ; SOURCE LINE # 383
+024D         ?C0079:
+                                           ; SOURCE LINE # 385
+024D E596              MOV     A,USB0ADR
+024F 20E7FB            JB      ACC.7,?C0079
+0252         ?C0080:
+0252 759691            MOV     USB0ADR,#091H
+0255         ?C0081:
+0255 E596              MOV     A,USB0ADR
+0257 20E7FB            JB      ACC.7,?C0081
+025A         ?C0082:
+025A 900000      R     MOV     DPTR,#ControlReg
+025D E597              MOV     A,USB0DAT
+025F F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 386
+0260 E0                MOVX    A,@DPTR
+0261 20E003            JB      ACC.0,$ + 6H
+0264 020000      R     LJMP    ?C0036
+                                           ; SOURCE LINE # 387
+                                           ; SOURCE LINE # 388
+0267 7440              MOV     A,#040H
+0269 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 389
+026A C3                CLR     C
+026B 900000      R     MOV     DPTR,#DATASIZE+01H
+026E E0                MOVX    A,@DPTR
+026F 9440              SUBB    A,#040H
+0271 900000      R     MOV     DPTR,#DATASIZE
+0274 E0                MOVX    A,@DPTR
+0275 9400              SUBB    A,#00H
+0277 403C              JC      ?C0084
+                                           ; SOURCE LINE # 390
+                                           ; SOURCE LINE # 391
+0279 900000      R     MOV     DPTR,#DATAPTR
+027C E0                MOVX    A,@DPTR
+027D FB                MOV     R3,A
+027E A3                INC     DPTR
+027F E0                MOVX    A,@DPTR
+C51 COMPILER V9.51   F3XX_USB0_INTERRUPTSERVICEROUTINE                                     06/26/2015 13:32:25 PAGE 27  
+
+0280 FA                MOV     R2,A
+0281 A3                INC     DPTR
+0282 E0                MOVX    A,@DPTR
+0283 F9                MOV     R1,A
+0284 7D40              MOV     R5,#040H
+0286 7C00              MOV     R4,#00H
+0288 7F20              MOV     R7,#020H
+028A 120000      R     LCALL   _Fifo_Read
+                                           ; SOURCE LINE # 393
+028D 900000      R     MOV     DPTR,#DATAPTR+01H
+0290 E4                CLR     A
+0291 75F040            MOV     B,#040H
+0294 120000      E     LCALL   ?C?IILDX
+                                           ; SOURCE LINE # 395
+0297 900000      R     MOV     DPTR,#DATASIZE+01H
+029A E0                MOVX    A,@DPTR
+029B 24C0              ADD     A,#0C0H
+029D F0                MOVX    @DPTR,A
+029E 900000      R     MOV     DPTR,#DATASIZE
+02A1 E0                MOVX    A,@DPTR
+02A2 34FF              ADDC    A,#0FFH
+02A4 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 397
+02A5 900000      R     MOV     DPTR,#DATASENT+01H
+02A8 E0                MOVX    A,@DPTR
+02A9 2440              ADD     A,#040H
+02AB F0                MOVX    @DPTR,A
+02AC 900000      R     MOV     DPTR,#DATASENT
+02AF E0                MOVX    A,@DPTR
+02B0 3400              ADDC    A,#00H
+02B2 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 398
+02B3 801C              SJMP    ?C0085
+02B5         ?C0084:
+                                           ; SOURCE LINE # 400
+                                           ; SOURCE LINE # 402
+02B5 900000      R     MOV     DPTR,#DATASIZE
+02B8 E0                MOVX    A,@DPTR
+02B9 FC                MOV     R4,A
+02BA A3                INC     DPTR
+02BB E0                MOVX    A,@DPTR
+02BC FD                MOV     R5,A
+02BD 900000      R     MOV     DPTR,#DATAPTR
+02C0 7F20              MOV     R7,#020H
+02C2 120000      R     LCALL   L?0196
+                                           ; SOURCE LINE # 404
+02C5 900000      R     MOV     DPTR,#ControlReg
+02C8 E0                MOVX    A,@DPTR
+02C9 4408              ORL     A,#08H
+02CB F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 405
+02CC E4                CLR     A
+02CD 900000      R     MOV     DPTR,#EP_STATUS
+02D0 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 406
+02D1         ?C0085:
+                                           ; SOURCE LINE # 407
+02D1 900000      R     MOV     DPTR,#SETUP+06H
+02D4 E0                MOVX    A,@DPTR
+02D5 FE                MOV     R6,A
+02D6 A3                INC     DPTR
+02D7 E0                MOVX    A,@DPTR
+C51 COMPILER V9.51   F3XX_USB0_INTERRUPTSERVICEROUTINE                                     06/26/2015 13:32:25 PAGE 28  
+
+02D8 FF                MOV     R7,A
+02D9 A3                INC     DPTR
+02DA E0                MOVX    A,@DPTR
+02DB B50611            CJNE    A,AR6,?C0086
+02DE A3                INC     DPTR
+02DF E0                MOVX    A,@DPTR
+02E0 B5070C            CJNE    A,AR7,?C0086
+                                           ; SOURCE LINE # 408
+                                           ; SOURCE LINE # 409
+02E3 900000      R     MOV     DPTR,#ControlReg
+02E6 E0                MOVX    A,@DPTR
+02E7 4408              ORL     A,#08H
+02E9 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 410
+02EA E4                CLR     A
+02EB 900000      R     MOV     DPTR,#EP_STATUS
+02EE F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 411
+02EF         ?C0086:
+                                           ; SOURCE LINE # 415
+02EF 900000      R     MOV     DPTR,#EP_STATUS
+02F2 E0                MOVX    A,@DPTR
+02F3 700E              JNZ     ?C0087
+02F5 900000      R     MOV     DPTR,#SETUP+01H
+02F8 E0                MOVX    A,@DPTR
+02F9 B40907            CJNE    A,#09H,?C0087
+                                           ; SOURCE LINE # 416
+                                           ; SOURCE LINE # 417
+02FC 7F01              MOV     R7,#01H
+02FE 7E00              MOV     R6,#00H
+0300 120000      E     LCALL   _OUT_REPORT_HANDLER
+                                           ; SOURCE LINE # 418
+0303         ?C0087:
+                                           ; SOURCE LINE # 420
+0303 900000      R     MOV     DPTR,#EP_STATUS
+0306 E0                MOVX    A,@DPTR
+0307 6404              XRL     A,#04H
+0309 6005              JZ      ?C0088
+030B         ?C0089:
+030B E596              MOV     A,USB0ADR
+030D 20E7FB            JB      ACC.7,?C0089
+0310         ?C0090:
+0310         ?C0088:
+0310 759611            MOV     USB0ADR,#011H
+0313 900000      R     MOV     DPTR,#ControlReg
+0316 E0                MOVX    A,@DPTR
+0317 F597              MOV     USB0DAT,A
+                                           ; SOURCE LINE # 421
+                                           ; SOURCE LINE # 422
+                                           ; SOURCE LINE # 424
+0319         ?C0036:
+0319 22                RET     
+             ; FUNCTION Handle_Control (END)
+
+             ; FUNCTION Handle_In3 (BEGIN)
+                                           ; SOURCE LINE # 450
+                                           ; SOURCE LINE # 451
+                                           ; SOURCE LINE # 452
+0000 E4                CLR     A
+0001 900000      R     MOV     DPTR,#EP_STATUS+03H
+0004 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 453
+C51 COMPILER V9.51   F3XX_USB0_INTERRUPTSERVICEROUTINE                                     06/26/2015 13:32:25 PAGE 29  
+
+0005 22                RET     
+             ; FUNCTION Handle_In3 (END)
+
+             ; FUNCTION Handle_Out3 (BEGIN)
+                                           ; SOURCE LINE # 548
+                                           ; SOURCE LINE # 549
+                                           ; SOURCE LINE # 551
+0000 E4                CLR     A
+0001 900000      R     MOV     DPTR,#Count
+0004 F0                MOVX    @DPTR,A
+0005         ?C0092:
+                                           ; SOURCE LINE # 554
+0005 E596              MOV     A,USB0ADR
+0007 20E7FB            JB      ACC.7,?C0092
+000A         ?C0093:
+000A 75960E            MOV     USB0ADR,#0EH
+000D 759703            MOV     USB0DAT,#03H
+0010         ?C0094:
+                                           ; SOURCE LINE # 555
+0010 E596              MOV     A,USB0ADR
+0012 20E7FB            JB      ACC.7,?C0094
+0015         ?C0095:
+0015 759694            MOV     USB0ADR,#094H
+0018         ?C0096:
+0018 E596              MOV     A,USB0ADR
+001A 20E7FB            JB      ACC.7,?C0096
+001D         ?C0097:
+;---- Variable 'ControlReg' assigned to Register 'R7' ----
+001D AF97              MOV     R7,USB0DAT
+                                           ; SOURCE LINE # 557
+001F 900000      R     MOV     DPTR,#EP_STATUS+03H
+0022 E0                MOVX    A,@DPTR
+0023 B4030C            CJNE    A,#03H,?C0098
+                                           ; SOURCE LINE # 558
+0026         ?C0099:
+                                           ; SOURCE LINE # 559
+0026 E596              MOV     A,USB0ADR
+0028 20E7FB            JB      ACC.7,?C0099
+002B         ?C0100:
+002B 759614            MOV     USB0ADR,#014H
+002E 759720            MOV     USB0DAT,#020H
+                                           ; SOURCE LINE # 560
+0031 22                RET     
+0032         ?C0098:
+                                           ; SOURCE LINE # 564
+                                           ; SOURCE LINE # 565
+0032 EF                MOV     A,R7
+0033 30E60B            JNB     ACC.6,?C0102
+                                           ; SOURCE LINE # 567
+0036         ?C0103:
+                                           ; SOURCE LINE # 568
+0036 E596              MOV     A,USB0ADR
+0038 20E7FB            JB      ACC.7,?C0103
+003B         ?C0104:
+003B 759614            MOV     USB0ADR,#014H
+003E 759780            MOV     USB0DAT,#080H
+                                           ; SOURCE LINE # 569
+0041         ?C0102:
+                                           ; SOURCE LINE # 571
+0041 120000      E     LCALL   Setup_IO_BUFFER
+                                           ; SOURCE LINE # 573
+0044 900000      E     MOV     DPTR,#IO_BUFFER
+C51 COMPILER V9.51   F3XX_USB0_INTERRUPTSERVICEROUTINE                                     06/26/2015 13:32:25 PAGE 30  
+
+0047 E0                MOVX    A,@DPTR
+0048 FD                MOV     R5,A
+0049 7C00              MOV     R4,#00H
+004B A3                INC     DPTR
+004C 7F23              MOV     R7,#023H
+004E 120000      R     LCALL   L?0196
+                                           ; SOURCE LINE # 581
+0051 E4                CLR     A
+0052 FF                MOV     R7,A
+0053 FE                MOV     R6,A
+0054 120000      E     LCALL   _OUT_REPORT_HANDLER
+0057         ?C0105:
+                                           ; SOURCE LINE # 583
+0057 E596              MOV     A,USB0ADR
+0059 20E7FB            JB      ACC.7,?C0105
+005C         ?C0106:
+005C 759614            MOV     USB0ADR,#014H
+005F E4                CLR     A
+0060 F597              MOV     USB0DAT,A
+                                           ; SOURCE LINE # 584
+                                           ; SOURCE LINE # 585
+0062         ?C0107:
+0062 22                RET     
+             ; FUNCTION Handle_Out3 (END)
+
+             ; FUNCTION Usb_Suspend (BEGIN)
+                                           ; SOURCE LINE # 593
+                                           ; SOURCE LINE # 594
+                                           ; SOURCE LINE # 596
+0000 900000      R     MOV     DPTR,#k+01H
+0003 E0                MOVX    A,@DPTR
+0004 04                INC     A
+0005 F0                MOVX    @DPTR,A
+0006 7006              JNZ     ?C0190
+0008 900000      R     MOV     DPTR,#k
+000B E0                MOVX    A,@DPTR
+000C 04                INC     A
+000D F0                MOVX    @DPTR,A
+000E         ?C0190:
+                                           ; SOURCE LINE # 597
+000E 22                RET     
+             ; FUNCTION Usb_Suspend (END)
+
+             ; FUNCTION L?0196 (BEGIN)
+0000 E0                MOVX    A,@DPTR
+0001 FB                MOV     R3,A
+0002 A3                INC     DPTR
+0003 E0                MOVX    A,@DPTR
+0004 FA                MOV     R2,A
+0005 A3                INC     DPTR
+0006 E0                MOVX    A,@DPTR
+0007 F9                MOV     R1,A
+             ; FUNCTION _Fifo_Read (BEGIN)
+                                           ; SOURCE LINE # 612
+0008 900000      R     MOV     DPTR,#addr
+000B EF                MOV     A,R7
+000C F0                MOVX    @DPTR,A
+000D 900000      R     MOV     DPTR,#pData
+0010 EB                MOV     A,R3
+0011 F0                MOVX    @DPTR,A
+0012 A3                INC     DPTR
+0013 EA                MOV     A,R2
+C51 COMPILER V9.51   F3XX_USB0_INTERRUPTSERVICEROUTINE                                     06/26/2015 13:32:25 PAGE 31  
+
+0014 F0                MOVX    @DPTR,A
+0015 A3                INC     DPTR
+0016 E9                MOV     A,R1
+0017 F0                MOVX    @DPTR,A
+0018 900000      R     MOV     DPTR,#uNumBytes
+001B EC                MOV     A,R4
+001C F0                MOVX    @DPTR,A
+001D A3                INC     DPTR
+001E ED                MOV     A,R5
+001F F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 614
+                                           ; SOURCE LINE # 617
+0020 4C                ORL     A,R4
+0021 603C              JZ      ?C0115
+                                           ; SOURCE LINE # 618
+                                           ; SOURCE LINE # 619
+0023 900000      R     MOV     DPTR,#addr
+0026 E0                MOVX    A,@DPTR
+0027 F596              MOV     USB0ADR,A
+                                           ; SOURCE LINE # 620
+0029 4396C0            ORL     USB0ADR,#0C0H
+                                           ; SOURCE LINE # 624
+;---- Variable 'i' assigned to Register 'R6/R7' ----
+002C E4                CLR     A
+002D FF                MOV     R7,A
+002E FE                MOV     R6,A
+002F         ?C0110:
+002F D3                SETB    C
+0030 900000      R     MOV     DPTR,#uNumBytes+01H
+0033 E0                MOVX    A,@DPTR
+0034 9F                SUBB    A,R7
+0035 900000      R     MOV     DPTR,#uNumBytes
+0038 E0                MOVX    A,@DPTR
+0039 9E                SUBB    A,R6
+003A 4020              JC      ?C0111
+                                           ; SOURCE LINE # 625
+003C         ?C0113:
+                                           ; SOURCE LINE # 626
+003C E596              MOV     A,USB0ADR
+003E 20E7FB            JB      ACC.7,?C0113
+0041         ?C0114:
+                                           ; SOURCE LINE # 627
+0041 900000      R     MOV     DPTR,#pData
+0044 E0                MOVX    A,@DPTR
+0045 FB                MOV     R3,A
+0046 A3                INC     DPTR
+0047 E0                MOVX    A,@DPTR
+0048 FA                MOV     R2,A
+0049 A3                INC     DPTR
+004A E0                MOVX    A,@DPTR
+004B F9                MOV     R1,A
+004C 8F82              MOV     DPL,R7
+004E 8E83              MOV     DPH,R6
+0050 E597              MOV     A,USB0DAT
+0052 120000      E     LCALL   ?C?CSTOPTR
+                                           ; SOURCE LINE # 628
+0055 0F                INC     R7
+0056 BF0001            CJNE    R7,#00H,?C0191
+0059 0E                INC     R6
+005A         ?C0191:
+005A 80D3              SJMP    ?C0110
+005C         ?C0111:
+C51 COMPILER V9.51   F3XX_USB0_INTERRUPTSERVICEROUTINE                                     06/26/2015 13:32:25 PAGE 32  
+
+                                           ; SOURCE LINE # 631
+005C E4                CLR     A
+005D F596              MOV     USB0ADR,A
+                                           ; SOURCE LINE # 632
+                                           ; SOURCE LINE # 633
+005F         ?C0115:
+005F 22                RET     
+             ; FUNCTION _Fifo_Read (END)
+
+             ; FUNCTION L?0195 (BEGIN)
+0000 900000      E     MOV     DPTR,#IO_BUFFER
+0003 E0                MOVX    A,@DPTR
+0004 FD                MOV     R5,A
+0005 7C00              MOV     R4,#00H
+0007 A3                INC     DPTR
+0008 E0                MOVX    A,@DPTR
+0009 FB                MOV     R3,A
+000A A3                INC     DPTR
+000B E0                MOVX    A,@DPTR
+000C FA                MOV     R2,A
+000D A3                INC     DPTR
+000E E0                MOVX    A,@DPTR
+000F F9                MOV     R1,A
+0010 7F23              MOV     R7,#023H
+             ; FUNCTION _Fifo_Write_Foreground (BEGIN)
+                                           ; SOURCE LINE # 652
+0012 900000      R     MOV     DPTR,#addr
+0015 EF                MOV     A,R7
+0016 F0                MOVX    @DPTR,A
+0017 900000      R     MOV     DPTR,#pData
+001A EB                MOV     A,R3
+001B F0                MOVX    @DPTR,A
+001C A3                INC     DPTR
+001D EA                MOV     A,R2
+001E F0                MOVX    @DPTR,A
+001F A3                INC     DPTR
+0020 E9                MOV     A,R1
+0021 F0                MOVX    @DPTR,A
+0022 900000      R     MOV     DPTR,#uNumBytes
+0025 EC                MOV     A,R4
+0026 F0                MOVX    @DPTR,A
+0027 A3                INC     DPTR
+0028 ED                MOV     A,R5
+0029 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 654
+                                           ; SOURCE LINE # 658
+002A 4C                ORL     A,R4
+002B 603B              JZ      ?C0124
+                                           ; SOURCE LINE # 659
+002D         ?C0117:
+                                           ; SOURCE LINE # 660
+002D E596              MOV     A,USB0ADR
+002F 20E7FB            JB      ACC.7,?C0117
+0032         ?C0118:
+                                           ; SOURCE LINE # 662
+0032 900000      R     MOV     DPTR,#addr
+0035 E0                MOVX    A,@DPTR
+0036 F596              MOV     USB0ADR,A
+                                           ; SOURCE LINE # 665
+;---- Variable 'i' assigned to Register 'R6/R7' ----
+0038 E4                CLR     A
+0039 FF                MOV     R7,A
+C51 COMPILER V9.51   F3XX_USB0_INTERRUPTSERVICEROUTINE                                     06/26/2015 13:32:25 PAGE 33  
+
+003A FE                MOV     R6,A
+003B         ?C0119:
+003B D3                SETB    C
+003C 900000      R     MOV     DPTR,#uNumBytes+01H
+003F E0                MOVX    A,@DPTR
+0040 9F                SUBB    A,R7
+0041 900000      R     MOV     DPTR,#uNumBytes
+0044 E0                MOVX    A,@DPTR
+0045 9E                SUBB    A,R6
+0046 4020              JC      ?C0124
+                                           ; SOURCE LINE # 666
+                                           ; SOURCE LINE # 667
+0048 900000      R     MOV     DPTR,#pData
+004B E0                MOVX    A,@DPTR
+004C FB                MOV     R3,A
+004D A3                INC     DPTR
+004E E0                MOVX    A,@DPTR
+004F FA                MOV     R2,A
+0050 A3                INC     DPTR
+0051 E0                MOVX    A,@DPTR
+0052 F9                MOV     R1,A
+0053 8F82              MOV     DPL,R7
+0055 8E83              MOV     DPH,R6
+0057 120000      E     LCALL   ?C?CLDOPTR
+005A F597              MOV     USB0DAT,A
+005C         ?C0122:
+                                           ; SOURCE LINE # 668
+005C E596              MOV     A,USB0ADR
+005E 20E7FB            JB      ACC.7,?C0122
+0061         ?C0123:
+                                           ; SOURCE LINE # 669
+0061         ?C0121:
+0061 0F                INC     R7
+0062 BF0001            CJNE    R7,#00H,?C0192
+0065 0E                INC     R6
+0066         ?C0192:
+0066 80D3              SJMP    ?C0119
+                                           ; SOURCE LINE # 670
+                                           ; SOURCE LINE # 671
+0068         ?C0124:
+0068 22                RET     
+             ; FUNCTION _Fifo_Write_Foreground (END)
+
+             ; FUNCTION _Fifo_Write_InterruptServiceRoutine (BEGIN)
+                                           ; SOURCE LINE # 673
+0000 900000      R     MOV     DPTR,#addr
+0003 EF                MOV     A,R7
+0004 F0                MOVX    @DPTR,A
+0005 900000      R     MOV     DPTR,#pData
+0008 EB                MOV     A,R3
+0009 F0                MOVX    @DPTR,A
+000A A3                INC     DPTR
+000B EA                MOV     A,R2
+000C F0                MOVX    @DPTR,A
+000D A3                INC     DPTR
+000E E9                MOV     A,R1
+000F F0                MOVX    @DPTR,A
+0010 900000      R     MOV     DPTR,#uNumBytes
+0013 EC                MOV     A,R4
+0014 F0                MOVX    @DPTR,A
+0015 A3                INC     DPTR
+0016 ED                MOV     A,R5
+C51 COMPILER V9.51   F3XX_USB0_INTERRUPTSERVICEROUTINE                                     06/26/2015 13:32:25 PAGE 34  
+
+0017 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 676
+                                           ; SOURCE LINE # 680
+0018 4C                ORL     A,R4
+0019 603B              JZ      ?C0133
+                                           ; SOURCE LINE # 681
+001B         ?C0126:
+                                           ; SOURCE LINE # 682
+001B E596              MOV     A,USB0ADR
+001D 20E7FB            JB      ACC.7,?C0126
+0020         ?C0127:
+                                           ; SOURCE LINE # 684
+0020 900000      R     MOV     DPTR,#addr
+0023 E0                MOVX    A,@DPTR
+0024 F596              MOV     USB0ADR,A
+                                           ; SOURCE LINE # 687
+;---- Variable 'i' assigned to Register 'R6/R7' ----
+0026 E4                CLR     A
+0027 FF                MOV     R7,A
+0028 FE                MOV     R6,A
+0029         ?C0128:
+0029 D3                SETB    C
+002A 900000      R     MOV     DPTR,#uNumBytes+01H
+002D E0                MOVX    A,@DPTR
+002E 9F                SUBB    A,R7
+002F 900000      R     MOV     DPTR,#uNumBytes
+0032 E0                MOVX    A,@DPTR
+0033 9E                SUBB    A,R6
+0034 4020              JC      ?C0133
+                                           ; SOURCE LINE # 688
+                                           ; SOURCE LINE # 689
+0036 900000      R     MOV     DPTR,#pData
+0039 E0                MOVX    A,@DPTR
+003A FB                MOV     R3,A
+003B A3                INC     DPTR
+003C E0                MOVX    A,@DPTR
+003D FA                MOV     R2,A
+003E A3                INC     DPTR
+003F E0                MOVX    A,@DPTR
+0040 F9                MOV     R1,A
+0041 8F82              MOV     DPL,R7
+0043 8E83              MOV     DPH,R6
+0045 120000      E     LCALL   ?C?CLDOPTR
+0048 F597              MOV     USB0DAT,A
+004A         ?C0131:
+                                           ; SOURCE LINE # 690
+004A E596              MOV     A,USB0ADR
+004C 20E7FB            JB      ACC.7,?C0131
+004F         ?C0132:
+                                           ; SOURCE LINE # 691
+004F         ?C0130:
+004F 0F                INC     R7
+0050 BF0001            CJNE    R7,#00H,?C0193
+0053 0E                INC     R6
+0054         ?C0193:
+0054 80D3              SJMP    ?C0128
+                                           ; SOURCE LINE # 692
+                                           ; SOURCE LINE # 693
+0056         ?C0133:
+0056 22                RET     
+             ; FUNCTION _Fifo_Write_InterruptServiceRoutine (END)
+
+C51 COMPILER V9.51   F3XX_USB0_INTERRUPTSERVICEROUTINE                                     06/26/2015 13:32:25 PAGE 35  
+
+             ; FUNCTION Force_Stall (BEGIN)
+                                           ; SOURCE LINE # 706
+                                           ; SOURCE LINE # 707
+0000         ?C0134:
+                                           ; SOURCE LINE # 708
+0000 E596              MOV     A,USB0ADR
+0002 20E7FB            JB      ACC.7,?C0134
+0005         ?C0135:
+0005 75960E            MOV     USB0ADR,#0EH
+0008 E4                CLR     A
+0009 F597              MOV     USB0DAT,A
+000B         ?C0136:
+                                           ; SOURCE LINE # 709
+000B E596              MOV     A,USB0ADR
+000D 20E7FB            JB      ACC.7,?C0136
+0010         ?C0137:
+0010 759611            MOV     USB0ADR,#011H
+0013 759720            MOV     USB0DAT,#020H
+                                           ; SOURCE LINE # 710
+0016 900000      R     MOV     DPTR,#EP_STATUS
+0019 7404              MOV     A,#04H
+001B F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 711
+001C 22                RET     
+             ; FUNCTION Force_Stall (END)
+
+             ; FUNCTION SendPacket (BEGIN)
+                                           ; SOURCE LINE # 725
+                                           ; SOURCE LINE # 726
+                                           ; SOURCE LINE # 730
+0000 A2AF              MOV     C,EA
+0002 9200        R     MOV     EAState,C
+                                           ; SOURCE LINE # 731
+0004 C2AF              CLR     EA
+0006         ?C0139:
+                                           ; SOURCE LINE # 733
+0006 E596              MOV     A,USB0ADR
+0008 20E7FB            JB      ACC.7,?C0139
+000B         ?C0140:
+000B 75960E            MOV     USB0ADR,#0EH
+000E 759703            MOV     USB0DAT,#03H
+0011         ?C0141:
+                                           ; SOURCE LINE # 736
+0011 E596              MOV     A,USB0ADR
+0013 20E7FB            JB      ACC.7,?C0141
+0016         ?C0142:
+0016 759691            MOV     USB0ADR,#091H
+0019         ?C0143:
+0019 E596              MOV     A,USB0ADR
+001B 20E7FB            JB      ACC.7,?C0143
+001E         ?C0144:
+;---- Variable 'ControlReg' assigned to Register 'R7' ----
+001E AF97              MOV     R7,USB0DAT
+                                           ; SOURCE LINE # 739
+0020 900000      R     MOV     DPTR,#EP_STATUS+03H
+0023 E0                MOVX    A,@DPTR
+0024 FE                MOV     R6,A
+0025 B4030D            CJNE    A,#03H,?C0145
+                                           ; SOURCE LINE # 740
+0028         ?C0146:
+                                           ; SOURCE LINE # 741
+0028 E596              MOV     A,USB0ADR
+C51 COMPILER V9.51   F3XX_USB0_INTERRUPTSERVICEROUTINE                                     06/26/2015 13:32:25 PAGE 36  
+
+002A 20E7FB            JB      ACC.7,?C0146
+002D         ?C0147:
+002D 759611            MOV     USB0ADR,#011H
+0030 759710            MOV     USB0DAT,#010H
+                                           ; SOURCE LINE # 742
+0033 8034              SJMP    ?C0148
+0035         ?C0145:
+                                           ; SOURCE LINE # 743
+0035 EE                MOV     A,R6
+0036 7031              JNZ     ?C0148
+                                           ; SOURCE LINE # 744
+                                           ; SOURCE LINE # 746
+0038 900000      R     MOV     DPTR,#EP_STATUS+03H
+003B 04                INC     A
+003C F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 749
+003D EF                MOV     A,R7
+003E 30E50B            JNB     ACC.5,?C0150
+                                           ; SOURCE LINE # 750
+0041         ?C0151:
+                                           ; SOURCE LINE # 751
+0041 E596              MOV     A,USB0ADR
+0043 20E7FB            JB      ACC.7,?C0151
+0046         ?C0152:
+0046 759611            MOV     USB0ADR,#011H
+0049 759740            MOV     USB0DAT,#040H
+                                           ; SOURCE LINE # 752
+004C         ?C0150:
+                                           ; SOURCE LINE # 755
+004C EF                MOV     A,R7
+004D 30E20B            JNB     ACC.2,?C0153
+                                           ; SOURCE LINE # 756
+0050         ?C0154:
+                                           ; SOURCE LINE # 757
+0050 E596              MOV     A,USB0ADR
+0052 20E7FB            JB      ACC.7,?C0154
+0055         ?C0155:
+0055 759611            MOV     USB0ADR,#011H
+0058 E4                CLR     A
+0059 F597              MOV     USB0DAT,A
+                                           ; SOURCE LINE # 758
+005B         ?C0153:
+                                           ; SOURCE LINE # 777
+005B 120000      R     LCALL   L?0195
+005E         ?C0156:
+                                           ; SOURCE LINE # 782
+005E E596              MOV     A,USB0ADR
+0060 20E7FB            JB      ACC.7,?C0156
+0063         ?C0157:
+0063 759611            MOV     USB0ADR,#011H
+0066 759701            MOV     USB0DAT,#01H
+                                           ; SOURCE LINE # 783
+0069         ?C0148:
+                                           ; SOURCE LINE # 785
+0069 A200        R     MOV     C,EAState
+006B 92AF              MOV     EA,C
+                                           ; SOURCE LINE # 786
+006D 22                RET     
+             ; FUNCTION SendPacket (END)
+
+             ; FUNCTION SendPacketWaitEP1INready (BEGIN)
+                                           ; SOURCE LINE # 790
+C51 COMPILER V9.51   F3XX_USB0_INTERRUPTSERVICEROUTINE                                     06/26/2015 13:32:25 PAGE 37  
+
+                                           ; SOURCE LINE # 791
+                                           ; SOURCE LINE # 795
+0000 A2AF              MOV     C,EA
+0002 9200        R     MOV     EAState,C
+                                           ; SOURCE LINE # 796
+0004 C2AF              CLR     EA
+0006         ?C0159:
+                                           ; SOURCE LINE # 798
+0006 E596              MOV     A,USB0ADR
+0008 20E7FB            JB      ACC.7,?C0159
+000B         ?C0160:
+000B 75960E            MOV     USB0ADR,#0EH
+000E 759703            MOV     USB0DAT,#03H
+0011         ?C0161:
+                                           ; SOURCE LINE # 801
+0011 E596              MOV     A,USB0ADR
+0013 20E7FB            JB      ACC.7,?C0161
+0016         ?C0162:
+0016 759691            MOV     USB0ADR,#091H
+0019         ?C0163:
+0019 E596              MOV     A,USB0ADR
+001B 20E7FB            JB      ACC.7,?C0163
+001E         ?C0164:
+;---- Variable 'ControlReg' assigned to Register 'R7' ----
+001E AF97              MOV     R7,USB0DAT
+0020         ?C0165:
+                                           ; SOURCE LINE # 805
+0020 EF                MOV     A,R7
+0021 30E011            JNB     ACC.0,?C0166
+                                           ; SOURCE LINE # 806
+0024         ?C0167:
+                                           ; SOURCE LINE # 807
+0024 E596              MOV     A,USB0ADR
+0026 20E7FB            JB      ACC.7,?C0167
+0029         ?C0168:
+0029 759691            MOV     USB0ADR,#091H
+002C         ?C0169:
+002C E596              MOV     A,USB0ADR
+002E 20E7FB            JB      ACC.7,?C0169
+0031         ?C0170:
+0031 AF97              MOV     R7,USB0DAT
+                                           ; SOURCE LINE # 808
+0033 80EB              SJMP    ?C0165
+0035         ?C0166:
+                                           ; SOURCE LINE # 812
+0035 900000      R     MOV     DPTR,#EP_STATUS+03H
+0038 E0                MOVX    A,@DPTR
+0039 FE                MOV     R6,A
+003A B4030D            CJNE    A,#03H,?C0171
+                                           ; SOURCE LINE # 813
+003D         ?C0172:
+                                           ; SOURCE LINE # 814
+003D E596              MOV     A,USB0ADR
+003F 20E7FB            JB      ACC.7,?C0172
+0042         ?C0173:
+0042 759611            MOV     USB0ADR,#011H
+0045 759710            MOV     USB0DAT,#010H
+                                           ; SOURCE LINE # 815
+0048 8034              SJMP    ?C0174
+004A         ?C0171:
+                                           ; SOURCE LINE # 816
+004A EE                MOV     A,R6
+C51 COMPILER V9.51   F3XX_USB0_INTERRUPTSERVICEROUTINE                                     06/26/2015 13:32:25 PAGE 38  
+
+004B 7031              JNZ     ?C0174
+                                           ; SOURCE LINE # 817
+                                           ; SOURCE LINE # 819
+004D 900000      R     MOV     DPTR,#EP_STATUS+03H
+0050 04                INC     A
+0051 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 822
+0052 EF                MOV     A,R7
+0053 30E50B            JNB     ACC.5,?C0176
+                                           ; SOURCE LINE # 823
+0056         ?C0177:
+                                           ; SOURCE LINE # 824
+0056 E596              MOV     A,USB0ADR
+0058 20E7FB            JB      ACC.7,?C0177
+005B         ?C0178:
+005B 759611            MOV     USB0ADR,#011H
+005E 759740            MOV     USB0DAT,#040H
+                                           ; SOURCE LINE # 825
+0061         ?C0176:
+                                           ; SOURCE LINE # 828
+0061 EF                MOV     A,R7
+0062 30E20B            JNB     ACC.2,?C0179
+                                           ; SOURCE LINE # 829
+0065         ?C0180:
+                                           ; SOURCE LINE # 830
+0065 E596              MOV     A,USB0ADR
+0067 20E7FB            JB      ACC.7,?C0180
+006A         ?C0181:
+006A 759611            MOV     USB0ADR,#011H
+006D E4                CLR     A
+006E F597              MOV     USB0DAT,A
+                                           ; SOURCE LINE # 831
+0070         ?C0179:
+                                           ; SOURCE LINE # 850
+0070 120000      R     LCALL   L?0195
+0073         ?C0182:
+                                           ; SOURCE LINE # 855
+0073 E596              MOV     A,USB0ADR
+0075 20E7FB            JB      ACC.7,?C0182
+0078         ?C0183:
+0078 759611            MOV     USB0ADR,#011H
+007B 759701            MOV     USB0DAT,#01H
+                                           ; SOURCE LINE # 856
+007E         ?C0174:
+                                           ; SOURCE LINE # 858
+007E A200        R     MOV     C,EAState
+0080 92AF              MOV     EA,C
+                                           ; SOURCE LINE # 859
+0082 22                RET     
+             ; FUNCTION SendPacketWaitEP1INready (END)
+
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1689    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =     19      27
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----       2
+END OF MODULE INFORMATION.
+
+C51 COMPILER V9.51   F3XX_USB0_INTERRUPTSERVICEROUTINE                                     06/26/2015 13:32:25 PAGE 39  
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

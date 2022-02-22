@@ -1,0 +1,2759 @@
+BL51 BANKED LINKER/LOCATER V6.22                                                                    06/26/2015  13:32:25  PAGE 1
+
+
+BL51 BANKED LINKER/LOCATER V6.22, INVOKED BY:
+C:\KEIL\C51\BIN\BL51.EXE C:\svn\MAX30101\firmware\Uxx\trunk\F3xx_USB0_InterruptServiceRoutine.obj, C:\svn\MAX30101\firmware\Uxx\trunk\F3xx_USB0_Standard_Requests.obj, C:\svn\MAX30101\firmware\Uxx\trunk\F3xx_USB0_Main.obj, C:\svn\MAX30101\firmware\Uxx\trunk\F3xx_USB0_ReportHandler.obj, C:\svn\MAX30101\firmware\Uxx\trunk\F3xx_USB0_Descriptor.obj, C:\svn\MAX30101\firmware\Uxx\trunk\F3xx_Initialize.obj, C:\svn\MAX30101\firmware\Uxx\trunk\SMBus.obj, C:\svn\MAX30101\firmware\Uxx\trunk\SPI.obj, C:\svn\MAX30101\firmware\Uxx\trunk\lis2dh.obj, C:\svn\MAX30101\firmware\Uxx\trunk\max30101.obj, C:\svn\MAX30101\firmware\Uxx\trunk\max7311.obj TO C:\svn\MAX30101\firmware\Uxx\trunk\os24 RS (256) PL (68) PW (132) NOOL IX
+
+
+MEMORY MODEL: LARGE WITH FLOATING POINT ARITHMETIC
+
+
+INPUT MODULES INCLUDED:
+  C:\svn\MAX30101\firmware\Uxx\trunk\F3xx_USB0_InterruptServiceRoutine.obj (F3XX_USB0_INTERRUPTSERVICEROUTINE)
+  C:\svn\MAX30101\firmware\Uxx\trunk\F3xx_USB0_Standard_Requests.obj (F3XX_USB0_STANDARD_REQUESTS)
+  C:\svn\MAX30101\firmware\Uxx\trunk\F3xx_USB0_Main.obj (F3XX_USB0_MAIN)
+  C:\svn\MAX30101\firmware\Uxx\trunk\F3xx_USB0_ReportHandler.obj (F3XX_USB0_REPORTHANDLER)
+  C:\svn\MAX30101\firmware\Uxx\trunk\F3xx_USB0_Descriptor.obj (F3XX_USB0_DESCRIPTOR)
+  C:\svn\MAX30101\firmware\Uxx\trunk\F3xx_Initialize.obj (F3XX_INITIALIZE)
+  C:\svn\MAX30101\firmware\Uxx\trunk\SMBus.obj (SMBUS)
+  C:\svn\MAX30101\firmware\Uxx\trunk\SPI.obj (SPI)
+  C:\svn\MAX30101\firmware\Uxx\trunk\lis2dh.obj (LIS2DH)
+  C:\svn\MAX30101\firmware\Uxx\trunk\max30101.obj (MAX30101)
+  C:\svn\MAX30101\firmware\Uxx\trunk\max7311.obj (MAX7311)
+  C:\KEIL\C51\LIB\C51FPL.LIB (?C?FPDIV)
+  C:\KEIL\C51\LIB\C51FPL.LIB (?C?FPCMP)
+  C:\KEIL\C51\LIB\C51FPL.LIB (?C?FPNEG)
+  C:\KEIL\C51\LIB\C51FPL.LIB (?C?FCAST)
+  C:\KEIL\C51\LIB\C51FPL.LIB (?C?CASTF)
+  C:\KEIL\C51\LIB\C51FPL.LIB (?C?FPGETOPN)
+  C:\KEIL\C51\LIB\C51L.LIB (?C_STARTUP)
+  C:\KEIL\C51\LIB\C51L.LIB (?C?CLDPTR)
+  C:\KEIL\C51\LIB\C51L.LIB (?C?CLDOPTR)
+  C:\KEIL\C51\LIB\C51L.LIB (?C?CSTPTR)
+  C:\KEIL\C51\LIB\C51L.LIB (?C?CSTOPTR)
+  C:\KEIL\C51\LIB\C51L.LIB (?C?IILDX)
+  C:\KEIL\C51\LIB\C51L.LIB (?C?ISTPTR)
+  C:\KEIL\C51\LIB\C51L.LIB (?C?ISTOPTR)
+  C:\KEIL\C51\LIB\C51L.LIB (?C?ULDIV)
+  C:\KEIL\C51\LIB\C51L.LIB (?C?LNEG)
+  C:\KEIL\C51\LIB\C51L.LIB (?C?LSTPTR)
+  C:\KEIL\C51\LIB\C51L.LIB (?C?LSTXDATA)
+  C:\KEIL\C51\LIB\C51L.LIB (?C?LSTKXDATA)
+  C:\KEIL\C51\LIB\C51L.LIB (?C?LSTKPTR)
+  C:\KEIL\C51\LIB\C51L.LIB (?C?ICASE)
+  C:\KEIL\C51\LIB\C51L.LIB (?C_INIT)
+  C:\KEIL\C51\LIB\C51L.LIB (?C?LSTIDATA)
+  C:\KEIL\C51\LIB\C51L.LIB (?C?LSTPDATA)
+  C:\KEIL\C51\LIB\C51L.LIB (?C?LSTKIDATA)
+  C:\KEIL\C51\LIB\C51L.LIB (?C?LSTKPDATA)
+
+
+LINK MAP OF MODULE:  C:\svn\MAX30101\firmware\Uxx\trunk\os24 (F3XX_USB0_INTERRUPTSERVICEROUTINE)
+
+
+            TYPE    BASE      LENGTH    RELOCATION   SEGMENT NAME
+            -----------------------------------------------------
+
+            * * * * * * *   D A T A   M E M O R Y   * * * * * * *
+            REG     0000H     0008H     ABSOLUTE     "REG BANK 0"
+                    0008H     0018H                  *** GAP ***
+            BIT     0020H.0   0001H.0   UNIT         ?BI?SMBUS
+            BIT     0021H.0   0000H.2   UNIT         ?BI?READOS21?F3XX_USB0_REPORTHANDLER
+            BIT     0021H.2   0000H.2   UNIT         ?BI?READLIS2DH?F3XX_USB0_REPORTHANDLER
+            BIT     0021H.4   0000H.1   UNIT         ?BI?SENDPACKET?F3XX_USB0_INTERRUPTSERVICEROUTINE
+            BIT     0021H.5   0000H.1   UNIT         ?BI?SENDPACKETWAITEP1INREADY?F3XX_USB0_INTERRUPTSERVICEROUTINE
+            BIT     0021H.6   0000H.1   UNIT         ?BI?SMBUS_ISR?SMBUS
+                    0021H.7   0000H.1                *** GAP ***
+            IDATA   0022H     0001H     UNIT         ?STACK
+
+            * * * * * * *  X D A T A   M E M O R Y  * * * * * * *
+            XDATA   0000H     00DAH     UNIT         ?XD?F3XX_USB0_REPORTHANDLER
+            XDATA   00DAH     004CH     UNIT         ?XD?F3XX_INITIALIZE
+            XDATA   0126H     0013H     UNIT         ?XD?F3XX_USB0_INTERRUPTSERVICEROUTINE
+            XDATA   0139H     0009H     UNIT         ?XD?F3XX_USB0_DESCRIPTOR
+            XDATA   0142H     0009H     UNIT         ?XD?SMBUS
+            XDATA   014BH     0009H     UNIT         ?XD?_LIS2DH_READ_XYZ?LIS2DH
+            XDATA   0154H     0007H     UNIT         ?XD?_LIS2DH_READ_16BIT?LIS2DH
+            XDATA   015BH     0006H     UNIT         ?XD?_FIFO_READ?F3XX_USB0_INTERRUPTSERVICEROUTINE
+            XDATA   0161H     0006H     UNIT         ?XD?_FIFO_WRITE_FOREGROUND?F3XX_USB0_INTERRUPTSERVICEROUTINE
+            XDATA   0167H     0006H     UNIT         ?XD?_FIFO_WRITE_INTERRUPTSERVICEROUTINE?F3XX_USB0_INTERRUPTSERVICEROUTINE
+            XDATA   016DH     0006H     UNIT         ?XD?F3XX_USB0_MAIN
+            XDATA   0173H     0006H     UNIT         ?XD?READOS21?F3XX_USB0_REPORTHANDLER
+            XDATA   0179H     0006H     UNIT         ?XD?READLIS2DH?F3XX_USB0_REPORTHANDLER
+            XDATA   017FH     0006H     UNIT         ?XD?_I2C_WRITE?SMBUS
+            XDATA   0185H     0006H     UNIT         ?XD?_I2C_READ?SMBUS
+            XDATA   018BH     0006H     UNIT         ?XD?_LIS2DH_CONFIGURE_FIFO?LIS2DH
+            XDATA   0191H     0005H     UNIT         ?XD?_TIMER0_INIT?F3XX_INITIALIZE
+            XDATA   0196H     0005H     UNIT         ?XD?_GETTIMER0OR1CLKFREQ?F3XX_INITIALIZE
+            XDATA   019BH     0004H     UNIT         ?XD?TIMER3_INIT?F3XX_INITIALIZE
+            XDATA   019FH     0003H     UNIT         ?XD?USB_ISR?F3XX_USB0_INTERRUPTSERVICEROUTINE
+            XDATA   01A2H     0003H     UNIT         ?XD?_OUT_REPORT_HANDLER?F3XX_USB0_REPORTHANDLER
+            XDATA   01A5H     0003H     UNIT         ?XD?_I2C_SMBUS_READ_BYTE_DATA?F3XX_USB0_REPORTHANDLER
+            XDATA   01A8H     0003H     UNIT         ?XD?_GETTIMER3CLKFREQ?F3XX_INITIALIZE
+            XDATA   01ABH     0003H     UNIT         ?XD?_LIS2DH_CONFIGURE_OUTPUTDATARATEHZ?LIS2DH
+            XDATA   01AEH     0003H     UNIT         ?XD?_LIS2DH_CONFIGURE_RESOLUTIONBITS?LIS2DH
+            XDATA   01B1H     0003H     UNIT         ?XD?LIS2DH_OPEN?LIS2DH
+            XDATA   01B4H     0003H     UNIT         ?XD?MAX30101_OPEN?MAX30101
+            XDATA   01B7H     0002H     UNIT         ?XD?USB_RESUME?F3XX_USB0_INTERRUPTSERVICEROUTINE
+            XDATA   01B9H     0002H     UNIT         ?XD?USB_SUSPEND?F3XX_USB0_INTERRUPTSERVICEROUTINE
+            XDATA   01BBH     0002H     UNIT         ?XD?_LIS2DH_CONFIGURE_BDU?LIS2DH
+            XDATA   01BDH     0002H     UNIT         ?XD?MAX30101
+            XDATA   01BFH     0001H     UNIT         ?XD?HANDLE_CONTROL?F3XX_USB0_INTERRUPTSERVICEROUTINE
+            XDATA   01C0H     0001H     UNIT         ?XD?HANDLE_OUT3?F3XX_USB0_INTERRUPTSERVICEROUTINE
+            XDATA   01C1H     0001H     UNIT         ?XD?TESTOS21INTTIMING?F3XX_USB0_REPORTHANDLER
+            XDATA   01C2H     0001H     UNIT         ?XD?LIS2DH
+
+            * * * * * * *   C O D E   M E M O R Y   * * * * * * *
+            CODE    0000H     0003H     ABSOLUTE     
+            CODE    0003H     0003H     ABSOLUTE     
+            CODE    0006H     000DH     UNIT         ?PR?PORT_INIT?F3XX_INITIALIZE
+            CODE    0013H     0003H     ABSOLUTE     
+            CODE    0016H     0022H     UNIT         ?PR?_LIS2DH_READ_XYZ?LIS2DH
+            CODE    0038H     0003H     UNIT         ?CO?LIS2DH
+            CODE    003BH     0003H     ABSOLUTE     
+            CODE    003EH     0004H     UNIT         ?CO?F3XX_USB0_STANDARD_REQUESTS
+            CODE    0042H     0001H     UNIT         ?PR?GET_IDLE?F3XX_USB0_STANDARD_REQUESTS
+            CODE    0043H     0003H     ABSOLUTE     
+            CODE    0046H     0029H     UNIT         ?PR?_T0_WAIT?F3XX_INITIALIZE
+            CODE    006FH     0002H     UNIT         ?CO?MAX30101
+            CODE    0071H     0001H     UNIT         ?PR?GET_PROTOCOL?F3XX_USB0_STANDARD_REQUESTS
+            CODE    0072H     0001H     UNIT         ?PR?SET_PROTOCOL?F3XX_USB0_STANDARD_REQUESTS
+            CODE    0073H     0003H     ABSOLUTE     
+            CODE    0076H     0794H     UNIT         ?PR?_OUT_REPORT_HANDLER?F3XX_USB0_REPORTHANDLER
+            CODE    080AH     0489H     UNIT         ?C?LIB_CODE
+            CODE    0C93H     0343H     UNIT         ?PR?READOS21?F3XX_USB0_REPORTHANDLER
+            CODE    0FD6H     031AH     UNIT         ?PR?HANDLE_CONTROL?F3XX_USB0_INTERRUPTSERVICEROUTINE
+            CODE    12F0H     0285H     UNIT         ?PR?READLIS2DH?F3XX_USB0_REPORTHANDLER
+            CODE    1575H     020AH     UNIT         ?PR?SMBUS_ISR?SMBUS
+            CODE    177FH     01A6H     UNIT         ?PR?GET_DESCRIPTOR?F3XX_USB0_STANDARD_REQUESTS
+            CODE    1925H     00F3H     UNIT         ?PR?_LIS2DH_CONFIGURE_FIFO?LIS2DH
+            CODE    1A18H     00EAH     UNIT         ?PR?_LIS2DH_CONFIGURE_OUTPUTDATARATEHZ?LIS2DH
+            CODE    1B02H     00BEH     UNIT         ?PR?GET_STATUS?F3XX_USB0_STANDARD_REQUESTS
+            CODE    1BC0H     00B3H     UNIT         ?CO?F3XX_USB0_DESCRIPTOR
+            CODE    1C73H     00ADH     UNIT         ?PR?USB_ISR?F3XX_USB0_INTERRUPTSERVICEROUTINE
+            CODE    1D20H     00ABH     UNIT         ?PR?_GETTIMER0OR1CLKFREQ?F3XX_INITIALIZE
+            CODE    1DCBH     0094H     UNIT         ?PR?MAIN?F3XX_USB0_MAIN
+            CODE    1E5FH     008CH     UNIT         ?C_C51STARTUP
+            CODE    1EEBH     008BH     UNIT         ?PR?SET_FEATURE?F3XX_USB0_STANDARD_REQUESTS
+            CODE    1F76H     008AH     UNIT         ?PR?SET_CONFIGURATION?F3XX_USB0_STANDARD_REQUESTS
+            CODE    2000H     0087H     UNIT         ?PR?TIMER1_INIT?F3XX_INITIALIZE
+            CODE    2087H     0085H     UNIT         ?PR?CLEAR_FEATURE?F3XX_USB0_STANDARD_REQUESTS
+            CODE    210CH     0083H     UNIT         ?PR?SENDPACKETWAITEP1INREADY?F3XX_USB0_INTERRUPTSERVICEROUTINE
+            CODE    218FH     0082H     UNIT         ?PR?GET_CONFIGURATION?F3XX_USB0_STANDARD_REQUESTS
+            CODE    2211H     007EH     UNIT         ?PR?SYSCLK_INIT?F3XX_INITIALIZE
+            CODE    228FH     0077H     UNIT         ?PR?LIS2DH_OPEN?LIS2DH
+            CODE    2306H     0076H     UNIT         ?PR?_LIS2DH_CONFIGURE_RESOLUTIONBITS?LIS2DH
+            CODE    237CH     006EH     UNIT         ?PR?SENDPACKET?F3XX_USB0_INTERRUPTSERVICEROUTINE
+            CODE    23EAH     006AH     UNIT         ?C_INITSEG
+            CODE    2454H     0069H     UNIT         ?PR?_FIFO_WRITE_FOREGROUND?F3XX_USB0_INTERRUPTSERVICEROUTINE
+            CODE    24BDH     0068H     UNIT         ?PR?GET_INTERFACE?F3XX_USB0_STANDARD_REQUESTS
+            CODE    2525H     0066H     UNIT         ?PR?_I2C_SMBUS_READ_BYTE_DATA?F3XX_USB0_REPORTHANDLER
+            CODE    258BH     0066H     UNIT         ?PR?_GETTIMER3CLKFREQ?F3XX_INITIALIZE
+            CODE    25F1H     0064H     UNIT         ?PR?_LIS2DH_READ_16BIT?LIS2DH
+            CODE    2655H     0063H     UNIT         ?PR?HANDLE_OUT3?F3XX_USB0_INTERRUPTSERVICEROUTINE
+            CODE    26B8H     0060H     UNIT         ?PR?_FIFO_READ?F3XX_USB0_INTERRUPTSERVICEROUTINE
+            CODE    2718H     005BH     UNIT         ?PR?_I2C_READ?SMBUS
+            CODE    2773H     0059H     UNIT         ?PR?_TIMER0_INIT?F3XX_INITIALIZE
+            CODE    27CCH     0057H     UNIT         ?PR?_FIFO_WRITE_INTERRUPTSERVICEROUTINE?F3XX_USB0_INTERRUPTSERVICEROUTINE
+            CODE    2823H     0056H     UNIT         ?PR?MAX30101_OPEN?MAX30101
+            CODE    2879H     0053H     UNIT         ?PR?TESTOS21INTTIMING?F3XX_USB0_REPORTHANDLER
+            CODE    28CCH     0051H     UNIT         ?PR?SET_ADDRESS?F3XX_USB0_STANDARD_REQUESTS
+            CODE    291DH     004DH     UNIT         ?PR?_LIS2DH_CONFIGURE_BDU?LIS2DH
+            CODE    296AH     004BH     UNIT         ?PR?USB_INIT?F3XX_INITIALIZE
+            CODE    29B5H     004AH     UNIT         ?PR?_I2C_WRITE?SMBUS
+            CODE    29FFH     0049H     UNIT         ?PR?_I2C_SMBUS_WRITE_BYTE_DATA?F3XX_USB0_REPORTHANDLER
+            CODE    2A48H     0048H     UNIT         ?PR?SET_REPORT?F3XX_USB0_STANDARD_REQUESTS
+            CODE    2A90H     0047H     UNIT         ?PR?CLEARSDA?SMBUS
+            CODE    2AD7H     0043H     UNIT         ?PR?GET_REPORT?F3XX_USB0_STANDARD_REQUESTS
+            CODE    2B1AH     003EH     UNIT         ?PR?TIMER3_INIT?F3XX_INITIALIZE
+            CODE    2B58H     003BH     UNIT         ?PR?SET_INTERFACE?F3XX_USB0_STANDARD_REQUESTS
+            CODE    2B93H     0028H     UNIT         ?PR?_UPDATEVERSION?F3XX_USB0_MAIN
+            CODE    2BBBH     001DH     UNIT         ?PR?USB_RESET?F3XX_USB0_INTERRUPTSERVICEROUTINE
+            CODE    2BD8H     001DH     UNIT         ?PR?FORCE_STALL?F3XX_USB0_INTERRUPTSERVICEROUTINE
+            CODE    2BF5H     0018H     UNIT         ?PR?SYSTEM_INIT?F3XX_INITIALIZE
+            CODE    2C0DH     0018H     UNIT         ?PR?_MAX30101_REGWRITE?MAX30101
+            CODE    2C25H     0017H     UNIT         ?PR?INT0_ISR?F3XX_USB0_REPORTHANDLER
+            CODE    2C3CH     0015H     UNIT         ?PR?SETUP_IO_BUFFER?F3XX_USB0_REPORTHANDLER
+            CODE    2C51H     0014H     UNIT         ?PR?SET_IDLE?F3XX_USB0_STANDARD_REQUESTS
+            CODE    2C65H     0013H     UNIT         ?PR?INT1_ISR?F3XX_USB0_REPORTHANDLER
+            CODE    2C78H     0010H     UNIT         ?PR?FLASH_LED1L_LED2L_100MS?F3XX_USB0_REPORTHANDLER
+            CODE    2C88H     0010H     UNIT         ?PR?FLASH_LED1L_LED2H_100MS?F3XX_USB0_REPORTHANDLER
+            CODE    2C98H     0010H     UNIT         ?PR?FLASH_LED1H_LED2L_100MS?F3XX_USB0_REPORTHANDLER
+            CODE    2CA8H     0010H     UNIT         ?PR?FLASH_LED1H_LED2H_100MS?F3XX_USB0_REPORTHANDLER
+            CODE    2CB8H     000FH     UNIT         ?PR?USB_RESUME?F3XX_USB0_INTERRUPTSERVICEROUTINE
+            CODE    2CC7H     000FH     UNIT         ?PR?USB_SUSPEND?F3XX_USB0_INTERRUPTSERVICEROUTINE
+            CODE    2CD6H     000FH     UNIT         ?PR?FLASH_LED1LED2_EAST?F3XX_USB0_REPORTHANDLER
+            CODE    2CE5H     000FH     UNIT         ?PR?_LIS2DH_REGWRITE?LIS2DH
+            CODE    2CF4H     000DH     UNIT         ?PR?_LIS2DH_REGREAD?LIS2DH
+            CODE    2D01H     000DH     UNIT         ?PR?_MAX30101_REGREAD?MAX30101
+            CODE    2D0EH     000CH     UNIT         ?PR?TIMER3_ISR?F3XX_INITIALIZE
+            CODE    2D1AH     000AH     UNIT         ?PR?SMBUS_INIT?F3XX_INITIALIZE
+            CODE    2D24H     0009H     UNIT         ?PR?FLASH_LED1LED2_BLINK?F3XX_USB0_REPORTHANDLER
+            CODE    2D2DH     0006H     UNIT         ?PR?HANDLE_IN3?F3XX_USB0_INTERRUPTSERVICEROUTINE
+            CODE    2D33H     0006H     UNIT         ?PR?INT0_INIT?F3XX_INITIALIZE
+
+
+
+SYMBOL TABLE OF MODULE:  C:\svn\MAX30101\firmware\Uxx\trunk\os24 (F3XX_USB0_INTERRUPTSERVICEROUTINE)
+
+  VALUE           TYPE          NAME
+  ----------------------------------
+
+  -------         MODULE        F3XX_USB0_INTERRUPTSERVICEROUTINE
+  C:0000H         SYMBOL        _ICE_DUMMY_
+  X:0126H         PUBLIC        USB0_STATE
+  C:2CB8H         PUBLIC        Usb_Resume
+  B:00A8H.7       PUBLIC        EA
+  C:2BBBH         PUBLIC        Usb_Reset
+  X:0127H         PUBLIC        DATAPTR
+  X:012AH         PUBLIC        SETUP
+  C:0FD6H         PUBLIC        Handle_Control
+  C:2D2DH         PUBLIC        Handle_In3
+  C:2655H         PUBLIC        Handle_Out3
+  C:2BD8H         PUBLIC        Force_Stall
+  X:0132H         PUBLIC        DATASENT
+  X:0134H         PUBLIC        DATASIZE
+  X:0136H         PUBLIC        EP_STATUS
+  C:26C0H         PUBLIC        _Fifo_Read
+  C:237CH         PUBLIC        SendPacket
+  C:27CCH         PUBLIC        _Fifo_Write_InterruptServiceRoutine
+  C:2CC7H         PUBLIC        Usb_Suspend
+  D:0096H         PUBLIC        USB0ADR
+  D:0097H         PUBLIC        USB0DAT
+  C:2466H         PUBLIC        _Fifo_Write_Foreground
+  C:210CH         PUBLIC        SendPacketWaitEP1INready
+  C:1C73H         PUBLIC        Usb_ISR
+  -------         PROC          USB_ISR
+  -------         DO            
+  X:019FH         SYMBOL        bCommon
+  X:01A0H         SYMBOL        bIn
+  X:01A1H         SYMBOL        bOut
+  -------         ENDDO         
+  C:1C73H         LINE#         96
+  C:1C90H         LINE#         99
+  C:1CA3H         LINE#         100
+  C:1CB6H         LINE#         101
+  C:1CC9H         LINE#         102
+  C:1CC9H         LINE#         103
+  C:1CD0H         LINE#         104
+  C:1CD0H         LINE#         105
+  C:1CD3H         LINE#         106
+  C:1CD3H         LINE#         107
+  C:1CDAH         LINE#         108
+  C:1CDAH         LINE#         109
+  C:1CDDH         LINE#         110
+  C:1CDDH         LINE#         111
+  C:1CE4H         LINE#         112
+  C:1CE4H         LINE#         113
+  C:1CE7H         LINE#         114
+  C:1CE7H         LINE#         143
+  C:1CEEH         LINE#         144
+  C:1CEEH         LINE#         145
+  C:1CF1H         LINE#         146
+  C:1CF1H         LINE#         147
+  C:1CF8H         LINE#         148
+  C:1CF8H         LINE#         149
+  C:1CFBH         LINE#         150
+  C:1CFBH         LINE#         152
+  C:1D02H         LINE#         153
+  C:1D02H         LINE#         154
+  C:1D05H         LINE#         155
+  C:1D05H         LINE#         156
+  C:1D05H         LINE#         157
+  -------         ENDPROC       USB_ISR
+  -------         PROC          USB_RESET
+  C:2BBBH         LINE#         175
+  C:2BBBH         LINE#         176
+  C:2BBBH         LINE#         177
+  C:2BC1H         LINE#         179
+  C:2BCCH         LINE#         182
+  C:2BD1H         LINE#         183
+  C:2BD5H         LINE#         184
+  C:2BD7H         LINE#         185
+  -------         ENDPROC       USB_RESET
+  -------         PROC          USB_RESUME
+  -------         DO            
+  X:01B7H         SYMBOL        k
+  -------         ENDDO         
+  C:2CB8H         LINE#         200
+  C:2CB8H         LINE#         201
+  C:2CB8H         LINE#         204
+  C:2CC6H         LINE#         207
+  -------         ENDPROC       USB_RESUME
+  -------         PROC          HANDLE_CONTROL
+  -------         DO            
+  X:01BFH         SYMBOL        ControlReg
+  -------         ENDDO         
+  C:0FD6H         LINE#         222
+  C:0FD6H         LINE#         223
+  C:0FD6H         LINE#         227
+  C:0FE1H         LINE#         228
+  C:0FF4H         LINE#         230
+  C:0FFBH         LINE#         232
+  C:0FFBH         LINE#         233
+  C:1009H         LINE#         234
+  C:100EH         LINE#         235
+  C:100EH         LINE#         237
+  C:1016H         LINE#         238
+  C:1016H         LINE#         240
+  C:1021H         LINE#         241
+  C:1026H         LINE#         243
+  C:1026H         LINE#         245
+  C:102AH         LINE#         246
+  C:102AH         LINE#         247
+  C:1035H         LINE#         249
+  C:1040H         LINE#         250
+  C:1045H         LINE#         251
+  C:1045H         LINE#         253
+  C:104EH         LINE#         254
+  C:104EH         LINE#         255
+  C:1058H         LINE#         256
+  C:1058H         LINE#         259
+  C:1067H         LINE#         268
+  C:107BH         LINE#         269
+  C:108DH         LINE#         270
+  C:109FH         LINE#         273
+  C:10A9H         LINE#         274
+  C:10C0H         LINE#         275
+  C:10C0H         LINE#         276
+  C:10C3H         LINE#         277
+  C:10C6H         LINE#         278
+  C:10C6H         LINE#         279
+  C:10C9H         LINE#         280
+  C:10CBH         LINE#         281
+  C:10CBH         LINE#         282
+  C:10CEH         LINE#         283
+  C:10D0H         LINE#         284
+  C:10D0H         LINE#         285
+  C:10D3H         LINE#         286
+  C:10D5H         LINE#         287
+  C:10D5H         LINE#         288
+  C:10D8H         LINE#         289
+  C:10DAH         LINE#         290
+  C:10DAH         LINE#         291
+  C:10DDH         LINE#         292
+  C:10DFH         LINE#         293
+  C:10DFH         LINE#         294
+  C:10DFH         LINE#         295
+  C:10E1H         LINE#         296
+  C:10E1H         LINE#         297
+  C:10E1H         LINE#         299
+  C:1115H         LINE#         300
+  C:1115H         LINE#         301
+  C:1115H         LINE#         302
+  C:1118H         LINE#         303
+  C:111AH         LINE#         304
+  C:111AH         LINE#         305
+  C:111DH         LINE#         306
+  C:111FH         LINE#         307
+  C:111FH         LINE#         308
+  C:1122H         LINE#         309
+  C:1124H         LINE#         310
+  C:1124H         LINE#         311
+  C:1127H         LINE#         312
+  C:1129H         LINE#         313
+  C:1129H         LINE#         314
+  C:112CH         LINE#         315
+  C:112EH         LINE#         316
+  C:112EH         LINE#         317
+  C:1131H         LINE#         318
+  C:1133H         LINE#         319
+  C:1133H         LINE#         320
+  C:1136H         LINE#         321
+  C:1138H         LINE#         322
+  C:1138H         LINE#         323
+  C:113BH         LINE#         324
+  C:113DH         LINE#         325
+  C:113DH         LINE#         326
+  C:1140H         LINE#         327
+  C:1142H         LINE#         328
+  C:1142H         LINE#         329
+  C:1145H         LINE#         330
+  C:1145H         LINE#         331
+  C:1145H         LINE#         332
+  C:1145H         LINE#         333
+  C:1145H         LINE#         335
+  C:1150H         LINE#         336
+  C:1150H         LINE#         337
+  C:115AH         LINE#         338
+  C:115AH         LINE#         340
+  C:116DH         LINE#         344
+  C:1177H         LINE#         345
+  C:1177H         LINE#         347
+  C:117DH         LINE#         348
+  C:118CH         LINE#         349
+  C:118CH         LINE#         352
+  C:11A0H         LINE#         354
+  C:11AAH         LINE#         356
+  C:11B8H         LINE#         358
+  C:11C6H         LINE#         359
+  C:11C8H         LINE#         361
+  C:11C8H         LINE#         364
+  C:11E0H         LINE#         365
+  C:11E7H         LINE#         366
+  C:11ECH         LINE#         367
+  C:11ECH         LINE#         368
+  C:11FEH         LINE#         369
+  C:11FEH         LINE#         373
+  C:1205H         LINE#         374
+  C:120AH         LINE#         375
+  C:120AH         LINE#         377
+  C:1218H         LINE#         378
+  C:1218H         LINE#         379
+  C:1218H         LINE#         380
+  C:1218H         LINE#         382
+  C:1223H         LINE#         383
+  C:1223H         LINE#         385
+  C:1236H         LINE#         386
+  C:123DH         LINE#         387
+  C:123DH         LINE#         388
+  C:1240H         LINE#         389
+  C:124FH         LINE#         390
+  C:124FH         LINE#         391
+  C:1263H         LINE#         393
+  C:126DH         LINE#         395
+  C:127BH         LINE#         397
+  C:1289H         LINE#         398
+  C:128BH         LINE#         400
+  C:128BH         LINE#         402
+  C:129BH         LINE#         404
+  C:12A2H         LINE#         405
+  C:12A7H         LINE#         406
+  C:12A7H         LINE#         407
+  C:12B9H         LINE#         408
+  C:12B9H         LINE#         409
+  C:12C0H         LINE#         410
+  C:12C5H         LINE#         411
+  C:12C5H         LINE#         415
+  C:12D2H         LINE#         416
+  C:12D2H         LINE#         417
+  C:12D9H         LINE#         418
+  C:12D9H         LINE#         420
+  C:12EFH         LINE#         421
+  C:12EFH         LINE#         422
+  C:12EFH         LINE#         424
+  -------         ENDPROC       HANDLE_CONTROL
+  -------         PROC          HANDLE_IN3
+  C:2D2DH         LINE#         450
+  C:2D2DH         LINE#         451
+  C:2D2DH         LINE#         452
+  C:2D32H         LINE#         453
+  -------         ENDPROC       HANDLE_IN3
+  -------         PROC          HANDLE_OUT3
+  -------         DO            
+  X:01C0H         SYMBOL        Count
+  D:0007H         SYMBOL        ControlReg
+  -------         ENDDO         
+  C:2655H         LINE#         548
+  C:2655H         LINE#         549
+  C:2655H         LINE#         551
+  C:265AH         LINE#         554
+  C:2665H         LINE#         555
+  C:2674H         LINE#         557
+  C:267BH         LINE#         558
+  C:267BH         LINE#         559
+  C:2686H         LINE#         560
+  C:2687H         LINE#         564
+  C:2687H         LINE#         565
+  C:268BH         LINE#         567
+  C:268BH         LINE#         568
+  C:2696H         LINE#         569
+  C:2696H         LINE#         571
+  C:2699H         LINE#         573
+  C:26A6H         LINE#         581
+  C:26ACH         LINE#         583
+  C:26B7H         LINE#         584
+  C:26B7H         LINE#         585
+  -------         ENDPROC       HANDLE_OUT3
+  -------         PROC          USB_SUSPEND
+  -------         DO            
+  X:01B9H         SYMBOL        k
+  -------         ENDDO         
+  C:2CC7H         LINE#         593
+  C:2CC7H         LINE#         594
+  C:2CC7H         LINE#         596
+  C:2CD5H         LINE#         597
+  -------         ENDPROC       USB_SUSPEND
+  -------         PROC          L?0196
+  -------         ENDPROC       L?0196
+  -------         PROC          _FIFO_READ
+  X:015BH         SYMBOL        addr
+  X:015CH         SYMBOL        uNumBytes
+  X:015EH         SYMBOL        pData
+  -------         DO            
+  D:0006H         SYMBOL        i
+  -------         ENDDO         
+  C:26C0H         LINE#         612
+  C:26D8H         LINE#         614
+  C:26D8H         LINE#         617
+  C:26DBH         LINE#         618
+  C:26DBH         LINE#         619
+  C:26E1H         LINE#         620
+  C:26E4H         LINE#         624
+  C:26F4H         LINE#         625
+  C:26F4H         LINE#         626
+  C:26F9H         LINE#         627
+  C:270DH         LINE#         628
+  C:2714H         LINE#         631
+  C:2717H         LINE#         632
+  C:2717H         LINE#         633
+  -------         ENDPROC       _FIFO_READ
+  -------         PROC          L?0195
+  -------         ENDPROC       L?0195
+  -------         PROC          _FIFO_WRITE_FOREGROUND
+  X:0161H         SYMBOL        addr
+  X:0162H         SYMBOL        uNumBytes
+  X:0164H         SYMBOL        pData
+  -------         DO            
+  D:0006H         SYMBOL        i
+  -------         ENDDO         
+  C:2466H         LINE#         652
+  C:247EH         LINE#         654
+  C:247EH         LINE#         658
+  C:2481H         LINE#         659
+  C:2481H         LINE#         660
+  C:2486H         LINE#         662
+  C:248CH         LINE#         665
+  C:249CH         LINE#         666
+  C:249CH         LINE#         667
+  C:24B0H         LINE#         668
+  C:24B5H         LINE#         669
+  C:24BCH         LINE#         670
+  C:24BCH         LINE#         671
+  -------         ENDPROC       _FIFO_WRITE_FOREGROUND
+  -------         PROC          _FIFO_WRITE_INTERRUPTSERVICEROUTINE
+  X:0167H         SYMBOL        addr
+  X:0168H         SYMBOL        uNumBytes
+  X:016AH         SYMBOL        pData
+  -------         DO            
+  D:0006H         SYMBOL        i
+  -------         ENDDO         
+  C:27CCH         LINE#         673
+  C:27E4H         LINE#         676
+  C:27E4H         LINE#         680
+  C:27E7H         LINE#         681
+  C:27E7H         LINE#         682
+  C:27ECH         LINE#         684
+  C:27F2H         LINE#         687
+  C:2802H         LINE#         688
+  C:2802H         LINE#         689
+  C:2816H         LINE#         690
+  C:281BH         LINE#         691
+  C:2822H         LINE#         692
+  C:2822H         LINE#         693
+  -------         ENDPROC       _FIFO_WRITE_INTERRUPTSERVICEROUTINE
+  -------         PROC          FORCE_STALL
+  C:2BD8H         LINE#         706
+  C:2BD8H         LINE#         707
+  C:2BD8H         LINE#         708
+  C:2BE3H         LINE#         709
+  C:2BEEH         LINE#         710
+  C:2BF4H         LINE#         711
+  -------         ENDPROC       FORCE_STALL
+  -------         PROC          SENDPACKET
+  -------         DO            
+  B:0021H.4       SYMBOL        EAState
+  D:0007H         SYMBOL        ControlReg
+  -------         ENDDO         
+  C:237CH         LINE#         725
+  C:237CH         LINE#         726
+  C:237CH         LINE#         730
+  C:2380H         LINE#         731
+  C:2382H         LINE#         733
+  C:238DH         LINE#         736
+  C:239CH         LINE#         739
+  C:23A4H         LINE#         740
+  C:23A4H         LINE#         741
+  C:23AFH         LINE#         742
+  C:23B1H         LINE#         743
+  C:23B4H         LINE#         744
+  C:23B4H         LINE#         746
+  C:23B9H         LINE#         749
+  C:23BDH         LINE#         750
+  C:23BDH         LINE#         751
+  C:23C8H         LINE#         752
+  C:23C8H         LINE#         755
+  C:23CCH         LINE#         756
+  C:23CCH         LINE#         757
+  C:23D7H         LINE#         758
+  C:23D7H         LINE#         777
+  C:23DAH         LINE#         782
+  C:23E5H         LINE#         783
+  C:23E5H         LINE#         785
+  C:23E9H         LINE#         786
+  -------         ENDPROC       SENDPACKET
+  -------         PROC          SENDPACKETWAITEP1INREADY
+  -------         DO            
+  B:0021H.5       SYMBOL        EAState
+  D:0007H         SYMBOL        ControlReg
+  -------         ENDDO         
+  C:210CH         LINE#         790
+  C:210CH         LINE#         791
+  C:210CH         LINE#         795
+  C:2110H         LINE#         796
+  C:2112H         LINE#         798
+  C:211DH         LINE#         801
+  C:212CH         LINE#         805
+  C:2130H         LINE#         806
+  C:2130H         LINE#         807
+  C:213FH         LINE#         808
+  C:2141H         LINE#         812
+  C:2149H         LINE#         813
+  C:2149H         LINE#         814
+  C:2154H         LINE#         815
+  C:2156H         LINE#         816
+  C:2159H         LINE#         817
+  C:2159H         LINE#         819
+  C:215EH         LINE#         822
+  C:2162H         LINE#         823
+  C:2162H         LINE#         824
+  C:216DH         LINE#         825
+  C:216DH         LINE#         828
+  C:2171H         LINE#         829
+  C:2171H         LINE#         830
+  C:217CH         LINE#         831
+  C:217CH         LINE#         850
+  C:217FH         LINE#         855
+  C:218AH         LINE#         856
+  C:218AH         LINE#         858
+  C:218EH         LINE#         859
+  -------         ENDPROC       SENDPACKETWAITEP1INREADY
+  -------         ENDMOD        F3XX_USB0_INTERRUPTSERVICEROUTINE
+
+  -------         MODULE        F3XX_USB0_STANDARD_REQUESTS
+  C:0000H         SYMBOL        _ICE_DUMMY_
+  C:0042H         PUBLIC        Get_Idle
+  C:2AD7H         PUBLIC        Get_Report
+  C:1B02H         PUBLIC        Get_Status
+  C:2C51H         PUBLIC        Set_Idle
+  C:2A48H         PUBLIC        Set_Report
+  C:24BDH         PUBLIC        Get_Interface
+  C:2087H         PUBLIC        Clear_Feature
+  C:2B58H         PUBLIC        Set_Interface
+  C:177FH         PUBLIC        Get_Descriptor
+  C:003EH         PUBLIC        ONES_PACKET
+  C:28CCH         PUBLIC        Set_Address
+  C:0071H         PUBLIC        Get_Protocol
+  C:0040H         PUBLIC        ZERO_PACKET
+  C:1EEBH         PUBLIC        Set_Feature
+  C:218FH         PUBLIC        Get_Configuration
+  C:0072H         PUBLIC        Set_Protocol
+  C:1F76H         PUBLIC        Set_Configuration
+  D:0096H         PUBLIC        USB0ADR
+  D:0097H         PUBLIC        USB0DAT
+  -------         PROC          GET_STATUS
+  C:1B02H         LINE#         79
+  C:1B02H         LINE#         80
+  C:1B02H         LINE#         82
+  C:1B18H         LINE#         87
+  C:1B18H         LINE#         88
+  C:1B1BH         LINE#         89
+  C:1B1BH         LINE#         91
+  C:1B2AH         LINE#         92
+  C:1B2AH         LINE#         93
+  C:1B2AH         LINE#         94
+  C:1B34H         LINE#         95
+  C:1B34H         LINE#         96
+  C:1B34H         LINE#         97
+  C:1B36H         LINE#         107
+  C:1B36H         LINE#         108
+  C:1B47H         LINE#         112
+  C:1B47H         LINE#         113
+  C:1B47H         LINE#         114
+  C:1B49H         LINE#         116
+  C:1B49H         LINE#         118
+  C:1B56H         LINE#         119
+  C:1B56H         LINE#         120
+  C:1B56H         LINE#         121
+  C:1B58H         LINE#         123
+  C:1B58H         LINE#         124
+  C:1B65H         LINE#         127
+  C:1B65H         LINE#         128
+  C:1B65H         LINE#         129
+  C:1B67H         LINE#         131
+  C:1B67H         LINE#         133
+  C:1B6EH         LINE#         134
+  C:1B6EH         LINE#         135
+  C:1B78H         LINE#         136
+  C:1B78H         LINE#         138
+  C:1B82H         LINE#         139
+  C:1B82H         LINE#         140
+  C:1B84H         LINE#         142
+  C:1B84H         LINE#         144
+  C:1B8FH         LINE#         145
+  C:1B98H         LINE#         146
+  C:1B98H         LINE#         147
+  C:1B9AH         LINE#         149
+  C:1B9AH         LINE#         150
+  C:1B9AH         LINE#         152
+  C:1B9AH         LINE#         153
+  C:1B9AH         LINE#         154
+  C:1B9CH         LINE#         156
+  C:1B9CH         LINE#         157
+  C:1B9FH         LINE#         158
+  C:1B9FH         LINE#         159
+  C:1B9FH         LINE#         160
+  C:1BA7H         LINE#         161
+  C:1BA7H         LINE#         164
+  C:1BB2H         LINE#         165
+  C:1BB8H         LINE#         166
+  C:1BBFH         LINE#         167
+  C:1BBFH         LINE#         168
+  -------         ENDPROC       GET_STATUS
+  -------         PROC          CLEAR_FEATURE
+  C:2087H         LINE#         180
+  C:2087H         LINE#         181
+  C:2087H         LINE#         184
+  C:20B0H         LINE#         193
+  C:20B0H         LINE#         194
+  C:20B0H         LINE#         195
+  C:20B2H         LINE#         198
+  C:20B2H         LINE#         200
+  C:20C9H         LINE#         205
+  C:20C9H         LINE#         206
+  C:20CDH         LINE#         207
+  C:20CDH         LINE#         220
+  C:20D8H         LINE#         221
+  C:20E3H         LINE#         222
+  C:20E8H         LINE#         223
+  C:20E8H         LINE#         224
+  C:20EAH         LINE#         226
+  C:20EAH         LINE#         227
+  C:20EDH         LINE#         228
+  C:20EDH         LINE#         229
+  C:20EDH         LINE#         230
+  C:20F8H         LINE#         231
+  C:2100H         LINE#         232
+  C:2100H         LINE#         233
+  C:210BH         LINE#         237
+  C:210BH         LINE#         238
+  -------         ENDPROC       CLEAR_FEATURE
+  -------         PROC          SET_FEATURE
+  C:1EEBH         LINE#         250
+  C:1EEBH         LINE#         251
+  C:1EEBH         LINE#         254
+  C:1F14H         LINE#         260
+  C:1F14H         LINE#         261
+  C:1F14H         LINE#         262
+  C:1F16H         LINE#         265
+  C:1F16H         LINE#         267
+  C:1F32H         LINE#         272
+  C:1F32H         LINE#         296
+  C:1F36H         LINE#         297
+  C:1F36H         LINE#         298
+  C:1F41H         LINE#         299
+  C:1F4CH         LINE#         300
+  C:1F52H         LINE#         301
+  C:1F52H         LINE#         303
+  C:1F54H         LINE#         305
+  C:1F54H         LINE#         306
+  C:1F57H         LINE#         307
+  C:1F57H         LINE#         308
+  C:1F57H         LINE#         309
+  C:1F62H         LINE#         310
+  C:1F6AH         LINE#         311
+  C:1F6AH         LINE#         312
+  C:1F75H         LINE#         315
+  C:1F75H         LINE#         316
+  -------         ENDPROC       SET_FEATURE
+  -------         PROC          SET_ADDRESS
+  C:28CCH         LINE#         328
+  C:28CCH         LINE#         329
+  C:28CCH         LINE#         331
+  C:28EFH         LINE#         336
+  C:28EFH         LINE#         337
+  C:28F2H         LINE#         338
+  C:28F2H         LINE#         340
+  C:28F8H         LINE#         342
+  C:2901H         LINE#         343
+  C:2901H         LINE#         344
+  C:2904H         LINE#         346
+  C:2906H         LINE#         348
+  C:2906H         LINE#         349
+  C:2909H         LINE#         350
+  C:2909H         LINE#         351
+  C:2911H         LINE#         352
+  C:2911H         LINE#         353
+  C:291CH         LINE#         356
+  C:291CH         LINE#         357
+  -------         ENDPROC       SET_ADDRESS
+  -------         PROC          GET_DESCRIPTOR
+  C:177FH         LINE#         369
+  C:177FH         LINE#         370
+  C:177FH         LINE#         373
+  C:17B7H         LINE#         374
+  C:17B7H         LINE#         375
+  C:17B7H         LINE#         376
+  C:17C5H         LINE#         377
+  C:17C8H         LINE#         378
+  C:17CAH         LINE#         380
+  C:17CAH         LINE#         381
+  C:17D8H         LINE#         385
+  C:17EDH         LINE#         387
+  C:17F0H         LINE#         389
+  C:17F0H         LINE#         394
+  C:17F9H         LINE#         395
+  C:17F9H         LINE#         396
+  C:17F9H         LINE#         397
+  C:17FCH         LINE#         399
+  C:17FCH         LINE#         400
+  C:1821H         LINE#         402
+  C:1829H         LINE#         403
+  C:1829H         LINE#         404
+  C:182BH         LINE#         406
+  C:182BH         LINE#         407
+  C:1839H         LINE#         408
+  C:1843H         LINE#         409
+  C:1845H         LINE#         411
+  C:1845H         LINE#         446
+  C:184DH         LINE#         447
+  C:184DH         LINE#         448
+  C:185BH         LINE#         449
+  C:1869H         LINE#         450
+  C:186BH         LINE#         451
+  C:186FH         LINE#         452
+  C:186FH         LINE#         453
+  C:187DH         LINE#         454
+  C:1887H         LINE#         455
+  C:1889H         LINE#         458
+  C:1889H         LINE#         459
+  C:1889H         LINE#         460
+  C:1889H         LINE#         461
+  C:188BH         LINE#         463
+  C:188BH         LINE#         464
+  C:1899H         LINE#         465
+  C:18A7H         LINE#         466
+  C:18A9H         LINE#         468
+  C:18A9H         LINE#         469
+  C:18B7H         LINE#         470
+  C:18C0H         LINE#         471
+  C:18C2H         LINE#         473
+  C:18C2H         LINE#         474
+  C:18C5H         LINE#         475
+  C:18C5H         LINE#         476
+  C:18C5H         LINE#         479
+  C:18E1H         LINE#         484
+  C:18E1H         LINE#         485
+  C:18FAH         LINE#         487
+  C:18FAH         LINE#         488
+  C:1904H         LINE#         489
+  C:1904H         LINE#         490
+  C:1904H         LINE#         491
+  C:190CH         LINE#         492
+  C:190CH         LINE#         493
+  C:1917H         LINE#         494
+  C:191DH         LINE#         495
+  C:1924H         LINE#         496
+  C:1924H         LINE#         497
+  -------         ENDPROC       GET_DESCRIPTOR
+  -------         PROC          GET_CONFIGURATION
+  C:218FH         LINE#         509
+  C:218FH         LINE#         510
+  C:218FH         LINE#         512
+  C:21B3H         LINE#         519
+  C:21B3H         LINE#         520
+  C:21B6H         LINE#         521
+  C:21B8H         LINE#         524
+  C:21B8H         LINE#         525
+  C:21C0H         LINE#         526
+  C:21C0H         LINE#         528
+  C:21CEH         LINE#         529
+  C:21D6H         LINE#         530
+  C:21D6H         LINE#         531
+  C:21DAH         LINE#         532
+  C:21DAH         LINE#         533
+  C:21E8H         LINE#         534
+  C:21F0H         LINE#         535
+  C:21F0H         LINE#         536
+  C:21F0H         LINE#         537
+  C:21F8H         LINE#         538
+  C:21F8H         LINE#         540
+  C:2203H         LINE#         541
+  C:2209H         LINE#         542
+  C:2210H         LINE#         543
+  C:2210H         LINE#         544
+  -------         ENDPROC       GET_CONFIGURATION
+  -------         PROC          SET_CONFIGURATION
+  C:1F76H         LINE#         556
+  C:1F76H         LINE#         557
+  C:1F76H         LINE#         560
+  C:1FA3H         LINE#         568
+  C:1FA3H         LINE#         569
+  C:1FA6H         LINE#         570
+  C:1FA8H         LINE#         573
+  C:1FA8H         LINE#         574
+  C:1FB1H         LINE#         575
+  C:1FB1H         LINE#         577
+  C:1FB7H         LINE#         579
+  C:1FBCH         LINE#         581
+  C:1FC7H         LINE#         583
+  C:1FD2H         LINE#         584
+  C:1FDDH         LINE#         598
+  C:1FE0H         LINE#         600
+  C:1FE2H         LINE#         602
+  C:1FE2H         LINE#         603
+  C:1FE8H         LINE#         604
+  C:1FECH         LINE#         606
+  C:1FECH         LINE#         607
+  C:1FECH         LINE#         608
+  C:1FF4H         LINE#         609
+  C:1FF4H         LINE#         610
+  C:1FFFH         LINE#         613
+  C:1FFFH         LINE#         614
+  -------         ENDPROC       SET_CONFIGURATION
+  -------         PROC          GET_INTERFACE
+  C:24BDH         LINE#         626
+  C:24BDH         LINE#         627
+  C:24BDH         LINE#         631
+  C:24E9H         LINE#         639
+  C:24E9H         LINE#         640
+  C:24ECH         LINE#         642
+  C:24EEH         LINE#         645
+  C:24EEH         LINE#         647
+  C:24FCH         LINE#         648
+  C:2504H         LINE#         649
+  C:2504H         LINE#         650
+  C:250CH         LINE#         651
+  C:250CH         LINE#         654
+  C:2517H         LINE#         655
+  C:251DH         LINE#         656
+  C:2524H         LINE#         657
+  C:2524H         LINE#         658
+  -------         ENDPROC       GET_INTERFACE
+  -------         PROC          SET_INTERFACE
+  C:2B58H         LINE#         670
+  C:2B58H         LINE#         671
+  C:2B58H         LINE#         673
+  C:2B7CH         LINE#         678
+  C:2B7CH         LINE#         679
+  C:2B7FH         LINE#         680
+  C:2B7FH         LINE#         681
+  C:2B87H         LINE#         682
+  C:2B87H         LINE#         683
+  C:2B92H         LINE#         686
+  C:2B92H         LINE#         687
+  -------         ENDPROC       SET_INTERFACE
+  -------         PROC          GET_IDLE
+  C:0042H         LINE#         695
+  C:0042H         LINE#         696
+  -------         ENDPROC       GET_IDLE
+  -------         PROC          GET_PROTOCOL
+  C:0071H         LINE#         706
+  -------         ENDPROC       GET_PROTOCOL
+  -------         PROC          SET_PROTOCOL
+  C:0072H         LINE#         714
+  -------         ENDPROC       SET_PROTOCOL
+  -------         PROC          SET_IDLE
+  C:2C51H         LINE#         727
+  C:2C51H         LINE#         728
+  C:2C51H         LINE#         730
+  C:2C59H         LINE#         731
+  C:2C59H         LINE#         733
+  C:2C64H         LINE#         734
+  C:2C64H         LINE#         736
+  -------         ENDPROC       SET_IDLE
+  -------         PROC          GET_REPORT
+  C:2AD7H         LINE#         750
+  C:2AD7H         LINE#         751
+  C:2AD7H         LINE#         755
+  C:2AECH         LINE#         756
+  C:2AF9H         LINE#         758
+  C:2B01H         LINE#         759
+  C:2B01H         LINE#         761
+  C:2B0CH         LINE#         762
+  C:2B12H         LINE#         763
+  C:2B19H         LINE#         764
+  C:2B19H         LINE#         765
+  -------         ENDPROC       GET_REPORT
+  -------         PROC          SET_REPORT
+  C:2A48H         LINE#         779
+  C:2A48H         LINE#         780
+  C:2A48H         LINE#         782
+  C:2A4BH         LINE#         785
+  C:2A60H         LINE#         786
+  C:2A6FH         LINE#         788
+  C:2A77H         LINE#         789
+  C:2A77H         LINE#         791
+  C:2A82H         LINE#         792
+  C:2A88H         LINE#         793
+  C:2A8FH         LINE#         794
+  C:2A8FH         LINE#         795
+  -------         ENDPROC       SET_REPORT
+  -------         ENDMOD        F3XX_USB0_STANDARD_REQUESTS
+
+  -------         MODULE        F3XX_USB0_MAIN
+  C:0000H         SYMBOL        _ICE_DUMMY_
+  X:016DH         PUBLIC        versionInfo
+  C:1DCBH         PUBLIC        main
+  C:2B93H         PUBLIC        _updateVersion
+  -------         PROC          MAIN
+  C:1DCBH         LINE#         86
+  C:1DCBH         LINE#         87
+  C:1DCBH         LINE#         88
+  C:1DD5H         LINE#         89
+  C:1DD8H         LINE#         90
+  C:1DE1H         LINE#         94
+  C:1DE4H         LINE#         104
+  C:1DE7H         LINE#         108
+  C:1DEAH         LINE#         151
+  C:1DF0H         LINE#         164
+  C:1DF0H         LINE#         170
+  C:1DF3H         LINE#         171
+  C:1DF6H         LINE#         174
+  C:1DF9H         LINE#         175
+  C:1DFCH         LINE#         176
+  C:1DFFH         LINE#         177
+  C:1E02H         LINE#         178
+  C:1E05H         LINE#         179
+  C:1E08H         LINE#         180
+  C:1E0BH         LINE#         181
+  C:1E0EH         LINE#         182
+  C:1E11H         LINE#         196
+  C:1E11H         LINE#         199
+  C:1E17H         LINE#         202
+  C:1E1AH         LINE#         225
+  C:1E1CH         LINE#         230
+  C:1E1FH         LINE#         231
+  C:1E22H         LINE#         232
+  C:1E25H         LINE#         233
+  C:1E28H         LINE#         234
+  C:1E2BH         LINE#         235
+  C:1E2EH         LINE#         236
+  C:1E31H         LINE#         237
+  C:1E34H         LINE#         238
+  C:1E37H         LINE#         245
+  C:1E3AH         LINE#         246
+  C:1E3DH         LINE#         249
+  C:1E3DH         LINE#         268
+  C:1E40H         LINE#         311
+  C:1E40H         LINE#         312
+  C:1E40H         LINE#         314
+  C:1E46H         LINE#         315
+  C:1E46H         LINE#         317
+  C:1E49H         LINE#         320
+  C:1E4FH         LINE#         322
+  C:1E52H         LINE#         323
+  C:1E52H         LINE#         324
+  C:1E5AH         LINE#         326
+  C:1E5DH         LINE#         328
+  -------         ENDPROC       MAIN
+  -------         PROC          _UPDATEVERSION
+  D:0001H         SYMBOL        versionInfo
+  C:2B93H         LINE#         356
+  C:2B93H         LINE#         357
+  C:2B93H         LINE#         361
+  C:2B98H         LINE#         362
+  C:2BA0H         LINE#         363
+  C:2BABH         LINE#         402
+  C:2BB3H         LINE#         403
+  -------         ENDPROC       _UPDATEVERSION
+  -------         ENDMOD        F3XX_USB0_MAIN
+
+  -------         MODULE        F3XX_USB0_REPORTHANDLER
+  C:0000H         SYMBOL        _ICE_DUMMY_
+  D:00A2H         PUBLIC        SPI0CKR
+  D:0080H         PUBLIC        P0
+  D:0090H         PUBLIC        P1
+  D:00A0H         PUBLIC        P2
+  X:0000H         PUBLIC        gOS21ready
+  D:00A5H         PUBLIC        P1MDOUT
+  D:00A6H         PUBLIC        P2MDOUT
+  C:0076H         PUBLIC        _OUT_REPORT_HANDLER
+  D:00C1H         PUBLIC        SMB0CF
+  X:0001H         PUBLIC        gMockHIDreport2
+  D:00E2H         PUBLIC        XBR1
+  C:2525H         PUBLIC        _i2c_smbus_read_byte_data
+  X:0002H         PUBLIC        gMockHIDFIFOChannels
+  C:0C93H         PUBLIC        readOS21
+  X:0003H         PUBLIC        gLIS2DHready
+  X:0004H         PUBLIC        gOS21numIntServiced
+  C:2C3CH         PUBLIC        Setup_IO_BUFFER
+  X:0005H         PUBLIC        gMockHIDFIFOChannel
+  C:29FFH         PUBLIC        _i2c_smbus_write_byte_data
+  X:0006H         PUBLIC        blockArr
+  X:00C6H         PUBLIC        IO_BUFFER
+  B:00A0H.2       PUBLIC        Led1
+  C:2CA8H         PUBLIC        flash_Led1H_Led2H_100ms
+  C:12F0H         PUBLIC        readLIS2DH
+  B:00A0H.1       PUBLIC        Led2
+  X:00CAH         PUBLIC        gLIS2DHnumIntServiced
+  C:2C98H         PUBLIC        flash_Led1H_Led2L_100ms
+  C:2C88H         PUBLIC        flash_Led1L_Led2H_100ms
+  B:00A8H.0       PUBLIC        EX0
+  D:008DH         PUBLIC        TH1
+  X:00CBH         PUBLIC        gMockHIDFIFOCh1
+  B:00A8H.2       PUBLIC        EX1
+  X:00CDH         PUBLIC        gMockHIDFIFOCh2
+  C:2C78H         PUBLIC        flash_Led1L_Led2L_100ms
+  X:00CFH         PUBLIC        gMockHIDFIFOCh3
+  X:00D1H         PUBLIC        gMockHIDFIFOCh4
+  X:00D3H         PUBLIC        gOffset
+  X:00D4H         PUBLIC        gMockHID2X
+  X:00D6H         PUBLIC        gMockHID2Y
+  C:2D24H         PUBLIC        flash_Led1Led2_Blink
+  X:00D8H         PUBLIC        gMockHID2Z
+  B:0088H.6       PUBLIC        TR1
+  C:2879H         PUBLIC        testOS21IntTiming
+  C:2C25H         PUBLIC        INT0_ISR
+  C:2C65H         PUBLIC        INT1_ISR
+  C:2CD6H         PUBLIC        flash_Led1Led2_East
+  -------         PROC          _OUT_REPORT_HANDLER
+  X:01A2H         SYMBOL        internalCall
+  -------         DO            
+  X:01A4H         SYMBOL        temp
+  -------         ENDDO         
+  C:0076H         LINE#         148
+  C:007EH         LINE#         149
+  C:007EH         LINE#         156
+  C:0084H         LINE#         160
+  C:00D1H         LINE#         161
+  C:00D1H         LINE#         162
+  C:00D1H         LINE#         164
+  C:00E1H         LINE#         165
+  C:00FAH         LINE#         166
+  C:010AH         LINE#         167
+  C:011EH         LINE#         168
+  C:0133H         LINE#         169
+  C:014AH         LINE#         170
+  C:015CH         LINE#         171
+  C:016AH         LINE#         172
+  C:016AH         LINE#         173
+  C:016DH         LINE#         174
+  C:016DH         LINE#         175
+  C:0195H         LINE#         176
+  C:0195H         LINE#         177
+  C:0195H         LINE#         178
+  C:01A2H         LINE#         179
+  C:01ABH         LINE#         180
+  C:01ACH         LINE#         181
+  C:01ACH         LINE#         182
+  C:01B1H         LINE#         183
+  C:01E4H         LINE#         184
+  C:01F4H         LINE#         185
+  C:020DH         LINE#         187
+  C:0215H         LINE#         188
+  C:0215H         LINE#         189
+  C:0218H         LINE#         190
+  C:0218H         LINE#         191
+  C:0218H         LINE#         192
+  C:0218H         LINE#         193
+  C:0240H         LINE#         194
+  C:0240H         LINE#         195
+  C:0240H         LINE#         196
+  C:024BH         LINE#         197
+  C:0257H         LINE#         198
+  C:0270H         LINE#         199
+  C:0271H         LINE#         200
+  C:0271H         LINE#         201
+  C:0281H         LINE#         202
+  C:029AH         LINE#         203
+  C:02A6H         LINE#         204
+  C:02B1H         LINE#         205
+  C:02C9H         LINE#         206
+  C:02C9H         LINE#         207
+  C:02CCH         LINE#         208
+  C:02CCH         LINE#         209
+  C:02CCH         LINE#         210
+  C:02CCH         LINE#         211
+  C:02F4H         LINE#         212
+  C:02F4H         LINE#         213
+  C:02F4H         LINE#         214
+  C:02FFH         LINE#         215
+  C:030BH         LINE#         216
+  C:030CH         LINE#         217
+  C:030CH         LINE#         218
+  C:0312H         LINE#         219
+  C:0331H         LINE#         220
+  C:0331H         LINE#         221
+  C:0334H         LINE#         222
+  C:0339H         LINE#         223
+  C:0340H         LINE#         224
+  C:0340H         LINE#         225
+  C:0350H         LINE#         226
+  C:0369H         LINE#         227
+  C:0375H         LINE#         228
+  C:0380H         LINE#         229
+  C:0386H         LINE#         230
+  C:0386H         LINE#         231
+  C:0389H         LINE#         232
+  C:0389H         LINE#         233
+  C:0389H         LINE#         234
+  C:0389H         LINE#         235
+  C:03B4H         LINE#         236
+  C:03B4H         LINE#         237
+  C:03B4H         LINE#         238
+  C:03C1H         LINE#         243
+  C:03D6H         LINE#         244
+  C:03F8H         LINE#         245
+  C:03F8H         LINE#         246
+  C:03FDH         LINE#         247
+  C:0415H         LINE#         248
+  C:0435H         LINE#         249
+  C:0435H         LINE#         250
+  C:0435H         LINE#         251
+  C:0438H         LINE#         252
+  C:0438H         LINE#         253
+  C:0448H         LINE#         254
+  C:0461H         LINE#         255
+  C:0471H         LINE#         256
+  C:047DH         LINE#         257
+  C:047DH         LINE#         258
+  C:0480H         LINE#         259
+  C:0480H         LINE#         260
+  C:0480H         LINE#         261
+  C:0480H         LINE#         262
+  C:04A5H         LINE#         263
+  C:04A5H         LINE#         264
+  C:04A5H         LINE#         265
+  C:04E9H         LINE#         266
+  C:04EBH         LINE#         267
+  C:04EEH         LINE#         268
+  C:04EEH         LINE#         269
+  C:04EEH         LINE#         270
+  C:04FEH         LINE#         271
+  C:0516H         LINE#         272
+  C:055AH         LINE#         273
+  C:0568H         LINE#         274
+  C:0568H         LINE#         275
+  C:056BH         LINE#         276
+  C:056BH         LINE#         277
+  C:056BH         LINE#         278
+  C:056BH         LINE#         279
+  C:0595H         LINE#         280
+  C:0595H         LINE#         281
+  C:0595H         LINE#         282
+  C:05D9H         LINE#         284
+  C:05DBH         LINE#         285
+  C:05DBH         LINE#         286
+  C:0625H         LINE#         288
+  C:0625H         LINE#         289
+  C:0625H         LINE#         290
+  C:0632H         LINE#         291
+  C:0632H         LINE#         292
+  C:0635H         LINE#         293
+  C:0635H         LINE#         294
+  C:0657H         LINE#         295
+  C:0657H         LINE#         296
+  C:0657H         LINE#         304
+  C:0657H         LINE#         305
+  C:0657H         LINE#         311
+  C:065CH         LINE#         312
+  C:0672H         LINE#         314
+  C:0672H         LINE#         315
+  C:0675H         LINE#         316
+  C:0675H         LINE#         317
+  C:0675H         LINE#         318
+  C:0675H         LINE#         319
+  C:0697H         LINE#         320
+  C:0697H         LINE#         321
+  C:0697H         LINE#         325
+  C:0697H         LINE#         326
+  C:0697H         LINE#         333
+  C:06A7H         LINE#         334
+  C:06C0H         LINE#         335
+  C:06FAH         LINE#         336
+  C:0707H         LINE#         338
+  C:0707H         LINE#         339
+  C:0709H         LINE#         340
+  C:0709H         LINE#         341
+  C:0709H         LINE#         342
+  C:0709H         LINE#         343
+  C:072CH         LINE#         344
+  C:0735H         LINE#         345
+  C:0735H         LINE#         379
+  C:0735H         LINE#         380
+  C:074BH         LINE#         381
+  C:074EH         LINE#         382
+  C:074EH         LINE#         383
+  C:074EH         LINE#         386
+  C:0753H         LINE#         387
+  C:075BH         LINE#         388
+  C:0762H         LINE#         389
+  C:0769H         LINE#         390
+  C:0770H         LINE#         391
+  C:0774H         LINE#         393
+  C:0778H         LINE#         394
+  C:0782H         LINE#         395
+  C:078AH         LINE#         396
+  C:0792H         LINE#         398
+  C:07C1H         LINE#         399
+  C:07C1H         LINE#         400
+  C:07C1H         LINE#         401
+  C:07C1H         LINE#         402
+  C:07C1H         LINE#         403
+  C:07C6H         LINE#         405
+  C:07CAH         LINE#         407
+  C:07CFH         LINE#         410
+  C:07D2H         LINE#         412
+  C:07D8H         LINE#         415
+  C:07DAH         LINE#         417
+  C:07DBH         LINE#         418
+  C:07DBH         LINE#         439
+  C:07E4H         LINE#         484
+  C:07E6H         LINE#         486
+  C:07E6H         LINE#         488
+  C:07E7H         LINE#         489
+  C:07E7H         LINE#         490
+  C:07EAH         LINE#         491
+  C:07EAH         LINE#         492
+  C:07ECH         LINE#         493
+  C:07ECH         LINE#         494
+  C:07F1H         LINE#         495
+  C:07F1H         LINE#         496
+  C:07F3H         LINE#         497
+  C:07F3H         LINE#         498
+  C:07F8H         LINE#         499
+  C:07F8H         LINE#         500
+  C:07FAH         LINE#         501
+  C:07FAH         LINE#         502
+  C:07FFH         LINE#         503
+  C:07FFH         LINE#         504
+  C:0801H         LINE#         506
+  C:0801H         LINE#         507
+  C:0807H         LINE#         508
+  C:0809H         LINE#         509
+  C:0809H         LINE#         511
+  C:0809H         LINE#         512
+  C:0809H         LINE#         513
+  C:0809H         LINE#         514
+  -------         ENDPROC       _OUT_REPORT_HANDLER
+  -------         PROC          SETUP_IO_BUFFER
+  C:2C3CH         LINE#         516
+  C:2C3CH         LINE#         517
+  C:2C3CH         LINE#         518
+  C:2C4AH         LINE#         520
+  C:2C50H         LINE#         524
+  -------         ENDPROC       SETUP_IO_BUFFER
+  -------         PROC          INT0_ISR
+  C:2C25H         LINE#         532
+  C:2C2BH         LINE#         534
+  C:2C31H         LINE#         537
+  C:2C35H         LINE#         539
+  -------         ENDPROC       INT0_ISR
+  -------         PROC          INT1_ISR
+  C:2C65H         LINE#         548
+  C:2C6BH         LINE#         557
+  C:2C71H         LINE#         562
+  -------         ENDPROC       INT1_ISR
+  -------         PROC          TESTOS21INTTIMING
+  -------         DO            
+  X:01C1H         SYMBOL        outer
+  -------         ENDDO         
+  C:2879H         LINE#         565
+  C:2879H         LINE#         566
+  C:2879H         LINE#         573
+  C:287EH         LINE#         575
+  C:2882H         LINE#         576
+  C:289AH         LINE#         577
+  C:28A0H         LINE#         578
+  C:28A5H         LINE#         579
+  C:28BDH         LINE#         580
+  C:28C9H         LINE#         581
+  -------         ENDPROC       TESTOS21INTTIMING
+  -------         PROC          READOS21
+  -------         DO            
+  X:0173H         SYMBOL        inner
+  X:0174H         SYMBOL        outer
+  X:0175H         SYMBOL        ptrDelta
+  X:0176H         SYMBOL        MAX30101_InterruptStatus1_value
+  X:0177H         SYMBOL        bytesRemaining
+  B:0021H.0       SYMBOL        singleSample
+  B:0021H.1       SYMBOL        singleReport
+  X:0178H         SYMBOL        numBytesToRequestFromOpticalFIFO
+  -------         ENDDO         
+  C:0C93H         LINE#         592
+  C:0C93H         LINE#         593
+  C:0C93H         LINE#         603
+  C:0C95H         LINE#         604
+  C:0C97H         LINE#         637
+  C:0C9AH         LINE#         638
+  C:0C9CH         LINE#         639
+  C:0C9CH         LINE#         640
+  C:0CA1H         LINE#         644
+  C:0CBDH         LINE#         655
+  C:0CC4H         LINE#         679
+  C:0CC9H         LINE#         680
+  C:0CDFH         LINE#         682
+  C:0CE7H         LINE#         688
+  C:0CEDH         LINE#         689
+  C:0D07H         LINE#         698
+  C:0D18H         LINE#         705
+  C:0D1EH         LINE#         707
+  C:0D3AH         LINE#         712
+  C:0D3AH         LINE#         747
+  C:0D46H         LINE#         761
+  C:0D4BH         LINE#         763
+  C:0D60H         LINE#         764
+  C:0D7AH         LINE#         765
+  C:0D7AH         LINE#         766
+  C:0D88H         LINE#         767
+  C:0D98H         LINE#         768
+  C:0DAEH         LINE#         769
+  C:0DB1H         LINE#         770
+  C:0DB4H         LINE#         771
+  C:0DB4H         LINE#         772
+  C:0DC2H         LINE#         773
+  C:0DD2H         LINE#         774
+  C:0DE8H         LINE#         775
+  C:0DEEH         LINE#         776
+  C:0DF0H         LINE#         777
+  C:0DF0H         LINE#         778
+  C:0DFEH         LINE#         779
+  C:0E0EH         LINE#         780
+  C:0E24H         LINE#         781
+  C:0E2AH         LINE#         782
+  C:0E2CH         LINE#         783
+  C:0E2CH         LINE#         784
+  C:0E3AH         LINE#         785
+  C:0E4AH         LINE#         786
+  C:0E60H         LINE#         787
+  C:0E6FH         LINE#         788
+  C:0E6FH         LINE#         789
+  C:0E6FH         LINE#         791
+  C:0E75H         LINE#         792
+  C:0E82H         LINE#         793
+  C:0E84H         LINE#         794
+  C:0E84H         LINE#         795
+  C:0E8EH         LINE#         796
+  C:0E8EH         LINE#         801
+  C:0E95H         LINE#         802
+  C:0E95H         LINE#         803
+  C:0E9BH         LINE#         804
+  C:0EA1H         LINE#         805
+  C:0EA1H         LINE#         806
+  C:0EB0H         LINE#         811
+  C:0EB0H         LINE#         814
+  C:0EC0H         LINE#         815
+  C:0ED9H         LINE#         816
+  C:0EE3H         LINE#         818
+  C:0EEDH         LINE#         819
+  C:0F04H         LINE#         820
+  C:0F2AH         LINE#         821
+  C:0F32H         LINE#         824
+  C:0F35H         LINE#         828
+  C:0F3BH         LINE#         829
+  C:0F3BH         LINE#         830
+  C:0F41H         LINE#         831
+  C:0F44H         LINE#         832
+  C:0F44H         LINE#         833
+  C:0F5CH         LINE#         834
+  C:0F5CH         LINE#         835
+  C:0F6EH         LINE#         836
+  C:0F89H         LINE#         837
+  C:0FC1H         LINE#         838
+  C:0FC9H         LINE#         841
+  C:0FCCH         LINE#         845
+  C:0FD5H         LINE#         846
+  C:0FD5H         LINE#         847
+  C:0FD5H         LINE#         1034
+  -------         ENDPROC       READOS21
+  -------         PROC          READLIS2DH
+  -------         DO            
+  X:0179H         SYMBOL        inner
+  X:017AH         SYMBOL        outer
+  X:017BH         SYMBOL        ptrDelta
+  X:017CH         SYMBOL        bytesRemaining
+  B:0021H.2       SYMBOL        singleSample
+  B:0021H.3       SYMBOL        singleReport
+  X:017DH         SYMBOL        lis2dh_STATUS_REG2_value
+  X:017EH         SYMBOL        lis2dh_FIFO_SRC_REG_value
+  -------         ENDDO         
+  C:12F0H         LINE#         1047
+  C:12F0H         LINE#         1048
+  C:12F0H         LINE#         1058
+  C:12F2H         LINE#         1059
+  C:12F4H         LINE#         1076
+  C:12F9H         LINE#         1090
+  C:12FCH         LINE#         1091
+  C:12FEH         LINE#         1092
+  C:12FEH         LINE#         1095
+  C:1305H         LINE#         1097
+  C:1307H         LINE#         1098
+  C:1307H         LINE#         1101
+  C:1307H         LINE#         1102
+  C:130CH         LINE#         1111
+  C:1312H         LINE#         1116
+  C:131DH         LINE#         1118
+  C:1325H         LINE#         1119
+  C:1328H         LINE#         1124
+  C:132AH         LINE#         1127
+  C:132AH         LINE#         1139
+  C:1330H         LINE#         1149
+  C:134AH         LINE#         1189
+  C:134AH         LINE#         1191
+  C:1356H         LINE#         1197
+  C:135BH         LINE#         1200
+  C:1381H         LINE#         1201
+  C:138FH         LINE#         1202
+  C:138FH         LINE#         1203
+  C:139DH         LINE#         1204
+  C:13A0H         LINE#         1205
+  C:13A0H         LINE#         1206
+  C:13A2H         LINE#         1207
+  C:13A2H         LINE#         1208
+  C:13B0H         LINE#         1209
+  C:13B3H         LINE#         1210
+  C:13B3H         LINE#         1211
+  C:13B5H         LINE#         1212
+  C:13B5H         LINE#         1213
+  C:13C3H         LINE#         1214
+  C:13DDH         LINE#         1215
+  C:13E9H         LINE#         1216
+  C:13E9H         LINE#         1217
+  C:13E9H         LINE#         1218
+  C:13EFH         LINE#         1219
+  C:13F5H         LINE#         1220
+  C:13F7H         LINE#         1221
+  C:13F7H         LINE#         1222
+  C:1401H         LINE#         1223
+  C:1401H         LINE#         1226
+  C:140AH         LINE#         1231
+  C:141AH         LINE#         1232
+  C:1433H         LINE#         1233
+  C:143DH         LINE#         1234
+  C:1445H         LINE#         1235
+  C:145CH         LINE#         1236
+  C:1482H         LINE#         1237
+  C:148AH         LINE#         1240
+  C:148DH         LINE#         1244
+  C:1493H         LINE#         1245
+  C:1493H         LINE#         1246
+  C:1499H         LINE#         1247
+  C:149CH         LINE#         1248
+  C:149CH         LINE#         1249
+  C:14B4H         LINE#         1250
+  C:14B4H         LINE#         1251
+  C:14C6H         LINE#         1252
+  C:14E1H         LINE#         1253
+  C:1519H         LINE#         1254
+  C:1521H         LINE#         1257
+  C:1524H         LINE#         1261
+  C:152DH         LINE#         1262
+  C:152DH         LINE#         1267
+  C:1538H         LINE#         1268
+  C:153FH         LINE#         1270
+  C:1546H         LINE#         1271
+  C:1569H         LINE#         1273
+  C:1572H         LINE#         1280
+  C:1574H         LINE#         1283
+  C:1574H         LINE#         1299
+  C:1574H         LINE#         1300
+  -------         ENDPROC       READLIS2DH
+  -------         PROC          _I2C_SMBUS_READ_BYTE_DATA
+  D:0007H         SYMBOL        deviceAddress
+  D:0005H         SYMBOL        regAddress
+  X:01A5H         SYMBOL        pRegValue
+  -------         DO            
+  D:0007H         SYMBOL        regValue
+  D:0006H         SYMBOL        status
+  -------         ENDDO         
+  C:2525H         LINE#         1314
+  C:2530H         LINE#         1315
+  C:2530H         LINE#         1321
+  C:253FH         LINE#         1330
+  C:2554H         LINE#         1335
+  C:2564H         LINE#         1336
+  C:2570H         LINE#         1350
+  C:2573H         LINE#         1351
+  C:2576H         LINE#         1352
+  C:2576H         LINE#         1354
+  C:2584H         LINE#         1355
+  C:2588H         LINE#         1356
+  C:2588H         LINE#         1357
+  C:258AH         LINE#         1358
+  -------         ENDPROC       _I2C_SMBUS_READ_BYTE_DATA
+  -------         PROC          _I2C_SMBUS_WRITE_BYTE_DATA
+  D:0007H         SYMBOL        deviceAddress
+  D:0005H         SYMBOL        regAddress
+  D:0003H         SYMBOL        regValue
+  -------         DO            
+  D:0007H         SYMBOL        status
+  -------         ENDDO         
+  C:29FFH         LINE#         1414
+  C:29FFH         LINE#         1415
+  C:29FFH         LINE#         1420
+  C:2A11H         LINE#         1421
+  C:2A1DH         LINE#         1422
+  C:2A32H         LINE#         1427
+  C:2A40H         LINE#         1429
+  C:2A42H         LINE#         1430
+  C:2A45H         LINE#         1431
+  C:2A45H         LINE#         1432
+  C:2A47H         LINE#         1433
+  -------         ENDPROC       _I2C_SMBUS_WRITE_BYTE_DATA
+  -------         PROC          FLASH_LED1L_LED2L_100MS
+  C:2C78H         LINE#         1439
+  C:2C78H         LINE#         1440
+  C:2C78H         LINE#         1441
+  C:2C7AH         LINE#         1442
+  C:2C7CH         LINE#         1443
+  C:2C81H         LINE#         1444
+  -------         ENDPROC       FLASH_LED1L_LED2L_100MS
+  -------         PROC          FLASH_LED1L_LED2H_100MS
+  C:2C88H         LINE#         1450
+  C:2C88H         LINE#         1451
+  C:2C88H         LINE#         1452
+  C:2C8AH         LINE#         1453
+  C:2C8CH         LINE#         1454
+  C:2C91H         LINE#         1455
+  -------         ENDPROC       FLASH_LED1L_LED2H_100MS
+  -------         PROC          FLASH_LED1H_LED2L_100MS
+  C:2C98H         LINE#         1461
+  C:2C98H         LINE#         1462
+  C:2C98H         LINE#         1463
+  C:2C9AH         LINE#         1464
+  C:2C9CH         LINE#         1465
+  C:2CA1H         LINE#         1466
+  -------         ENDPROC       FLASH_LED1H_LED2L_100MS
+  -------         PROC          FLASH_LED1H_LED2H_100MS
+  C:2CA8H         LINE#         1472
+  C:2CA8H         LINE#         1473
+  C:2CA8H         LINE#         1474
+  C:2CAAH         LINE#         1475
+  C:2CACH         LINE#         1476
+  C:2CB1H         LINE#         1477
+  -------         ENDPROC       FLASH_LED1H_LED2H_100MS
+  -------         PROC          FLASH_LED1LED2_EAST
+  C:2CD6H         LINE#         1482
+  C:2CD6H         LINE#         1483
+  C:2CD6H         LINE#         1484
+  C:2CD9H         LINE#         1485
+  C:2CDCH         LINE#         1486
+  C:2CDFH         LINE#         1487
+  C:2CE2H         LINE#         1488
+  -------         ENDPROC       FLASH_LED1LED2_EAST
+  -------         PROC          FLASH_LED1LED2_BLINK
+  C:2D24H         LINE#         1493
+  C:2D24H         LINE#         1494
+  C:2D24H         LINE#         1495
+  C:2D27H         LINE#         1496
+  C:2D2AH         LINE#         1497
+  -------         ENDPROC       FLASH_LED1LED2_BLINK
+  -------         ENDMOD        F3XX_USB0_REPORTHANDLER
+
+  -------         MODULE        F3XX_USB0_DESCRIPTOR
+  C:0000H         SYMBOL        _ICE_DUMMY_
+  C:1C23H         PUBLIC        String0Desc
+  C:1C27H         PUBLIC        String1Desc
+  C:1C4FH         PUBLIC        String2Desc
+  C:1BD2H         PUBLIC        HIDCONFIGDESC
+  C:1BC0H         PUBLIC        DEVICEDESC
+  C:1BFBH         PUBLIC        HIDREPORTDESC
+  X:0139H         PUBLIC        STRINGDESCTABLE
+  -------         ENDMOD        F3XX_USB0_DESCRIPTOR
+
+  -------         MODULE        F3XX_INITIALIZE
+  C:0000H         SYMBOL        _ICE_DUMMY_
+  C:2BF5H         PUBLIC        System_Init
+  D:00E6H         PUBLIC        EIE1
+  B:00A8H.7       PUBLIC        EA
+  D:00D7H         PUBLIC        USB0XCN
+  C:2D0EH         PUBLIC        Timer3_ISR
+  D:00A6H         PUBLIC        P2MDOUT
+  D:00F6H         PUBLIC        EIP1
+  C:2D33H         PUBLIC        INT0_Init
+  D:00D9H         PUBLIC        PCA0MD
+  D:00E1H         PUBLIC        XBR0
+  D:00C1H         PUBLIC        SMB0CF
+  C:0006H         PUBLIC        Port_Init
+  D:00E2H         PUBLIC        XBR1
+  C:296AH         PUBLIC        Usb_Init
+  C:258BH         PUBLIC        _getTimer3ClkFreq
+  D:0094H         PUBLIC        TMR3
+  C:2773H         PUBLIC        _Timer0_Init
+  C:2000H         PUBLIC        Timer1_Init
+  C:2B1AH         PUBLIC        Timer3_Init
+  X:00DAH         PUBLIC        IO_PACKET
+  D:0089H         PUBLIC        TMOD
+  D:0088H         PUBLIC        TCON
+  C:1D20H         PUBLIC        _getTimer0or1ClkFreq
+  D:00D4H         PUBLIC        P0SKIP
+  D:0091H         PUBLIC        TMR3CN
+  D:00A9H         PUBLIC        CLKSEL
+  D:00B2H         PUBLIC        OSCICN
+  C:2D1AH         PUBLIC        SMBus_Init
+  D:0092H         PUBLIC        TMR3RL
+  X:011AH         PUBLIC        gTimer1ClkFreq
+  B:0088H.5       PUBLIC        TF0
+  D:00B9H         PUBLIC        CLKMUL
+  D:008CH         PUBLIC        TH0
+  B:00A8H.0       PUBLIC        EX0
+  D:008DH         PUBLIC        TH1
+  D:008AH         PUBLIC        TL0
+  D:008BH         PUBLIC        TL1
+  X:011EH         PUBLIC        gSysClkFreq
+  B:0088H.4       PUBLIC        TR0
+  B:0088H.6       PUBLIC        TR1
+  X:0122H         PUBLIC        gSMBusClkFreq
+  D:008EH         PUBLIC        CKCON
+  C:2211H         PUBLIC        Sysclk_Init
+  D:0096H         PUBLIC        USB0ADR
+  D:0097H         PUBLIC        USB0DAT
+  C:0046H         PUBLIC        _T0_Wait
+  -------         PROC          SYSTEM_INIT
+  C:2BF5H         LINE#         95
+  C:2BF5H         LINE#         96
+  C:2BF5H         LINE#         97
+  C:2BF8H         LINE#         99
+  C:2BFBH         LINE#         100
+  C:2BFEH         LINE#         101
+  C:2C01H         LINE#         103
+  C:2C04H         LINE#         104
+  C:2C07H         LINE#         108
+  C:2C0AH         LINE#         109
+  -------         ENDPROC       SYSTEM_INIT
+  -------         PROC          SYSCLK_INIT
+  -------         DO            
+  D:0007H         SYMBOL        delay
+  -------         ENDDO         
+  C:2211H         LINE#         122
+  C:2211H         LINE#         123
+  C:2211H         LINE#         124
+  C:2213H         LINE#         126
+  C:2216H         LINE#         128
+  C:2219H         LINE#         129
+  C:221CH         LINE#         130
+  C:2222H         LINE#         131
+  C:2225H         LINE#         132
+  C:222AH         LINE#         134
+  C:222DH         LINE#         135
+  C:2230H         LINE#         136
+  C:223CH         LINE#         137
+  C:223CH         LINE#         138
+  C:223CH         LINE#         139
+  C:224DH         LINE#         140
+  C:224DH         LINE#         141
+  C:224DH         LINE#         142
+  C:2257H         LINE#         143
+  C:2258H         LINE#         144
+  C:2258H         LINE#         145
+  C:2262H         LINE#         146
+  C:2263H         LINE#         147
+  C:2263H         LINE#         148
+  C:226DH         LINE#         149
+  C:226EH         LINE#         150
+  C:226EH         LINE#         151
+  C:2278H         LINE#         152
+  C:2279H         LINE#         153
+  C:2279H         LINE#         157
+  C:2279H         LINE#         158
+  C:2283H         LINE#         159
+  C:2284H         LINE#         160
+  C:2284H         LINE#         161
+  C:228EH         LINE#         162
+  C:228EH         LINE#         163
+  -------         ENDPROC       SYSCLK_INIT
+  -------         PROC          PORT_INIT
+  C:0006H         LINE#         176
+  C:0006H         LINE#         177
+  C:0006H         LINE#         225
+  C:0009H         LINE#         230
+  C:000CH         LINE#         233
+  C:000FH         LINE#         235
+  C:0012H         LINE#         273
+  -------         ENDPROC       PORT_INIT
+  -------         PROC          SMBUS_INIT
+  C:2D1AH         LINE#         284
+  C:2D1AH         LINE#         285
+  C:2D1AH         LINE#         286
+  C:2D1DH         LINE#         287
+  C:2D20H         LINE#         288
+  C:2D23H         LINE#         289
+  -------         ENDPROC       SMBUS_INIT
+  -------         PROC          USB_INIT
+  C:296AH         LINE#         304
+  C:296AH         LINE#         305
+  C:296AH         LINE#         306
+  C:2975H         LINE#         307
+  C:2980H         LINE#         308
+  C:298BH         LINE#         309
+  C:2996H         LINE#         310
+  C:2999H         LINE#         311
+  C:29A4H         LINE#         312
+  C:29A7H         LINE#         313
+  C:29A9H         LINE#         316
+  C:29B4H         LINE#         317
+  -------         ENDPROC       USB_INIT
+  -------         PROC          _TIMER0_INIT
+  X:0191H         SYMBOL        delayUnitsAreMicroseconds
+  -------         DO            
+  X:0192H         SYMBOL        timer0ClkFreq
+  -------         ENDDO         
+  C:2773H         LINE#         332
+  C:2778H         LINE#         334
+  C:2778H         LINE#         336
+  C:277BH         LINE#         337
+  C:277EH         LINE#         338
+  C:2781H         LINE#         339
+  C:2784H         LINE#         340
+  C:2790H         LINE#         343
+  C:279BH         LINE#         344
+  C:27CBH         LINE#         347
+  -------         ENDPROC       _TIMER0_INIT
+  -------         PROC          _T0_WAIT
+  D:0006H         SYMBOL        delayCount
+  C:0046H         LINE#         349
+  C:0046H         LINE#         350
+  C:0046H         LINE#         351
+  C:004FH         LINE#         353
+  C:004FH         LINE#         354
+  C:0052H         LINE#         355
+  C:0054H         LINE#         356
+  C:0056H         LINE#         357
+  C:0060H         LINE#         358
+  C:0060H         LINE#         359
+  C:0063H         LINE#         360
+  C:0065H         LINE#         361
+  C:006AH         LINE#         362
+  C:006CH         LINE#         363
+  C:006EH         LINE#         364
+  -------         ENDPROC       _T0_WAIT
+  -------         PROC          _GETTIMER0OR1CLKFREQ
+  D:0007H         SYMBOL        timer
+  X:0196H         SYMBOL        timer0or1ClkFreq
+  -------         DO            
+  X:0199H         SYMBOL        mask
+  X:019AH         SYMBOL        rightShift
+  -------         ENDDO         
+  C:1D20H         LINE#         366
+  C:1D2BH         LINE#         367
+  C:1D2BH         LINE#         370
+  C:1D32H         LINE#         371
+  C:1D32H         LINE#         372
+  C:1D32H         LINE#         373
+  C:1D38H         LINE#         374
+  C:1D3CH         LINE#         375
+  C:1D3EH         LINE#         376
+  C:1D3EH         LINE#         377
+  C:1D44H         LINE#         378
+  C:1D48H         LINE#         379
+  C:1D48H         LINE#         380
+  C:1D48H         LINE#         381
+  C:1D62H         LINE#         382
+  C:1D62H         LINE#         383
+  C:1D62H         LINE#         384
+  C:1D70H         LINE#         385
+  C:1D70H         LINE#         386
+  C:1D70H         LINE#         387
+  C:1D77H         LINE#         388
+  C:1D79H         LINE#         389
+  C:1D79H         LINE#         390
+  C:1D80H         LINE#         391
+  C:1D82H         LINE#         392
+  C:1D82H         LINE#         393
+  C:1D9AH         LINE#         394
+  C:1D9CH         LINE#         395
+  C:1D9CH         LINE#         399
+  C:1D9CH         LINE#         400
+  C:1DB8H         LINE#         401
+  C:1DB8H         LINE#         402
+  C:1DB8H         LINE#         403
+  C:1DCAH         LINE#         404
+  C:1DCAH         LINE#         405
+  -------         ENDPROC       _GETTIMER0OR1CLKFREQ
+  -------         PROC          TIMER1_INIT
+  C:2000H         LINE#         420
+  C:2000H         LINE#         421
+  C:2000H         LINE#         424
+  C:2003H         LINE#         425
+  C:2006H         LINE#         426
+  C:2009H         LINE#         427
+  C:2014H         LINE#         429
+  C:204BH         LINE#         430
+  C:207EH         LINE#         432
+  C:2081H         LINE#         433
+  C:2084H         LINE#         434
+  C:2086H         LINE#         435
+  -------         ENDPROC       TIMER1_INIT
+  -------         PROC          TIMER3_INIT
+  -------         DO            
+  X:019BH         SYMBOL        timer3ClkFreq
+  -------         ENDDO         
+  C:2B1AH         LINE#         452
+  C:2B1AH         LINE#         453
+  C:2B1AH         LINE#         455
+  C:2B1DH         LINE#         456
+  C:2B20H         LINE#         457
+  C:2B29H         LINE#         458
+  C:2B4BH         LINE#         459
+  C:2B51H         LINE#         461
+  C:2B54H         LINE#         462
+  C:2B57H         LINE#         463
+  -------         ENDPROC       TIMER3_INIT
+  -------         PROC          _GETTIMER3CLKFREQ
+  X:01A8H         SYMBOL        timer3ClkFreq
+  C:258BH         LINE#         465
+  C:2596H         LINE#         466
+  C:2596H         LINE#         467
+  C:25A2H         LINE#         468
+  C:25A2H         LINE#         469
+  C:25A2H         LINE#         470
+  C:25A8H         LINE#         471
+  C:25A8H         LINE#         472
+  C:25A8H         LINE#         473
+  C:25C0H         LINE#         474
+  C:25C2H         LINE#         475
+  C:25C2H         LINE#         479
+  C:25C2H         LINE#         480
+  C:25DEH         LINE#         481
+  C:25DEH         LINE#         482
+  C:25DEH         LINE#         483
+  C:25F0H         LINE#         484
+  C:25F0H         LINE#         485
+  -------         ENDPROC       _GETTIMER3CLKFREQ
+  -------         PROC          TIMER3_ISR
+  C:2D0EH         LINE#         493
+  C:2D0EH         LINE#         495
+  C:2D11H         LINE#         496
+  C:2D14H         LINE#         497
+  C:2D17H         LINE#         498
+  C:2D19H         LINE#         499
+  -------         ENDPROC       TIMER3_ISR
+  -------         PROC          INT0_INIT
+  C:2D33H         LINE#         501
+  C:2D33H         LINE#         502
+  C:2D33H         LINE#         503
+  C:2D36H         LINE#         505
+  C:2D38H         LINE#         507
+  -------         ENDPROC       INT0_INIT
+  -------         ENDMOD        F3XX_INITIALIZE
+
+  -------         MODULE        SMBUS
+  C:0000H         SYMBOL        _ICE_DUMMY_
+  D:0080H         PUBLIC        P0
+  C:29B5H         PUBLIC        _i2c_write
+  B:0020H.1       PUBLIC        gSMBbusy
+  B:0020H.2       PUBLIC        gSMBackPoll
+  C:1575H         PUBLIC        SMBus_ISR
+  B:00C0H.0       PUBLIC        SI
+  D:00C1H         PUBLIC        SMB0CF
+  D:00C0H         PUBLIC        SMB0CN
+  B:0020H.3       PUBLIC        gSMBrepeatedStart
+  B:0020H.4       PUBLIC        gSMBrw
+  X:0144H         PUBLIC        gSMBslaveAddress
+  X:0145H         PUBLIC        gI2Cflags
+  X:0146H         PUBLIC        gSMBnumBytesToTransfer
+  B:0020H.5       PUBLIC        gSMBrandomRead
+  B:00C0H.1       PUBLIC        ACK
+  B:0020H.6       PUBLIC        gSMBsendStartRegister
+  X:0147H         PUBLIC        gpSMBdata
+  B:0080H.4       PUBLIC        SDA
+  B:0020H.7       PUBLIC        gSMBstoppedWrite
+  B:0080H.5       PUBLIC        SCL
+  C:2A90H         PUBLIC        clearSDA
+  B:00C0H.5       PUBLIC        STA
+  X:014AH         PUBLIC        gSMBlenStartRegister
+  D:00C2H         PUBLIC        SMB0DAT
+  B:00C0H.4       PUBLIC        STO
+  C:2718H         PUBLIC        _i2c_read
+  -------         PROC          SMBUS_ISR
+  -------         DO            
+  B:0021H.6       SYMBOL        FAIL
+  X:0142H         SYMBOL        dataByte
+  X:0143H         SYMBOL        regByte
+  B:0020H.0       SYMBOL        SEND_START
+  -------         ENDDO         
+  C:1575H         LINE#         88
+  C:1590H         LINE#         90
+  C:1592H         LINE#         101
+  C:15A8H         LINE#         102
+  C:15A8H         LINE#         104
+  C:15A8H         LINE#         105
+  C:15AEH         LINE#         106
+  C:15B1H         LINE#         108
+  C:15B7H         LINE#         109
+  C:15B9H         LINE#         110
+  C:15BEH         LINE#         111
+  C:15C0H         LINE#         112
+  C:15C3H         LINE#         115
+  C:15C3H         LINE#         116
+  C:15C9H         LINE#         117
+  C:15C9H         LINE#         118
+  C:15CCH         LINE#         119
+  C:15CCH         LINE#         120
+  C:15CFH         LINE#         121
+  C:15D1H         LINE#         122
+  C:15D3H         LINE#         123
+  C:15D5H         LINE#         124
+  C:15D8H         LINE#         125
+  C:15D8H         LINE#         126
+  C:15DBH         LINE#         127
+  C:15DBH         LINE#         128
+  C:15DDH         LINE#         129
+  C:15DFH         LINE#         130
+  C:15E2H         LINE#         131
+  C:15E4H         LINE#         132
+  C:15E6H         LINE#         133
+  C:15E9H         LINE#         134
+  C:15E9H         LINE#         135
+  C:15ECH         LINE#         136
+  C:15ECH         LINE#         137
+  C:161EH         LINE#         139
+  C:162DH         LINE#         140
+  C:162DH         LINE#         141
+  C:162FH         LINE#         142
+  C:1635H         LINE#         143
+  C:1635H         LINE#         144
+  C:1637H         LINE#         145
+  C:1639H         LINE#         146
+  C:1639H         LINE#         147
+  C:1639H         LINE#         148
+  C:163CH         LINE#         149
+  C:163CH         LINE#         151
+  C:1642H         LINE#         152
+  C:1642H         LINE#         153
+  C:165AH         LINE#         154
+  C:1698H         LINE#         156
+  C:1698H         LINE#         157
+  C:169AH         LINE#         158
+  C:169CH         LINE#         159
+  C:169CH         LINE#         160
+  C:169CH         LINE#         161
+  C:169CH         LINE#         162
+  C:169EH         LINE#         164
+  C:16A1H         LINE#         165
+  C:16A6H         LINE#         167
+  C:16A8H         LINE#         168
+  C:16ABH         LINE#         171
+  C:16ABH         LINE#         172
+  C:16C3H         LINE#         173
+  C:16C3H         LINE#         174
+  C:16F5H         LINE#         175
+  C:170EH         LINE#         176
+  C:1712H         LINE#         177
+  C:1716H         LINE#         178
+  C:1716H         LINE#         179
+  C:1718H         LINE#         180
+  C:171AH         LINE#         181
+  C:171CH         LINE#         182
+  C:1734H         LINE#         183
+  C:1734H         LINE#         184
+  C:1734H         LINE#         185
+  C:1736H         LINE#         187
+  C:1736H         LINE#         188
+  C:1738H         LINE#         190
+  C:1738H         LINE#         191
+  C:1738H         LINE#         193
+  C:173BH         LINE#         194
+  C:173BH         LINE#         195
+  C:173EH         LINE#         196
+  C:1741H         LINE#         197
+  C:1743H         LINE#         198
+  C:1745H         LINE#         199
+  C:1747H         LINE#         201
+  C:1749H         LINE#         203
+  C:174BH         LINE#         204
+  C:1764H         LINE#         205
+  C:1764H         LINE#         207
+  C:1766H         LINE#         208
+  -------         ENDPROC       SMBUS_ISR
+  -------         PROC          _I2C_WRITE
+  D:0007H         SYMBOL        slaveAddress
+  D:0001H         SYMBOL        pData
+  X:0183H         SYMBOL        lenData
+  X:0184H         SYMBOL        lenStartReg
+  C:29B5H         LINE#         229
+  C:29B5H         LINE#         230
+  C:29B5H         LINE#         231
+  C:29B8H         LINE#         232
+  C:29BAH         LINE#         234
+  C:29BFH         LINE#         235
+  C:29C1H         LINE#         236
+  C:29C7H         LINE#         237
+  C:29CBH         LINE#         239
+  C:29CDH         LINE#         240
+  C:29CFH         LINE#         241
+  C:29D7H         LINE#         243
+  C:29DCH         LINE#         244
+  C:29E7H         LINE#         245
+  C:29EFH         LINE#         246
+  C:29F7H         LINE#         248
+  C:29F9H         LINE#         250
+  C:29FBH         LINE#         251
+  C:29FEH         LINE#         252
+  -------         ENDPROC       _I2C_WRITE
+  -------         PROC          _I2C_READ
+  D:0007H         SYMBOL        slaveAddress
+  D:0001H         SYMBOL        pData
+  X:0189H         SYMBOL        lenData
+  X:018AH         SYMBOL        lenStartReg
+  C:2718H         LINE#         269
+  C:2718H         LINE#         270
+  C:2718H         LINE#         271
+  C:271BH         LINE#         272
+  C:271DH         LINE#         274
+  C:2722H         LINE#         276
+  C:2728H         LINE#         277
+  C:2728H         LINE#         278
+  C:272AH         LINE#         279
+  C:272CH         LINE#         280
+  C:272EH         LINE#         282
+  C:272EH         LINE#         283
+  C:2730H         LINE#         285
+  C:2732H         LINE#         286
+  C:2732H         LINE#         287
+  C:273AH         LINE#         288
+  C:273AH         LINE#         289
+  C:273CH         LINE#         290
+  C:273EH         LINE#         291
+  C:2740H         LINE#         293
+  C:2742H         LINE#         295
+  C:2744H         LINE#         296
+  C:2748H         LINE#         298
+  C:274DH         LINE#         300
+  C:2752H         LINE#         301
+  C:275DH         LINE#         302
+  C:2765H         LINE#         303
+  C:276DH         LINE#         305
+  C:276FH         LINE#         306
+  C:2772H         LINE#         309
+  -------         ENDPROC       _I2C_READ
+  -------         PROC          CLEARSDA
+  -------         DO            
+  D:0006H         SYMBOL        count
+  D:0004H         SYMBOL        i
+  -------         ENDDO         
+  C:2A90H         LINE#         316
+  C:2A90H         LINE#         317
+  C:2A90H         LINE#         318
+  C:2A93H         LINE#         321
+  C:2A9FH         LINE#         322
+  C:2A9FH         LINE#         323
+  C:2AA1H         LINE#         324
+  C:2AAEH         LINE#         325
+  C:2AB0H         LINE#         326
+  C:2AB3H         LINE#         327
+  C:2AC1H         LINE#         328
+  C:2AC6H         LINE#         329
+  C:2AC8H         LINE#         330
+  C:2AD6H         LINE#         331
+  C:2AD6H         LINE#         332
+  -------         ENDPROC       CLEARSDA
+  -------         ENDMOD        SMBUS
+
+  -------         MODULE        SPI
+  C:0000H         SYMBOL        _ICE_DUMMY_
+  -------         ENDMOD        SPI
+
+  -------         MODULE        LIS2DH
+  C:0000H         SYMBOL        _ICE_DUMMY_
+  C:0038H         PUBLIC        searchLIS2DHdeviceAddressList
+  C:25F9H         PUBLIC        _lis2dh_Read_16Bit
+  C:0016H         PUBLIC        _lis2dh_Read_XYZ
+  C:291DH         PUBLIC        _lis2dh_configure_BDU
+  C:2306H         PUBLIC        _lis2dh_configure_resolutionBits
+  C:2CF4H         PUBLIC        _lis2dh_RegRead
+  X:01C2H         PUBLIC        gLIS2DHdeviceAddress
+  C:2CE5H         PUBLIC        _lis2dh_RegWrite
+  C:1A18H         PUBLIC        _lis2dh_configure_outputDataRateHz
+  C:228FH         PUBLIC        lis2dh_open
+  C:1925H         PUBLIC        _lis2dh_configure_FIFO
+  -------         PROC          _LIS2DH_REGREAD
+  D:0006H         SYMBOL        regAddress
+  D:0001H         SYMBOL        pRegValue
+  C:2CF4H         LINE#         74
+  C:2CF6H         LINE#         75
+  C:2CF6H         LINE#         76
+  C:2D00H         LINE#         77
+  -------         ENDPROC       _LIS2DH_REGREAD
+  -------         PROC          _LIS2DH_REGWRITE
+  D:0005H         SYMBOL        regAddress
+  D:0006H         SYMBOL        regValue
+  C:2CE5H         LINE#         82
+  C:2CE9H         LINE#         83
+  C:2CE9H         LINE#         84
+  C:2CF3H         LINE#         85
+  -------         ENDPROC       _LIS2DH_REGWRITE
+  -------         PROC          L?0056
+  -------         ENDPROC       L?0056
+  -------         PROC          _LIS2DH_READ_16BIT
+  X:0154H         SYMBOL        regAddress_L
+  X:0155H         SYMBOL        regAddress_H
+  X:0156H         SYMBOL        resultPtr
+  -------         DO            
+  X:0159H         SYMBOL        regValue_L
+  X:015AH         SYMBOL        regValue_H
+  D:0006H         SYMBOL        regValue_HL
+  -------         ENDDO         
+  C:25F9H         LINE#         90
+  C:260AH         LINE#         91
+  C:260AH         LINE#         93
+  C:260DH         LINE#         94
+  C:260FH         LINE#         95
+  C:2611H         LINE#         99
+  C:2617H         LINE#         100
+  C:2618H         LINE#         101
+  C:2618H         LINE#         109
+  C:2626H         LINE#         110
+  C:2634H         LINE#         111
+  C:2640H         LINE#         114
+  C:264EH         LINE#         115
+  C:2654H         LINE#         116
+  C:2654H         LINE#         117
+  C:2654H         LINE#         118
+  -------         ENDPROC       _LIS2DH_READ_16BIT
+  -------         PROC          _LIS2DH_READ_XYZ
+  D:0001H         SYMBOL        XPtr
+  X:014EH         SYMBOL        YPtr
+  X:0151H         SYMBOL        ZPtr
+  C:0016H         LINE#         123
+  C:0016H         LINE#         124
+  C:0016H         LINE#         129
+  C:001CH         LINE#         131
+  C:001CH         LINE#         142
+  C:0023H         LINE#         143
+  C:002DH         LINE#         144
+  C:0037H         LINE#         146
+  -------         ENDPROC       _LIS2DH_READ_XYZ
+  -------         PROC          _LIS2DH_CONFIGURE_OUTPUTDATARATEHZ
+  X:01ABH         SYMBOL        outputDataRateHz
+  -------         DO            
+  X:01ADH         SYMBOL        lis2dh_CTRL_REG1_value
+  -------         ENDDO         
+  C:1A18H         LINE#         150
+  C:1A20H         LINE#         151
+  C:1A20H         LINE#         152
+  C:1A23H         LINE#         161
+  C:1A29H         LINE#         162
+  C:1A2BH         LINE#         163
+  C:1A2BH         LINE#         165
+  C:1A36H         LINE#         172
+  C:1A72H         LINE#         173
+  C:1A72H         LINE#         174
+  C:1A72H         LINE#         176
+  C:1A79H         LINE#         177
+  C:1A7BH         LINE#         178
+  C:1A7DH         LINE#         179
+  C:1A7DH         LINE#         181
+  C:1A84H         LINE#         182
+  C:1A88H         LINE#         183
+  C:1A8AH         LINE#         184
+  C:1A8AH         LINE#         186
+  C:1A91H         LINE#         187
+  C:1A95H         LINE#         188
+  C:1A97H         LINE#         189
+  C:1A97H         LINE#         191
+  C:1A9EH         LINE#         192
+  C:1AA2H         LINE#         193
+  C:1AA4H         LINE#         194
+  C:1AA4H         LINE#         196
+  C:1AABH         LINE#         197
+  C:1AAFH         LINE#         198
+  C:1AB1H         LINE#         199
+  C:1AB1H         LINE#         201
+  C:1AB8H         LINE#         202
+  C:1ABCH         LINE#         203
+  C:1ABEH         LINE#         204
+  C:1ABEH         LINE#         206
+  C:1AC5H         LINE#         207
+  C:1AC9H         LINE#         208
+  C:1ACBH         LINE#         209
+  C:1ACBH         LINE#         211
+  C:1AD2H         LINE#         212
+  C:1AD6H         LINE#         213
+  C:1AD8H         LINE#         214
+  C:1AD8H         LINE#         216
+  C:1ADFH         LINE#         217
+  C:1AE3H         LINE#         218
+  C:1AE5H         LINE#         219
+  C:1AE5H         LINE#         221
+  C:1AE5H         LINE#         222
+  C:1AE5H         LINE#         223
+  C:1AE5H         LINE#         224
+  C:1AECH         LINE#         227
+  C:1AF0H         LINE#         228
+  C:1AF2H         LINE#         229
+  C:1AF2H         LINE#         230
+  C:1AF5H         LINE#         231
+  C:1AF5H         LINE#         233
+  C:1AFFH         LINE#         240
+  C:1B01H         LINE#         241
+  -------         ENDPROC       _LIS2DH_CONFIGURE_OUTPUTDATARATEHZ
+  -------         PROC          _LIS2DH_CONFIGURE_RESOLUTIONBITS
+  X:01AEH         SYMBOL        resolutionBits
+  -------         DO            
+  X:01AFH         SYMBOL        lis2dh_CTRL_REG1_value
+  X:01B0H         SYMBOL        lis2dh_CTRL_REG4_value
+  -------         ENDDO         
+  C:2306H         LINE#         245
+  C:230BH         LINE#         246
+  C:230BH         LINE#         247
+  C:230EH         LINE#         250
+  C:2310H         LINE#         256
+  C:2316H         LINE#         257
+  C:2318H         LINE#         258
+  C:2318H         LINE#         260
+  C:2323H         LINE#         263
+  C:232EH         LINE#         267
+  C:233EH         LINE#         268
+  C:233EH         LINE#         269
+  C:233EH         LINE#         271
+  C:2345H         LINE#         272
+  C:234AH         LINE#         273
+  C:234CH         LINE#         274
+  C:234CH         LINE#         276
+  C:2352H         LINE#         277
+  C:2352H         LINE#         278
+  C:2354H         LINE#         279
+  C:2354H         LINE#         281
+  C:235BH         LINE#         282
+  C:2360H         LINE#         283
+  C:2362H         LINE#         284
+  C:2362H         LINE#         285
+  C:2365H         LINE#         286
+  C:2365H         LINE#         288
+  C:236FH         LINE#         291
+  C:2379H         LINE#         295
+  C:237BH         LINE#         296
+  -------         ENDPROC       _LIS2DH_CONFIGURE_RESOLUTIONBITS
+  -------         PROC          _LIS2DH_CONFIGURE_BDU
+  X:01BBH         SYMBOL        bduBlockDataUpdate
+  -------         DO            
+  X:01BCH         SYMBOL        lis2dh_CTRL_REG4_value
+  -------         ENDDO         
+  C:291DH         LINE#         355
+  C:2922H         LINE#         356
+  C:2922H         LINE#         360
+  C:2925H         LINE#         366
+  C:292BH         LINE#         367
+  C:292DH         LINE#         368
+  C:292DH         LINE#         373
+  C:2938H         LINE#         377
+  C:2942H         LINE#         378
+  C:2942H         LINE#         379
+  C:2942H         LINE#         381
+  C:2949H         LINE#         382
+  C:294BH         LINE#         383
+  C:294DH         LINE#         384
+  C:294DH         LINE#         386
+  C:2954H         LINE#         387
+  C:2958H         LINE#         388
+  C:295AH         LINE#         389
+  C:295AH         LINE#         390
+  C:295DH         LINE#         391
+  C:295DH         LINE#         396
+  C:2967H         LINE#         400
+  C:2969H         LINE#         401
+  -------         ENDPROC       _LIS2DH_CONFIGURE_BDU
+  -------         PROC          _LIS2DH_CONFIGURE_FIFO
+  X:018BH         SYMBOL        fifoModeFM10
+  X:018CH         SYMBOL        fifoTR
+  X:018DH         SYMBOL        fifoWatermarkLevelFTH40
+  -------         DO            
+  X:018EH         SYMBOL        lis2dh_CTRL_REG3_value
+  X:018FH         SYMBOL        lis2dh_CTRL_REG5_value
+  X:0190H         SYMBOL        lis2dh_FIFO_CTRL_REG_value
+  -------         ENDDO         
+  C:1925H         LINE#         405
+  C:1930H         LINE#         406
+  C:1930H         LINE#         413
+  C:1933H         LINE#         415
+  C:1935H         LINE#         419
+  C:1937H         LINE#         430
+  C:193DH         LINE#         431
+  C:193FH         LINE#         432
+  C:193FH         LINE#         445
+  C:194AH         LINE#         447
+  C:1955H         LINE#         451
+  C:1960H         LINE#         460
+  C:1971H         LINE#         461
+  C:1971H         LINE#         462
+  C:1971H         LINE#         464
+  C:1978H         LINE#         465
+  C:197AH         LINE#         466
+  C:1981H         LINE#         467
+  C:1983H         LINE#         468
+  C:1983H         LINE#         470
+  C:198AH         LINE#         471
+  C:198DH         LINE#         472
+  C:198DH         LINE#         473
+  C:198FH         LINE#         474
+  C:198FH         LINE#         476
+  C:1996H         LINE#         477
+  C:199AH         LINE#         478
+  C:19A1H         LINE#         489
+  C:19A8H         LINE#         490
+  C:19ACH         LINE#         492
+  C:19B1H         LINE#         509
+  C:19B3H         LINE#         510
+  C:19B3H         LINE#         512
+  C:19BAH         LINE#         513
+  C:19BEH         LINE#         514
+  C:19C5H         LINE#         515
+  C:19C7H         LINE#         516
+  C:19C7H         LINE#         517
+  C:19CAH         LINE#         518
+  C:19CAH         LINE#         521
+  C:19D1H         LINE#         522
+  C:19E4H         LINE#         525
+  C:19E8H         LINE#         526
+  C:19F7H         LINE#         534
+  C:1A01H         LINE#         536
+  C:1A0BH         LINE#         540
+  C:1A15H         LINE#         548
+  C:1A17H         LINE#         549
+  -------         ENDPROC       _LIS2DH_CONFIGURE_FIFO
+  -------         PROC          LIS2DH_OPEN
+  -------         DO            
+  X:01B1H         SYMBOL        i2cAddressIndex
+  D:0007H         SYMBOL        DeviceID_regAddr
+  X:01B2H         SYMBOL        DeviceID_expect
+  X:01B3H         SYMBOL        DeviceID_actual
+  -------         ENDDO         
+  C:228FH         LINE#         556
+  C:228FH         LINE#         557
+  C:228FH         LINE#         589
+  C:22ABH         LINE#         590
+  C:22ABH         LINE#         591
+  C:22AFH         LINE#         597
+  C:22B1H         LINE#         598
+  C:22B7H         LINE#         600
+  C:22C8H         LINE#         604
+  C:22CAH         LINE#         605
+  C:22D7H         LINE#         618
+  C:22D9H         LINE#         619
+  C:22D9H         LINE#         628
+  C:22E0H         LINE#         631
+  C:22E7H         LINE#         632
+  C:22ECH         LINE#         640
+  C:22F1H         LINE#         645
+  C:22F8H         LINE#         677
+  C:22F8H         LINE#         678
+  C:2300H         LINE#         679
+  C:2305H         LINE#         680
+  -------         ENDPROC       LIS2DH_OPEN
+  -------         ENDMOD        LIS2DH
+
+  -------         MODULE        MAX30101
+  C:0000H         SYMBOL        _ICE_DUMMY_
+  X:01BDH         PUBLIC        gMAX30101deviceAddress
+  X:01BEH         PUBLIC        gMAX30101_ModeConfiguration_value
+  C:006FH         PUBLIC        searchMAX30101deviceAddressList
+  C:2D01H         PUBLIC        _max30101_RegRead
+  C:2C0DH         PUBLIC        _max30101_RegWrite
+  C:2823H         PUBLIC        max30101_open
+  -------         PROC          MAX30101_OPEN
+  -------         DO            
+  X:01B4H         SYMBOL        i2cAddressIndex
+  D:0007H         SYMBOL        DeviceID_regAddr
+  X:01B5H         SYMBOL        DeviceID_expect
+  X:01B6H         SYMBOL        DeviceID_actual
+  -------         ENDDO         
+  C:2823H         LINE#         79
+  C:2823H         LINE#         80
+  C:2823H         LINE#         112
+  C:283FH         LINE#         113
+  C:283FH         LINE#         114
+  C:2843H         LINE#         120
+  C:2845H         LINE#         121
+  C:284BH         LINE#         123
+  C:285CH         LINE#         127
+  C:285EH         LINE#         128
+  C:286BH         LINE#         141
+  C:286BH         LINE#         142
+  C:286BH         LINE#         163
+  C:286BH         LINE#         164
+  C:2873H         LINE#         165
+  C:2878H         LINE#         171
+  -------         ENDPROC       MAX30101_OPEN
+  -------         PROC          _MAX30101_REGREAD
+  D:0006H         SYMBOL        regAddress
+  D:0001H         SYMBOL        pRegValue
+  C:2D01H         LINE#         176
+  C:2D03H         LINE#         177
+  C:2D03H         LINE#         178
+  C:2D0DH         LINE#         179
+  -------         ENDPROC       _MAX30101_REGREAD
+  -------         PROC          _MAX30101_REGWRITE
+  D:0005H         SYMBOL        regAddress
+  D:0006H         SYMBOL        regValue
+  C:2C0DH         LINE#         184
+  C:2C11H         LINE#         185
+  C:2C11H         LINE#         187
+  C:2C15H         LINE#         188
+  C:2C1AH         LINE#         194
+  C:2C1AH         LINE#         195
+  C:2C24H         LINE#         196
+  -------         ENDPROC       _MAX30101_REGWRITE
+  -------         ENDMOD        MAX30101
+
+  -------         MODULE        MAX7311
+  C:0000H         SYMBOL        _ICE_DUMMY_
+  -------         ENDMOD        MAX7311
+
+  -------         MODULE        ?C?FPDIV
+  C:080DH         PUBLIC        ?C?FPDIV
+  -------         ENDMOD        ?C?FPDIV
+
+  -------         MODULE        ?C?FPCMP
+  C:08ACH         PUBLIC        ?C?FPCMP
+  C:08AAH         PUBLIC        ?C?FPCMP3
+  -------         ENDMOD        ?C?FPCMP
+
+  -------         MODULE        ?C?FPNEG
+  C:0923H         PUBLIC        ?C?FPNEG
+  -------         ENDMOD        ?C?FPNEG
+
+  -------         MODULE        ?C?FCAST
+  C:093EH         PUBLIC        ?C?FCASTC
+  C:0939H         PUBLIC        ?C?FCASTI
+  C:0934H         PUBLIC        ?C?FCASTL
+  -------         ENDMOD        ?C?FCAST
+
+  -------         MODULE        ?C?CASTF
+  C:0972H         PUBLIC        ?C?CASTF
+  -------         ENDMOD        ?C?CASTF
+
+  -------         MODULE        ?C?CLDPTR
+  C:09F3H         PUBLIC        ?C?CLDPTR
+  -------         ENDMOD        ?C?CLDPTR
+
+  -------         MODULE        ?C?CLDOPTR
+  C:0A0CH         PUBLIC        ?C?CLDOPTR
+  -------         ENDMOD        ?C?CLDOPTR
+
+  -------         MODULE        ?C?CSTPTR
+  C:0A39H         PUBLIC        ?C?CSTPTR
+  -------         ENDMOD        ?C?CSTPTR
+
+  -------         MODULE        ?C?CSTOPTR
+  C:0A4BH         PUBLIC        ?C?CSTOPTR
+  -------         ENDMOD        ?C?CSTOPTR
+
+  -------         MODULE        ?C?IILDX
+  C:0A6DH         PUBLIC        ?C?IILDX
+  -------         ENDMOD        ?C?IILDX
+
+  -------         MODULE        ?C?ISTPTR
+  C:0A83H         PUBLIC        ?C?ISTPTR
+  -------         ENDMOD        ?C?ISTPTR
+
+  -------         MODULE        ?C?ISTOPTR
+  C:0AA2H         PUBLIC        ?C?ISTOPTR
+  -------         ENDMOD        ?C?ISTOPTR
+
+  -------         MODULE        ?C?ULDIV
+  C:0B0BH         PUBLIC        ?C?ULDIV
+  -------         ENDMOD        ?C?ULDIV
+
+  -------         MODULE        ?C?LNEG
+  C:0B9DH         PUBLIC        ?C?LNEG
+  -------         ENDMOD        ?C?LNEG
+
+  -------         MODULE        ?C?LSTPTR
+  C:0BABH         PUBLIC        ?C?LSTPTR
+  -------         ENDMOD        ?C?LSTPTR
+
+  -------         MODULE        ?C?LSTXDATA
+  C:0BC5H         PUBLIC        ?C?LSTXDATA
+  -------         ENDMOD        ?C?LSTXDATA
+
+  -------         MODULE        ?C?LSTKXDATA
+  C:0BD1H         PUBLIC        ?C?LSTKXDATA
+  -------         ENDMOD        ?C?LSTKXDATA
+
+  -------         MODULE        ?C?LSTKPTR
+  C:0C02H         PUBLIC        ?C?LSTKPTR
+  -------         ENDMOD        ?C?LSTKPTR
+
+  -------         MODULE        ?C?ICASE
+  C:0C1CH         PUBLIC        ?C?ICASE
+  -------         ENDMOD        ?C?ICASE
+
+  -------         MODULE        ?C?LSTIDATA
+  C:0C49H         PUBLIC        ?C?LSTIDATA
+  -------         ENDMOD        ?C?LSTIDATA
+
+  -------         MODULE        ?C?LSTPDATA
+  C:0C55H         PUBLIC        ?C?LSTPDATA
+  -------         ENDMOD        ?C?LSTPDATA
+
+  -------         MODULE        ?C?LSTKIDATA
+  C:0C61H         PUBLIC        ?C?LSTKIDATA
+  -------         ENDMOD        ?C?LSTKIDATA
+
+  -------         MODULE        ?C?LSTKPDATA
+  C:0C7AH         PUBLIC        ?C?LSTKPDATA
+  -------         ENDMOD        ?C?LSTKPDATA
+
+
+
+INTER-MODULE CROSS-REFERENCE LISTING
+------------------------------------
+
+
+NAME . . . . . . . . . . . . . . . . USAGE    MODULE NAMES
+----------------------------------------------------------
+
+?C?CASTF . . . . . . . . . . . . . . CODE;    ?C?CASTF  F3XX_INITIALIZE  F3XX_USB0_REPORTHANDLER  
+?C?CLDOPTR . . . . . . . . . . . . . CODE;    ?C?CLDOPTR  F3XX_USB0_INTERRUPTSERVICEROUTINE  F3XX_USB0_REPORTHANDLER  
+?C?CLDPTR. . . . . . . . . . . . . . CODE;    ?C?CLDPTR  F3XX_USB0_STANDARD_REQUESTS  SMBUS  
+?C?CSTOPTR . . . . . . . . . . . . . CODE;    ?C?CSTOPTR  F3XX_USB0_INTERRUPTSERVICEROUTINE  F3XX_USB0_MAIN  F3XX_USB0_REPORTHANDLER
+                                                SMBUS  
+?C?CSTPTR. . . . . . . . . . . . . . CODE;    ?C?CSTPTR  F3XX_USB0_MAIN  F3XX_USB0_REPORTHANDLER  SMBUS  
+?C?FCASTC. . . . . . . . . . . . . . CODE;    ?C?FCAST  F3XX_USB0_REPORTHANDLER  
+?C?FCASTI. . . . . . . . . . . . . . CODE;    ?C?FCAST  
+?C?FCASTL. . . . . . . . . . . . . . CODE;    ?C?FCAST  
+?C?FPCMP . . . . . . . . . . . . . . CODE;    ?C?FPCMP  
+?C?FPCMP3. . . . . . . . . . . . . . CODE;    ?C?FPCMP  F3XX_INITIALIZE  
+?C?FPDIV . . . . . . . . . . . . . . CODE;    ?C?FPDIV  F3XX_INITIALIZE  F3XX_USB0_REPORTHANDLER  
+?C?FPGETOPN2 . . . . . . . . . . . . CODE;    ?C?FPGETOPN  ?C?FPDIV  
+?C?FPNANRESULT . . . . . . . . . . . CODE;    ?C?FPGETOPN  ?C?FPDIV  
+?C?FPNEG . . . . . . . . . . . . . . CODE;    ?C?FPNEG  F3XX_INITIALIZE  
+?C?FPOVERFLOW. . . . . . . . . . . . CODE;    ?C?FPGETOPN  ?C?FPDIV  
+?C?FPRESULT. . . . . . . . . . . . . CODE;    ?C?FPGETOPN  ?C?FPDIV  
+?C?FPRESULT2 . . . . . . . . . . . . CODE;    ?C?FPGETOPN  ?C?FPDIV  
+?C?FPUNDERFLOW . . . . . . . . . . . CODE;    ?C?FPGETOPN  ?C?FPDIV  
+?C?ICASE . . . . . . . . . . . . . . CODE;    ?C?ICASE  LIS2DH  
+?C?IILDX . . . . . . . . . . . . . . CODE;    ?C?IILDX  F3XX_USB0_INTERRUPTSERVICEROUTINE  
+?C?ISTOPTR . . . . . . . . . . . . . CODE;    ?C?ISTOPTR  F3XX_USB0_MAIN  
+?C?ISTPTR. . . . . . . . . . . . . . CODE;    ?C?ISTPTR  LIS2DH  
+?C?LNEG. . . . . . . . . . . . . . . CODE;    ?C?LNEG  ?C?CASTF  ?C?FCAST  F3XX_INITIALIZE  
+?C?LSTIDATA. . . . . . . . . . . . . CODE;    ?C?LSTIDATA  ?C?LSTPTR  
+?C?LSTKIDATA . . . . . . . . . . . . CODE;    ?C?LSTKIDATA  ?C?LSTKPTR  
+?C?LSTKPDATA . . . . . . . . . . . . CODE;    ?C?LSTKPDATA  ?C?LSTKPTR  
+?C?LSTKPTR . . . . . . . . . . . . . CODE;    ?C?LSTKPTR  F3XX_INITIALIZE  
+?C?LSTKXDATA . . . . . . . . . . . . CODE;    ?C?LSTKXDATA  ?C?LSTKPTR  F3XX_INITIALIZE  F3XX_USB0_MAIN  
+?C?LSTPDATA. . . . . . . . . . . . . CODE;    ?C?LSTPDATA  ?C?LSTPTR  
+?C?LSTPTR. . . . . . . . . . . . . . CODE;    ?C?LSTPTR  F3XX_INITIALIZE  
+?C?LSTXDATA. . . . . . . . . . . . . CODE;    ?C?LSTXDATA  ?C?LSTPTR  F3XX_USB0_REPORTHANDLER  
+?C?ULDIV . . . . . . . . . . . . . . CODE;    ?C?ULDIV  F3XX_INITIALIZE  
+?C_INITSEGSTART. . . . . . . . . . . CODE;    ** L51 GENERATED **  
+?C_START . . . . . . . . . . . . . . CODE;    ?C_INIT  ?C_STARTUP  
+?C_STARTUP . . . . . . . . . . . . . CODE;    ?C_STARTUP  F3XX_USB0_MAIN  
+?_I2C_READ?BYTE. . . . . . . . . . . XDATA;   SMBUS  F3XX_USB0_REPORTHANDLER  
+?_I2C_WRITE?BYTE . . . . . . . . . . XDATA;   SMBUS  F3XX_USB0_REPORTHANDLER  
+?_LIS2DH_READ_XYZ?BYTE . . . . . . . XDATA;   LIS2DH  F3XX_USB0_REPORTHANDLER  
+BLOCKARR . . . . . . . . . . . . . . XDATA;   F3XX_USB0_REPORTHANDLER  
+CLEARSDA . . . . . . . . . . . . . . CODE;    SMBUS  F3XX_USB0_REPORTHANDLER  
+CLEAR_FEATURE. . . . . . . . . . . . CODE;    F3XX_USB0_STANDARD_REQUESTS  F3XX_USB0_INTERRUPTSERVICEROUTINE  
+DATAPTR. . . . . . . . . . . . . . . XDATA;   F3XX_USB0_INTERRUPTSERVICEROUTINE  F3XX_USB0_STANDARD_REQUESTS  
+DATASENT . . . . . . . . . . . . . . XDATA;   F3XX_USB0_INTERRUPTSERVICEROUTINE  F3XX_USB0_STANDARD_REQUESTS  
+DATASIZE . . . . . . . . . . . . . . XDATA;   F3XX_USB0_INTERRUPTSERVICEROUTINE  F3XX_USB0_STANDARD_REQUESTS  
+DEVICEDESC . . . . . . . . . . . . . CODE;    F3XX_USB0_DESCRIPTOR  F3XX_USB0_STANDARD_REQUESTS  
+EP_STATUS. . . . . . . . . . . . . . XDATA;   F3XX_USB0_INTERRUPTSERVICEROUTINE  F3XX_USB0_STANDARD_REQUESTS  
+FLASH_LED1H_LED2H_100MS. . . . . . . CODE;    F3XX_USB0_REPORTHANDLER  F3XX_USB0_MAIN  
+FLASH_LED1H_LED2L_100MS. . . . . . . CODE;    F3XX_USB0_REPORTHANDLER  F3XX_USB0_MAIN  
+FLASH_LED1LED2_BLINK . . . . . . . . CODE;    F3XX_USB0_REPORTHANDLER  
+FLASH_LED1LED2_EAST. . . . . . . . . CODE;    F3XX_USB0_REPORTHANDLER  F3XX_USB0_MAIN  
+FLASH_LED1L_LED2H_100MS. . . . . . . CODE;    F3XX_USB0_REPORTHANDLER  F3XX_USB0_MAIN  
+FLASH_LED1L_LED2L_100MS. . . . . . . CODE;    F3XX_USB0_REPORTHANDLER  F3XX_USB0_MAIN  
+FORCE_STALL. . . . . . . . . . . . . CODE;    F3XX_USB0_INTERRUPTSERVICEROUTINE  F3XX_USB0_STANDARD_REQUESTS  
+GET_CONFIGURATION. . . . . . . . . . CODE;    F3XX_USB0_STANDARD_REQUESTS  F3XX_USB0_INTERRUPTSERVICEROUTINE  
+GET_DESCRIPTOR . . . . . . . . . . . CODE;    F3XX_USB0_STANDARD_REQUESTS  F3XX_USB0_INTERRUPTSERVICEROUTINE  
+GET_IDLE . . . . . . . . . . . . . . CODE;    F3XX_USB0_STANDARD_REQUESTS  F3XX_USB0_INTERRUPTSERVICEROUTINE  
+GET_INTERFACE. . . . . . . . . . . . CODE;    F3XX_USB0_STANDARD_REQUESTS  F3XX_USB0_INTERRUPTSERVICEROUTINE  
+GET_PROTOCOL . . . . . . . . . . . . CODE;    F3XX_USB0_STANDARD_REQUESTS  F3XX_USB0_INTERRUPTSERVICEROUTINE  
+GET_REPORT . . . . . . . . . . . . . CODE;    F3XX_USB0_STANDARD_REQUESTS  F3XX_USB0_INTERRUPTSERVICEROUTINE  
+GET_STATUS . . . . . . . . . . . . . CODE;    F3XX_USB0_STANDARD_REQUESTS  F3XX_USB0_INTERRUPTSERVICEROUTINE  
+GI2CFLAGS. . . . . . . . . . . . . . XDATA;   SMBUS  F3XX_USB0_REPORTHANDLER  
+GLIS2DHDEVICEADDRESS . . . . . . . . XDATA;   LIS2DH  F3XX_USB0_MAIN  F3XX_USB0_REPORTHANDLER  
+GLIS2DHNUMINTSERVICED. . . . . . . . XDATA;   F3XX_USB0_REPORTHANDLER  
+GLIS2DHREADY . . . . . . . . . . . . XDATA;   F3XX_USB0_REPORTHANDLER  F3XX_USB0_MAIN  
+GMAX30101DEVICEADDRESS . . . . . . . XDATA;   MAX30101  F3XX_USB0_MAIN  F3XX_USB0_REPORTHANDLER  
+GMAX30101_MODECONFIGURATION_VALUE. . XDATA;   MAX30101  F3XX_USB0_REPORTHANDLER  
+GMOCKHID2X . . . . . . . . . . . . . XDATA;   F3XX_USB0_REPORTHANDLER  
+GMOCKHID2Y . . . . . . . . . . . . . XDATA;   F3XX_USB0_REPORTHANDLER  
+GMOCKHID2Z . . . . . . . . . . . . . XDATA;   F3XX_USB0_REPORTHANDLER  
+GMOCKHIDFIFOCH1. . . . . . . . . . . XDATA;   F3XX_USB0_REPORTHANDLER  
+GMOCKHIDFIFOCH2. . . . . . . . . . . XDATA;   F3XX_USB0_REPORTHANDLER  
+GMOCKHIDFIFOCH3. . . . . . . . . . . XDATA;   F3XX_USB0_REPORTHANDLER  
+GMOCKHIDFIFOCH4. . . . . . . . . . . XDATA;   F3XX_USB0_REPORTHANDLER  
+GMOCKHIDFIFOCHANNEL. . . . . . . . . XDATA;   F3XX_USB0_REPORTHANDLER  
+GMOCKHIDFIFOCHANNELS . . . . . . . . XDATA;   F3XX_USB0_REPORTHANDLER  
+GMOCKHIDREPORT2. . . . . . . . . . . XDATA;   F3XX_USB0_REPORTHANDLER  
+GOFFSET. . . . . . . . . . . . . . . XDATA;   F3XX_USB0_REPORTHANDLER  SMBUS  
+GOS21NUMINTSERVICED. . . . . . . . . XDATA;   F3XX_USB0_REPORTHANDLER  
+GOS21READY . . . . . . . . . . . . . XDATA;   F3XX_USB0_REPORTHANDLER  F3XX_USB0_MAIN  
+GPSMBDATA. . . . . . . . . . . . . . XDATA;   SMBUS  
+GSMBACKPOLL. . . . . . . . . . . . . BIT;     SMBUS  
+GSMBBUSY . . . . . . . . . . . . . . BIT;     SMBUS  F3XX_INITIALIZE  
+GSMBLENSTARTREGISTER . . . . . . . . XDATA;   SMBUS  
+GSMBNUMBYTESTOTRANSFER . . . . . . . XDATA;   SMBUS  
+GSMBRANDOMREAD . . . . . . . . . . . BIT;     SMBUS  
+GSMBREPEATEDSTART. . . . . . . . . . BIT;     SMBUS  
+GSMBRW . . . . . . . . . . . . . . . BIT;     SMBUS  
+GSMBSENDSTARTREGISTER. . . . . . . . BIT;     SMBUS  
+GSMBSLAVEADDRESS . . . . . . . . . . XDATA;   SMBUS  
+GSMBSTOPPEDWRITE . . . . . . . . . . BIT;     SMBUS  
+GSMBUSCLKFREQ. . . . . . . . . . . . XDATA;   F3XX_INITIALIZE  F3XX_USB0_MAIN  F3XX_USB0_REPORTHANDLER  
+GSYSCLKFREQ. . . . . . . . . . . . . XDATA;   F3XX_INITIALIZE  F3XX_USB0_REPORTHANDLER  
+GTIMER1CLKFREQ . . . . . . . . . . . XDATA;   F3XX_INITIALIZE  F3XX_USB0_REPORTHANDLER  
+HANDLE_CONTROL . . . . . . . . . . . CODE;    F3XX_USB0_INTERRUPTSERVICEROUTINE  
+HANDLE_IN3 . . . . . . . . . . . . . CODE;    F3XX_USB0_INTERRUPTSERVICEROUTINE  F3XX_USB0_STANDARD_REQUESTS  
+HANDLE_OUT3. . . . . . . . . . . . . CODE;    F3XX_USB0_INTERRUPTSERVICEROUTINE  
+HIDCONFIGDESC. . . . . . . . . . . . CODE;    F3XX_USB0_DESCRIPTOR  F3XX_USB0_STANDARD_REQUESTS  
+HIDREPORTDESC. . . . . . . . . . . . CODE;    F3XX_USB0_DESCRIPTOR  F3XX_USB0_STANDARD_REQUESTS  
+INT0_INIT. . . . . . . . . . . . . . CODE;    F3XX_INITIALIZE  
+INT0_ISR . . . . . . . . . . . . . . CODE;    F3XX_USB0_REPORTHANDLER  
+INT1_ISR . . . . . . . . . . . . . . CODE;    F3XX_USB0_REPORTHANDLER  
+IO_BUFFER. . . . . . . . . . . . . . XDATA;   F3XX_USB0_REPORTHANDLER  F3XX_USB0_INTERRUPTSERVICEROUTINE  F3XX_USB0_STANDARD_REQUEST
+                                              S  
+IO_PACKET. . . . . . . . . . . . . . XDATA;   F3XX_INITIALIZE  F3XX_USB0_REPORTHANDLER  
+LIS2DH_OPEN. . . . . . . . . . . . . CODE;    LIS2DH  F3XX_USB0_MAIN  
+MAIN . . . . . . . . . . . . . . . . CODE;    F3XX_USB0_MAIN  ?C_INIT  
+MAX30101_OPEN. . . . . . . . . . . . CODE;    MAX30101  F3XX_USB0_MAIN  
+ONES_PACKET. . . . . . . . . . . . . CODE;    F3XX_USB0_STANDARD_REQUESTS  
+PORT_INIT. . . . . . . . . . . . . . CODE;    F3XX_INITIALIZE  
+READLIS2DH . . . . . . . . . . . . . CODE;    F3XX_USB0_REPORTHANDLER  F3XX_USB0_MAIN  
+READOS21 . . . . . . . . . . . . . . CODE;    F3XX_USB0_REPORTHANDLER  F3XX_USB0_MAIN  
+SEARCHLIS2DHDEVICEADDRESSLIST. . . . CODE;    LIS2DH  
+SEARCHMAX30101DEVICEADDRESSLIST. . . CODE;    MAX30101  
+SENDPACKET . . . . . . . . . . . . . CODE;    F3XX_USB0_INTERRUPTSERVICEROUTINE  F3XX_USB0_REPORTHANDLER  
+SENDPACKETWAITEP1INREADY . . . . . . CODE;    F3XX_USB0_INTERRUPTSERVICEROUTINE  F3XX_USB0_REPORTHANDLER  
+SETUP. . . . . . . . . . . . . . . . XDATA;   F3XX_USB0_INTERRUPTSERVICEROUTINE  F3XX_USB0_STANDARD_REQUESTS  
+SETUP_IO_BUFFER. . . . . . . . . . . CODE;    F3XX_USB0_REPORTHANDLER  F3XX_USB0_INTERRUPTSERVICEROUTINE  F3XX_USB0_STANDARD_REQUEST
+                                              S  
+SET_ADDRESS. . . . . . . . . . . . . CODE;    F3XX_USB0_STANDARD_REQUESTS  F3XX_USB0_INTERRUPTSERVICEROUTINE  
+SET_CONFIGURATION. . . . . . . . . . CODE;    F3XX_USB0_STANDARD_REQUESTS  F3XX_USB0_INTERRUPTSERVICEROUTINE  
+SET_FEATURE. . . . . . . . . . . . . CODE;    F3XX_USB0_STANDARD_REQUESTS  F3XX_USB0_INTERRUPTSERVICEROUTINE  
+SET_IDLE . . . . . . . . . . . . . . CODE;    F3XX_USB0_STANDARD_REQUESTS  F3XX_USB0_INTERRUPTSERVICEROUTINE  
+SET_INTERFACE. . . . . . . . . . . . CODE;    F3XX_USB0_STANDARD_REQUESTS  F3XX_USB0_INTERRUPTSERVICEROUTINE  
+SET_PROTOCOL . . . . . . . . . . . . CODE;    F3XX_USB0_STANDARD_REQUESTS  F3XX_USB0_INTERRUPTSERVICEROUTINE  
+SET_REPORT . . . . . . . . . . . . . CODE;    F3XX_USB0_STANDARD_REQUESTS  F3XX_USB0_INTERRUPTSERVICEROUTINE  
+SMBUS_INIT . . . . . . . . . . . . . CODE;    F3XX_INITIALIZE  
+SMBUS_ISR. . . . . . . . . . . . . . CODE;    SMBUS  
+STRING0DESC. . . . . . . . . . . . . CODE;    F3XX_USB0_DESCRIPTOR  
+STRING1DESC. . . . . . . . . . . . . CODE;    F3XX_USB0_DESCRIPTOR  
+STRING2DESC. . . . . . . . . . . . . CODE;    F3XX_USB0_DESCRIPTOR  
+STRINGDESCTABLE. . . . . . . . . . . XDATA;   F3XX_USB0_DESCRIPTOR  F3XX_USB0_STANDARD_REQUESTS  
+SYSCLK_INIT. . . . . . . . . . . . . CODE;    F3XX_INITIALIZE  
+SYSTEM_INIT. . . . . . . . . . . . . CODE;    F3XX_INITIALIZE  F3XX_USB0_MAIN  
+TESTOS21INTTIMING. . . . . . . . . . CODE;    F3XX_USB0_REPORTHANDLER  
+TIMER1_INIT. . . . . . . . . . . . . CODE;    F3XX_INITIALIZE  F3XX_USB0_REPORTHANDLER  
+TIMER3_INIT. . . . . . . . . . . . . CODE;    F3XX_INITIALIZE  
+TIMER3_ISR . . . . . . . . . . . . . CODE;    F3XX_INITIALIZE  
+USB0_STATE . . . . . . . . . . . . . XDATA;   F3XX_USB0_INTERRUPTSERVICEROUTINE  F3XX_USB0_STANDARD_REQUESTS  
+USB_INIT . . . . . . . . . . . . . . CODE;    F3XX_INITIALIZE  
+USB_ISR. . . . . . . . . . . . . . . CODE;    F3XX_USB0_INTERRUPTSERVICEROUTINE  
+USB_RESET. . . . . . . . . . . . . . CODE;    F3XX_USB0_INTERRUPTSERVICEROUTINE  
+USB_RESUME . . . . . . . . . . . . . CODE;    F3XX_USB0_INTERRUPTSERVICEROUTINE  
+USB_SUSPEND. . . . . . . . . . . . . CODE;    F3XX_USB0_INTERRUPTSERVICEROUTINE  
+VERSIONINFO. . . . . . . . . . . . . XDATA;   F3XX_USB0_MAIN  F3XX_USB0_REPORTHANDLER  
+ZERO_PACKET. . . . . . . . . . . . . CODE;    F3XX_USB0_STANDARD_REQUESTS  
+_FIFO_READ . . . . . . . . . . . . . CODE;    F3XX_USB0_INTERRUPTSERVICEROUTINE  
+_FIFO_WRITE_FOREGROUND . . . . . . . CODE;    F3XX_USB0_INTERRUPTSERVICEROUTINE  
+_FIFO_WRITE_INTERRUPTSERVICEROUTINE. CODE;    F3XX_USB0_INTERRUPTSERVICEROUTINE  
+_GETTIMER0OR1CLKFREQ . . . . . . . . CODE;    F3XX_INITIALIZE  
+_GETTIMER3CLKFREQ. . . . . . . . . . CODE;    F3XX_INITIALIZE  
+_I2C_READ. . . . . . . . . . . . . . CODE;    SMBUS  F3XX_USB0_REPORTHANDLER  
+_I2C_SMBUS_READ_BYTE_DATA. . . . . . CODE;    F3XX_USB0_REPORTHANDLER  LIS2DH  MAX30101  
+_I2C_SMBUS_WRITE_BYTE_DATA . . . . . CODE;    F3XX_USB0_REPORTHANDLER  LIS2DH  MAX30101  
+_I2C_WRITE . . . . . . . . . . . . . CODE;    SMBUS  F3XX_USB0_REPORTHANDLER  
+_LIS2DH_CONFIGURE_BDU. . . . . . . . CODE;    LIS2DH  
+_LIS2DH_CONFIGURE_FIFO . . . . . . . CODE;    LIS2DH  F3XX_USB0_REPORTHANDLER  
+_LIS2DH_CONFIGURE_OUTPUTDATARATEHZ . CODE;    LIS2DH  
+_LIS2DH_CONFIGURE_RESOLUTIONBITS . . CODE;    LIS2DH  
+_LIS2DH_READ_16BIT . . . . . . . . . CODE;    LIS2DH  
+_LIS2DH_READ_XYZ . . . . . . . . . . CODE;    LIS2DH  F3XX_USB0_REPORTHANDLER  
+_LIS2DH_REGREAD. . . . . . . . . . . CODE;    LIS2DH  F3XX_USB0_REPORTHANDLER  
+_LIS2DH_REGWRITE . . . . . . . . . . CODE;    LIS2DH  
+_MAX30101_REGREAD. . . . . . . . . . CODE;    MAX30101  
+_MAX30101_REGWRITE . . . . . . . . . CODE;    MAX30101  
+_OUT_REPORT_HANDLER. . . . . . . . . CODE;    F3XX_USB0_REPORTHANDLER  F3XX_USB0_INTERRUPTSERVICEROUTINE  
+_T0_WAIT . . . . . . . . . . . . . . CODE;    F3XX_INITIALIZE  F3XX_USB0_REPORTHANDLER  
+_TIMER0_INIT . . . . . . . . . . . . CODE;    F3XX_INITIALIZE  F3XX_USB0_REPORTHANDLER  
+_UPDATEVERSION . . . . . . . . . . . CODE;    F3XX_USB0_MAIN  
+
+Program Size: data=10.7 xdata=451 code=11577
+LINK/LOCATE RUN COMPLETE.  0 WARNING(S),  0 ERROR(S)

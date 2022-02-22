@@ -1,0 +1,413 @@
+C51 COMPILER V9.51   F3XX_USB0_DESCRIPTOR                                                  06/26/2015 13:32:25 PAGE 1   
+
+
+C51 COMPILER V9.51, COMPILATION OF MODULE F3XX_USB0_DESCRIPTOR
+OBJECT MODULE PLACED IN F3xx_USB0_Descriptor.OBJ
+COMPILER INVOKED BY: c:\keil\C51\BIN\C51.exe F3xx_USB0_Descriptor.c DB OE LARGE CD
+
+line level    source
+
+   1          //-----------------------------------------------------------------------------
+   2          // F3xx_USB0_Descriptor.c
+   3          //-----------------------------------------------------------------------------
+   4          // Copyright 2014
+   5          //
+   6          // Program Description:
+   7          //
+   8          // Source file for USB HID firmware. Includes descriptor data.
+   9          //
+  10          //
+  11          // FID:            3XX000004
+  12          // Target:         C8051F32x/C8051F340
+  13          // Tool chain:     Keil C51 7.50 / Keil EVAL C51
+  14          //                 Silicon Laboratories IDE version 2.6
+  15          // Project Name:   Generic HID Firmware
+  16          //
+  17          //
+  18          // Release 1.0
+  19          //    -140401 Initial Revision (Tushar Mazumder)
+  20          //
+  21          // Update PID and product string in this file.
+  22          
+  23          //-----------------------------------------------------------------------------
+  24          // Includes
+  25          //-----------------------------------------------------------------------------
+  26          
+  27          // Project-level preprocessor #defines effective across all *.c files
+  28          #include "ProjectDefines.h"
+*** MESSAGE C286 IN LINE 169 OF ProjectDefines.h: writeReadHID() EP3OUT 256-byte buffer
+*** MESSAGE C286 IN LINE 170 OF ProjectDefines.h: writeReadHID() EP3IN 256-byte buffer
+*** MESSAGE C286 IN LINE 171 OF ProjectDefines.h: USB_EP_INDEX 3 for EP_STATUS[USB_EP_INDEX] and POLL_WRITE_BYTE (INDEX,
+             - USB_EP_INDEX);
+  29          
+  30          #include "F3xx_USB0_Register.h"
+  31          #include "F3xx_USB0_InterruptServiceRoutine.h"
+  32          #include "F3xx_USB0_Descriptor.h"
+  33          #include "F3xx_Initialize.h"
+  34          //-----------------------------------------------------------------------------
+  35          // Descriptor Declarations
+  36          //-----------------------------------------------------------------------------
+  37          
+  38          // LSB first
+  39          
+  40          code const device_descriptor DEVICEDESC =
+  41          {
+  42             18,                                 // bLength must be 18 bytes for DeviceDescriptor DSC_DEVICE
+  43             0x01,                               // bDescriptorType   1: DeviceDescriptor DSC_DEVICE
+  44             0x1001,                             // bcdUSB                                USB 1.1 (01.10)
+  45             0x00,                               // bDeviceClass
+  46             0x00,                               // bDeviceSubClass
+  47             0x00,                               // bDeviceProtocol
+  48             EP0_PACKET_SIZE,                    // bMaxPacketSize0
+  49          // VERIFY: OS24EVK-66 use SWAP_HIGH_AND_LOW_BYTE(data16) macro to convert big-endian to little-endian
+  50          #if SUPPORT_MAX30100
+                 SWAP_HIGH_AND_LOW_BYTE(0x0B6A),     // idVendor                              0x0B6A: Maxim Integrated
+C51 COMPILER V9.51   F3XX_USB0_DESCRIPTOR                                                  06/26/2015 13:32:25 PAGE 2   
+
+                 SWAP_HIGH_AND_LOW_BYTE(0x1364),     // idProduct                             0x1364: MAX30100
+              #elif SUPPORT_MAX30101
+  54             SWAP_HIGH_AND_LOW_BYTE(0x0B6A),     // idVendor                              0x0B6A: Maxim Integrated
+  55             SWAP_HIGH_AND_LOW_BYTE(0x1365),     // idProduct                             0x1365: MAX30101
+  56          #else
+                 // default USB VID/PID
+                 SWAP_HIGH_AND_LOW_BYTE(0x0B6A),     // idVendor                              0x0B6A: Maxim Integrated
+                 SWAP_HIGH_AND_LOW_BYTE(0x1365),     // idProduct                             0x1364: MAX30100
+              #endif // SUPPORT_MAX30100
+  61             0x0000,                             // bcdDevice         Device release number in binary-coded decimal
+  62             0x01,                               // iManufacturer     String1Desc, // Manufacturer String
+  63             0x02,                               // iProduct          String2Desc  // Product ID String
+  64             0x00,                               // iSerialNumber     String3Desc  // Serial Number String (optional
+             -)
+  65             0x01                                // bNumConfigurations   Number of possible configurations
+  66          }; //end of DEVICEDESC
+  67          
+  68          // From "USB Device Class Definition for Human Interface Devices (HID)".
+  69          // Section 7.1:
+  70          // "When a Get_Descriptor(Configuration) request is issued,
+  71          // it returns the Configuration descriptor, all Interface descriptors,
+  72          // all Endpoint descriptors, and the HID descriptor for each interface."
+  73          code const hid_configuration_descriptor HIDCONFIGDESC =
+  74          {
+  75          
+  76          { // configuration_descriptor hid_configuration_descriptor
+  77             0x09,                               // bLength must be 9 bytes for ConfigurationDescriptor DSC_CONFIG
+  78             0x02,                               // bDescriptorType   2: ConfigurationDescriptor DSC_CONFIG
+  79          // VERIFY: OS24EVK-66 use SWAP_HIGH_AND_LOW_BYTE(data16) macro to convert big-endian to little-endian
+  80          # if 1
+  81          //#  if USB_SUPPORT_EP1OUT
+  82             SWAP_HIGH_AND_LOW_BYTE( 9 + 9 + 9 + 7 + 7 ),     // Totallength (= 9+9+9+7+7)        0x0029; this is the sum o
+             -f the length of all descriptors except the hid_report_descriptor
+  83          //#  else // USB_SUPPORT_EP1OUT
+  84          //   SWAP_HIGH_AND_LOW_BYTE( 9 + 9 + 9 + 7     ),     // Totallength (= 9+9+9+7+7)      0x0029; this is the sum
+             - of the length of all descriptors except the hid_report_descriptor
+  85          //#  endif // USB_SUPPORT_EP1OUT
+  86          # else
+                 0x2900,                             // Totallength (= 9+9+9+7+7)     0x0029; this is the sum of the length 
+             -of all descriptors except the hid_report_descriptor
+              # endif
+  89             0x01,                               // NumInterfaces
+  90             0x01,                               // bConfigurationValue
+  91             0x00,                               // iConfiguration       String4Desc  // Configuration Name String (
+             -optional)
+  92             0x80,                               // bmAttributes 0x80:Reserved1 0x40:SelfPowered 0x20:RemoteWakeup 0
+             -x1F:Reserved00000
+  93             0x20                                // MaxPower (in 2mA units)
+  94          },
+  95          
+  96          { // interface_descriptor hid_interface_descriptor
+  97             0x09,                               // bLength must be 9 bytes for InterfaceDescriptor DSC_INTERFACE
+  98             0x04,                               // bDescriptorType   4: InterfaceDescriptor DSC_INTERFACE
+  99             0x00,                               // bInterfaceNumber
+ 100             0x00,                               // bAlternateSetting
+ 101          //# if USB_SUPPORT_EP1OUT
+ 102             0x02,                               // bNumEndpoints (not including EP0)
+ 103          //# else // USB_SUPPORT_EP1OUT
+ 104          //   0x01,                               // bNumEndpoints (not including EP0)
+ 105          //# endif // USB_SUPPORT_EP1OUT
+ 106             0x03,                               // bInterfaceClass (3 = HID)
+ 107             0x00,                               // bInterfaceSubClass
+C51 COMPILER V9.51   F3XX_USB0_DESCRIPTOR                                                  06/26/2015 13:32:25 PAGE 3   
+
+ 108             0x00,                               // bInterfaceProcotol
+ 109             0x00                                // iInterface           String5Desc  // Interface Name String (opti
+             -onal)
+ 110          },
+ 111          
+ 112          { // class_descriptor hid_descriptor
+ 113             0x09,                                   // bLength
+ 114             0x21,                                   // bDescriptorType   0x21: HIDDescriptor DSC_HID
+ 115             0x0101,                                 // bcdHID                            1.01
+ 116             0x00,                                   // bCountryCode
+ 117             0x01,                                   // bNumDescriptors
+ 118             0x22,                               // bDescriptorType   0x22: HIDReportDescriptor DSC_HID_REPORT
+ 119          # if 1
+ 120          // VERIFY: OS24EVK-66 use SWAP_HIGH_AND_LOW_BYTE(data16) macro to convert big-endian to little-endian
+ 121             SWAP_HIGH_AND_LOW_BYTE(HID_REPORT_DESCRIPTOR_SIZE)       // wItemLength (tot. len. of hid_report_descri
+             -ptor; this includes the identifier byte - THIS IS DEPENDENT ON THE NUMBER OF REPORTS!)
+ 122          # else
+                 HID_REPORT_DESCRIPTOR_SIZE_LE       // wItemLength (tot. len. of hid_report_descriptor; this includes t
+             -he identifier byte - THIS IS DEPENDENT ON THE NUMBER OF REPORTS!)
+              # endif
+ 125          },
+ 126          
+ 127          // IN endpoint (mandatory for HID)
+ 128          { // endpoint_descriptor hid_endpoint_in_descriptor
+ 129             0x07,                               // bLength must be 7 bytes for EndPointDescriptor DSC_ENDPOINT
+ 130             0x05,                               // bDescriptorType   5: EndPointDescriptor DSC_ENDPOINT
+ 131          #if USB_writeReadHID_EP1OUT_EP1IN
+                 // VERIFY: OS24EVK-66 can we use EP2IN or EP3IN instead of EP1IN INTERRUPT endpoint?
+                 0x81,                               // bEndpointAddress 0x81:EP1IN 0x01:EP1OUT 0x82:EP2IN 0x83:EP3IN
+              #elif USB_writeReadHID_EP2OUT_EP2IN
+                 0x82,                               // bEndpointAddress 0x81:EP1IN 0x01:EP1OUT 0x82:EP2IN 0x83:EP3IN
+              #elif USB_writeReadHID_EP3OUT_EP3IN
+ 137             0x83,                               // bEndpointAddress 0x81:EP1IN 0x01:EP1OUT 0x82:EP2IN 0x83:EP3IN
+ 138          #endif // USB_writeReadHID_EP1OUT_EP1IN
+ 139             0x03,                               // bmAttributes 0:Control 1:Isochronous 2:Bulk 3:Interrupt
+ 140          // VERIFY: OS24EVK-66 use SWAP_HIGH_AND_LOW_BYTE(data16) macro to convert big-endian to little-endian
+ 141          //# if 1
+ 142             SWAP_HIGH_AND_LOW_BYTE(EP1_PACKET_SIZE),                 // MaxPacketSize (LITTLE ENDIAN)
+ 143          //# else
+ 144          //   EP1_PACKET_SIZE_LE,                 // MaxPacketSize (LITTLE ENDIAN)
+ 145          //# endif
+ 146             1                                   // bInterval (Interrupt polling interval in milliseconds)
+ 147          },
+ 148          
+ 149          //#if USB_SUPPORT_EP1OUT
+ 150          // OUT endpoint (optional for HID)
+ 151          { // endpoint_descriptor hid_endpoint_out_descriptor
+ 152             0x07,                               // bLength must be 7 bytes for EndPointDescriptor DSC_ENDPOINT
+ 153             0x05,                               // bDescriptorType   5: EndPointDescriptor  DSC_ENDPOINT
+ 154          #if USB_writeReadHID_EP1OUT_EP1IN
+                 // VERIFY: OS24EVK-66 can we use EP2IN or EP3IN instead of EP1IN INTERRUPT endpoint?
+                 0x01,                               // bEndpointAddress 0x81:EP1IN 0x01:EP1OUT 0x02:EP2OUT 0x03:EP3OUT
+              #elif USB_writeReadHID_EP2OUT_EP2IN
+                 0x02,                               // bEndpointAddress 0x81:EP1IN 0x01:EP1OUT 0x02:EP2OUT 0x03:EP3OUT
+              #elif USB_writeReadHID_EP3OUT_EP3IN
+ 160             0x03,                               // bEndpointAddress 0x81:EP1IN 0x01:EP1OUT 0x02:EP2OUT 0x03:EP3OUT
+ 161          #endif // USB_writeReadHID_EP1OUT_EP1IN
+ 162             0x03,                               // bmAttributes 0:Control 1:Isochronous 2:Bulk 3:Interrupt
+ 163          // VERIFY: OS24EVK-66 use SWAP_HIGH_AND_LOW_BYTE(data16) macro to convert big-endian to little-endian
+ 164          //# if 1
+ 165             SWAP_HIGH_AND_LOW_BYTE(EP1_PACKET_SIZE),                 // MaxPacketSize (LITTLE ENDIAN)
+ 166          //# else
+C51 COMPILER V9.51   F3XX_USB0_DESCRIPTOR                                                  06/26/2015 13:32:25 PAGE 4   
+
+ 167          //   EP1_PACKET_SIZE_LE,                 // MaxPacketSize (LITTLE ENDIAN)
+ 168          //# endif
+ 169             1                                   // bInterval (Interrupt polling interval in milliseconds)
+ 170          }
+ 171          //#endif // USB_SUPPORT_EP1OUT
+ 172          
+ 173          };
+ 174          
+ 175          // VERIFY: OS24EVK-66 update *F3xx_USB0_Descriptor.c* hid_report_descriptor to define HID REPORT_ID(2) for
+             -mat
+ 176          // see http://stackoverflow.com/questions/21606991/custom-hid-device-hid-report-descriptor
+ 177          code const hid_report_descriptor HIDREPORTDESC =
+ 178          {
+ 179              0x06, 0x00, 0xff,                  // (GLOBAL) USAGE_PAGE (Vendor Defined Page 1) 0xFF00 Vendor-define
+             -d 
+ 180              0x09, 0x01,                        //   (LOCAL)  USAGE (Vendor Usage 1)
+ 181              0xa1, 0x01,                        // (MAIN)COLLECTION (Application)
+ 182                  // 7 bytes
+ 183          
+ 184             
+ 185          #ifdef EXPLICIT_REPORT_ID
+ 186              0x85, HID_REPORT_ID_1,    // 0x01  // (GLOBAL) REPORT_ID(1)                                         1000 01 nn
+ 187          #endif
+ 188              0x95, SHORT_REPORT_COUNT, // 0x3F  // (GLOBAL) REPORT_COUNT(SHORT_REPORT_COUNT)     1001 01 nn
+ 189              0x75, 0x08,                        //   (GLOBAL) REPORT_SIZE (8) in bits    0111 01 nn
+ 190              0x09, 0x01,                        //   (LOCAL)  USAGE (Vendor Usage 1)
+ 191          // TODO: OS24EVK-66 HID_Descriptor_Tool Error: LOGICAL MIN MUST be defined 
+ 192          // TODO: OS24EVK-66 HID_Descriptor_Tool Error: LOGICAL MAX MUST be defined 
+ 193          //#if USB_SUPPORT_EP1OUT
+ 194              0x91, 0x02,                        //   (MAIN)   OUTPUT (Data,Var,Abs)
+ 195          //#endif // USB_SUPPORT_EP1OUT
+ 196              0x75, 0x08,                        //   (GLOBAL) REPORT_SIZE (8)
+ 197              0x09, 0x01,                        //   (LOCAL)  USAGE (Vendor Usage 1)
+ 198          // TODO: OS24EVK-66 HID_Descriptor_Tool Error: LOGICAL MIN MUST be defined 
+ 199          // TODO: OS24EVK-66 HID_Descriptor_Tool Error: LOGICAL MAX MUST be defined 
+ 200              0x81, 0x02,                        //   (MAIN)   INPUT (Data,Var,Abs)
+ 201          
+ 202          #if SUPPORT_LIS2DH
+ 203             // VERIFY: OS24EVK-66 update *F3xx_USB0_Descriptor.c* hid_report_descriptor to define HID REPORT_ID(2) 
+             -format
+ 204              0x85, HID_REPORT_ID_2,    // 0x02  // (GLOBAL) REPORT_ID(2)                                         1000 01 nn
+ 205              0x95, SHORT_REPORT_COUNT, // 0x3F  // (GLOBAL) REPORT_COUNT(SHORT_REPORT_COUNT)     1001 01 nn
+ 206              0x75, 0x08,                        //   (GLOBAL) REPORT_SIZE (8) in bits    0111 01 nn
+ 207              0x09, 0x01,                        //   (LOCAL)  USAGE (Vendor Usage 1)
+ 208          // TODO: OS24EVK-66 HID_Descriptor_Tool Error: LOGICAL MIN MUST be defined 
+ 209          // TODO: OS24EVK-66 HID_Descriptor_Tool Error: LOGICAL MAX MUST be defined 
+ 210          //#if USB_SUPPORT_EP1OUT
+ 211              0x91, 0x02,                        //   (MAIN)   OUTPUT (Data,Var,Abs)
+ 212          //#endif // USB_SUPPORT_EP1OUT
+ 213              0x75, 0x08,                        //   (GLOBAL) REPORT_SIZE (8)
+ 214              0x09, 0x01,                        //   (LOCAL)  USAGE (Vendor Usage 1)
+ 215          // TODO: OS24EVK-66 HID_Descriptor_Tool Error: LOGICAL MIN MUST be defined 
+ 216          // TODO: OS24EVK-66 HID_Descriptor_Tool Error: LOGICAL MAX MUST be defined 
+ 217              0x81, 0x02,                        //   (MAIN)   INPUT (Data,Var,Abs)
+ 218          #endif // SUPPORT_LIS2DH
+ 219             
+ 220              0xC0                               // (MAIN)   END_COLLECTION       end Application Collection
+ 221                  //1 byte
+ 222          };
+ 223          
+ 224          // Localization String
+ 225          #define STR0LEN 4
+C51 COMPILER V9.51   F3XX_USB0_DESCRIPTOR                                                  06/26/2015 13:32:25 PAGE 5   
+
+ 226          code const uint8_t String0Desc [STR0LEN] =
+ 227          {
+ 228             STR0LEN,                            // bLength for StringDescriptor
+ 229             0x03,                               // bDescriptorType   3: StringDescriptor DSC_STRING
+ 230             0x09, 0x04  // US-English
+ 231          }; // End of String0Desc
+ 232          
+ 233          // Manufacturer String
+ 234          #if USB_MFGR_STRING_MAXIMINTEGRATED_COM
+ 235          #define STR1LEN sizeof ("maximintegrated.com") * 2              // includes NULL terminating character, so don't add 2
+             - bytes
+ 236          // Unicode UTF-16LE little-endian encoded string, prefixed by length
+ 237          code const uint8_t String1Desc [STR1LEN] =
+ 238          {
+ 239             STR1LEN,                            // bLength for StringDescriptor
+ 240             0x03,                               // bDescriptorType   3: StringDescriptor DSC_STRING
+ 241             'm', 0,
+ 242             'a', 0,
+ 243             'x', 0,
+ 244             'i', 0,
+ 245             'm', 0,
+ 246             'i', 0,
+ 247             'n', 0,
+ 248             't', 0,
+ 249             'e', 0,
+ 250             'g', 0,
+ 251             'r', 0,
+ 252             'a', 0,
+ 253             't', 0,
+ 254             'e', 0,
+ 255             'd', 0,
+ 256             '.', 0,
+ 257             'c', 0,
+ 258             'o', 0,
+ 259             'm', 0
+ 260          }; // End of String1Desc
+ 261          #else // USB_MFGR_STRING_MAXIMINTEGRATED_COM
+              #define STR1LEN sizeof ("Maxim-IC,Inc.") * 2            // includes NULL terminating character, so don't add 2 bytes
+              // Unicode UTF-16LE little-endian encoded string, prefixed by length
+              code const uint8_t String1Desc [STR1LEN] =
+              {
+                 STR1LEN,                            // bLength for StringDescriptor
+                 0x03,                               // bDescriptorType   3: StringDescriptor DSC_STRING
+                 'M', 0,
+                 'a', 0,
+                 'x', 0,
+                 'i', 0,
+                 'm', 0,
+                 '-', 0,
+                 'I', 0,
+                 'C', 0,
+                 ',', 0,
+                 'I', 0,
+                 'n', 0,
+                 'c', 0,
+                 '.', 0
+              }; // End of String1Desc
+              #endif // USB_MFGR_STRING_MAXIMINTEGRATED_COM
+ 283          
+ 284          // Product ID String
+ 285          // Windows: Control Panel: Device Manager:
+ 286          //   HID: USB Input Device Properties: Details:
+C51 COMPILER V9.51   F3XX_USB0_DESCRIPTOR                                                  06/26/2015 13:32:25 PAGE 6   
+
+ 287          //      Bus reported device description
+ 288          #if SUPPORT_LIS2DH
+ 289             #define STR2LEN sizeof ("MAX30101 + LIS2DH") * 2             // includes NULL terminating character, so don't add 
+             -2 bytes
+ 290             // Unicode UTF-16LE little-endian encoded string, prefixed by length
+ 291             code const uint8_t String2Desc [STR2LEN] =
+ 292             {
+ 293                STR2LEN,                            // bLength for StringDescriptor
+ 294                0x03,                               // bDescriptorType   3: StringDescriptor DSC_STRING
+ 295                'M', 0,
+ 296                'A', 0,
+ 297                'X', 0,
+ 298                '3', 0,
+ 299                '0', 0,
+ 300                '1', 0,
+ 301                '0', 0,
+ 302                '1', 0,
+ 303                ' ', 0,
+ 304                '+', 0,
+ 305                ' ', 0,
+ 306                'L', 0,
+ 307                'I', 0,
+ 308                'S', 0,
+ 309                '2', 0,
+ 310                'D', 0,
+ 311                'H', 0
+ 312             }; // End of String2Desc
+ 313          #else // SUPPORT_LIS2DH
+              # if USB_PRODUCT_STRING_MAX30101
+                 #define STR2LEN sizeof ("MAX30101") * 2              // includes NULL terminating character, so don't add 2 bytes
+                 // Unicode UTF-16LE little-endian encoded string, prefixed by length
+                 code const uint8_t String2Desc [STR2LEN] =
+                 {
+                    STR2LEN,                            // bLength for StringDescriptor
+                    0x03,                               // bDescriptorType   3: StringDescriptor DSC_STRING
+                    'M', 0,
+                    'A', 0,
+                    'X', 0,
+                    '3', 0,
+                    '0', 0,
+                    '1', 0,
+                    '0', 0,
+                    '1', 0
+                 }; // End of String2Desc
+              # else
+                 #define STR2LEN sizeof ("MAX30100") * 2              // includes NULL terminating character, so don't add 2 bytes
+                 // Unicode UTF-16LE little-endian encoded string, prefixed by length
+                 code const uint8_t String2Desc [STR2LEN] =
+                 {
+                    STR2LEN,                            // bLength for StringDescriptor
+                    0x03,                               // bDescriptorType   3: StringDescriptor DSC_STRING
+                    'M', 0,
+                    'A', 0,
+                    'X', 0,
+                    '3', 0,
+                    '0', 0,
+                    '1', 0,
+                    '0', 0,
+                    '0', 0
+                 }; // End of String2Desc
+              # endif // USB_PRODUCT_STRING_MAX30101
+              #endif // SUPPORT_LIS2DH
+C51 COMPILER V9.51   F3XX_USB0_DESCRIPTOR                                                  06/26/2015 13:32:25 PAGE 7   
+
+ 348          
+ 349          // USB String Descriptor Table
+ 350          uint8_t* const STRINGDESCTABLE [] =
+ 351          {
+ 352             String0Desc, // Localization String
+ 353             String1Desc, // Manufacturer String
+ 354             String2Desc  // Product ID String
+ 355          };
+C51 COMPILER V9.51   F3XX_USB0_DESCRIPTOR                                                  06/26/2015 13:32:25 PAGE 8   
+
+ASSEMBLY LISTING OF GENERATED OBJECT CODE
+
+
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   ----    ----
+   CONSTANT SIZE    =    179    ----
+   XDATA SIZE       =      9    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

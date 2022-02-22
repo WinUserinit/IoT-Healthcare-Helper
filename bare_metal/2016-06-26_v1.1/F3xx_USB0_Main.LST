@@ -1,0 +1,623 @@
+C51 COMPILER V9.51   F3XX_USB0_MAIN                                                        06/26/2015 13:32:25 PAGE 1   
+
+
+C51 COMPILER V9.51, COMPILATION OF MODULE F3XX_USB0_MAIN
+OBJECT MODULE PLACED IN F3xx_USB0_Main.OBJ
+COMPILER INVOKED BY: c:\keil\C51\BIN\C51.exe F3xx_USB0_Main.c DB OE LARGE CD
+
+line level    source
+
+   1          //-----------------------------------------------------------------------------
+   2          // F3xx_USB_Main.c
+   3          //-----------------------------------------------------------------------------
+   4          // Copyright 2014
+   5          //
+   6          // Program Description:
+   7          //
+   8          // HID firmware for Display Buffer Debug evaluation board.
+   9          //
+  10          //
+  11          // FID:            3XX000006
+  12          // Target:         C8051F32x/C8051F340
+  13          // Tool chain:     Keil C51 7.50 / Keil EVAL C51
+  14          //                 Silicon Laboratories IDE version 2.6
+  15          // Project Name:   Generic HID Firmware
+  16          //
+  17          //
+  18          // Release 1.0
+  19          //      -140401 Initial Revision (Tushar Mazumder)
+  20          //
+  21          // Update main program in this file.
+  22          
+  23          
+  24          /*
+  25          WARNING L15: MULTIPLE CALL TO SEGMENT warnings are due to possible I2C calls in main and in the USB ISR. H
+             -owever, this should never happen. 
+  26          Disabling USB interrupts can prevent this from happening, but the warnings still persist.
+  27          Disable variable overlaying in linker to prevent these warnings. 
+  28          Memory model in compiler may then need to be set to large because of address space overflow.
+  29          */
+  30          //-----------------------------------------------------------------------------
+  31          // Header Files
+  32          //-----------------------------------------------------------------------------
+  33          
+  34          // Project-level preprocessor #defines effective across all *.c files
+  35          #include "ProjectDefines.h"
+*** MESSAGE C286 IN LINE 169 OF ProjectDefines.h: writeReadHID() EP3OUT 256-byte buffer
+*** MESSAGE C286 IN LINE 170 OF ProjectDefines.h: writeReadHID() EP3IN 256-byte buffer
+*** MESSAGE C286 IN LINE 171 OF ProjectDefines.h: USB_EP_INDEX 3 for EP_STATUS[USB_EP_INDEX] and POLL_WRITE_BYTE (INDEX,
+             - USB_EP_INDEX);
+  36          
+  37          // OS24EVK-58 Software Toolkit - bare metal device driver
+  38          #if SUPPORT_MAX30100
+              #include "max30100.h"
+              #endif // SUPPORT_MAX30100
+  41          
+  42          // OS24EVK-58 Software Toolkit - bare metal device driver
+  43          #if SUPPORT_MAX30101
+  44          #include "max30101.h"
+  45          #endif // SUPPORT_MAX30101
+  46          
+  47          // OS24EVK-58 Software Toolkit - bare metal device driver
+  48          #if SUPPORT_LIS2DH
+  49          #include "lis2dh.h"
+  50          #endif // SUPPORT_LIS2DH
+C51 COMPILER V9.51   F3XX_USB0_MAIN                                                        06/26/2015 13:32:25 PAGE 2   
+
+  51          
+  52          // OS24EVK-58 Software Toolkit - bare metal device driver
+  53          #if SUPPORT_MAX7311
+              #include "max7311.h"
+              #endif // SUPPORT_MAX7311
+  56          
+  57          #include "c8051f3xx.h"
+  58          #include "F3xx_USB0_Register.h"
+  59          #include "F3xx_Initialize.h"
+  60          #include "F3xx_USB0_InterruptServiceRoutine.h"
+  61          #include "F3xx_USB0_Descriptor.h"
+  62          #include "F3xx_USB0_ReportHandler.h"
+  63          
+  64          
+  65          // ----------------------------------------------------------------------------
+  66          // Global Variable Declarations
+  67          // ----------------------------------------------------------------------------
+  68          
+  69          VersionStructure versionInfo;
+  70          extern float gSMBusClkFreq;
+  71          extern uint8_t gOS21ready; // TODO1: OS24EVK-66 could gOS21ready be a bit instead of uint8_t ? conserve xd
+             -ata space
+  72          #if 1 // TODO1: OS24EVK-83 (firmware 2015-04-29) separate trigger for LIS2DH-only interrupt service
+  73          extern uint8_t gLIS2DHready;
+  74          #endif // TODO1: OS24EVK-83 (firmware 2015-04-29) separate trigger for LIS2DH-only interrupt service
+  75          
+  76          
+  77          // ----------------------------------------------------------------------------
+  78          // Local Function Prototypes
+  79          // ----------------------------------------------------------------------------
+  80          
+  81          void updateVersion(VersionStructure*);
+  82          
+  83          //-----------------------------------------------------------------------------
+  84          // Main Routine
+  85          //-----------------------------------------------------------------------------
+  86          void main(void)
+  87          {
+  88   1              gSMBusClkFreq = 400000.0;                       //must come before system_init, since SMBus clock is set there
+  89   1              System_Init ();
+  90   1              updateVersion(&versionInfo);
+  91   1      #if SUPPORT_LED1_LED2_DIAGNOSTIC
+  92   1         //
+  93   1         // OS24EVK-66 flashing diagnostic LEDs on C8051F321 init
+  94   1         flash_Led1Led2_East();
+  95   1         //~ flash_Led1Led2_East();
+  96   1         //~ flash_Led1Led2_East();
+  97   1      #endif // SUPPORT_LED1_LED2_DIAGNOSTIC
+  98   1         //
+  99   1         // Verify attached devices respond on I2C bus
+ 100   1      #if SUPPORT_MAX30100
+                 max30100_open();
+              #endif // SUPPORT_MAX30100
+ 103   1      #if SUPPORT_MAX30101
+ 104   1         max30101_open();
+ 105   1      #endif // SUPPORT_MAX30101
+ 106   1      #if SUPPORT_LIS2DH
+ 107   1         // OS24EVK-66 Global LIS2DH device address gLIS2DHdeviceAddress
+ 108   1         lis2dh_open();
+ 109   1      #endif // SUPPORT_LIS2DH
+ 110   1      #if SUPPORT_MAX7311
+                 max7311_open();
+C51 COMPILER V9.51   F3XX_USB0_MAIN                                                        06/26/2015 13:32:25 PAGE 3   
+
+              #endif // SUPPORT_MAX7311
+ 113   1         //
+ 114   1         // VERIFY: Flash diagnostic LEDs to indicate which devices were detected
+ 115   1      #if SUPPORT_MAX30100
+                 if (gMAX30100deviceAddress != 0) {
+                    // MAX30100 is found, as expected
+                 } else {
+                    // MAX30100 is not connected.
+                    //
+              #if SUPPORT_LED1_LED2_DIAGNOSTIC
+                    flash_Led1H_Led2H_100ms(); // [RED] [GREEN]
+                    flash_Led1H_Led2H_100ms(); // [RED] [GREEN]
+                    //~ flash_Led1L_Led2L_100ms(); // [   ] [     ]
+                    //~ flash_Led1L_Led2H_100ms(); // [   ] [GREEN]
+                    flash_Led1L_Led2L_100ms(); // [   ] [     ]
+                    flash_Led1H_Led2L_100ms(); // [RED] [     ]
+                    flash_Led1L_Led2L_100ms(); // [   ] [     ]
+                    flash_Led1H_Led2L_100ms(); // [RED] [     ]
+                    flash_Led1L_Led2L_100ms(); // [   ] [     ]
+                    flash_Led1H_Led2L_100ms(); // [RED] [     ]
+                    flash_Led1L_Led2L_100ms(); // [   ] [     ]
+                    flash_Led1H_Led2H_100ms(); // [RED] [GREEN]
+                    flash_Led1H_Led2H_100ms(); // [RED] [GREEN]
+                    
+                    //~ flash_Led1L_Led2L_100ms(); // [   ] [     ]
+                    //~ flash_Led1L_Led2L_100ms(); // [   ] [     ]
+                    //~ flash_Led1L_Led2L_100ms(); // [   ] [     ]
+                    //~ flash_Led1H_Led2L_100ms(); // [RED] [     ]
+                    //~ flash_Led1H_Led2L_100ms(); // [RED] [     ]
+                    //~ flash_Led1H_Led2L_100ms(); // [RED] [     ]
+                    //~ flash_Led1H_Led2L_100ms(); // [RED] [     ]
+                    //~ flash_Led1H_Led2L_100ms(); // [RED] [     ]
+                    //~ flash_Led1L_Led2L_100ms(); // [   ] [     ]
+                    //~ flash_Led1L_Led2L_100ms(); // [   ] [     ]
+                    //~ flash_Led1L_Led2L_100ms(); // [   ] [     ]
+              #endif // SUPPORT_LED1_LED2_DIAGNOSTIC
+                 }
+              #endif // SUPPORT_MAX30100
+ 150   1      #if SUPPORT_MAX30101
+ 151   1         if (gMAX30101deviceAddress != 0) {
+ 152   2            // MAX30101 is found, as expected
+ 153   2            //~ flash_Led1L_Led2L_100ms(); // [   ] [     ]
+ 154   2            //~ flash_Led1L_Led2L_100ms(); // [   ] [     ]
+ 155   2            //~ flash_Led1L_Led2L_100ms(); // [   ] [     ]
+ 156   2            //~ flash_Led1H_Led2L_100ms(); // [RED] [     ]
+ 157   2            //~ flash_Led1H_Led2L_100ms(); // [RED] [     ]
+ 158   2            //~ flash_Led1H_Led2L_100ms(); // [RED] [     ]
+ 159   2            //~ flash_Led1H_Led2L_100ms(); // [RED] [     ]
+ 160   2            //~ flash_Led1H_Led2L_100ms(); // [RED] [     ]
+ 161   2            //~ flash_Led1L_Led2L_100ms(); // [   ] [     ]
+ 162   2            //~ flash_Led1L_Led2L_100ms(); // [   ] [     ]
+ 163   2            //~ flash_Led1L_Led2L_100ms(); // [   ] [     ]
+ 164   2         } else {
+ 165   2            // MAX30101 is not connected.
+ 166   2            // This is only likely if using bare C8051F321 daughterboard,
+ 167   2            // or if MAX30101+ACCEL daughterboard is not connected
+ 168   2            //
+ 169   2      #if SUPPORT_LED1_LED2_DIAGNOSTIC
+ 170   2            flash_Led1H_Led2H_100ms(); // [RED] [GREEN]
+ 171   2            flash_Led1H_Led2H_100ms(); // [RED] [GREEN]
+ 172   2            //~ flash_Led1L_Led2L_100ms(); // [   ] [     ]
+ 173   2            //~ flash_Led1L_Led2H_100ms(); // [   ] [GREEN]
+C51 COMPILER V9.51   F3XX_USB0_MAIN                                                        06/26/2015 13:32:25 PAGE 4   
+
+ 174   2            flash_Led1L_Led2L_100ms(); // [   ] [     ]
+ 175   2            flash_Led1H_Led2L_100ms(); // [RED] [     ]
+ 176   2            flash_Led1L_Led2L_100ms(); // [   ] [     ]
+ 177   2            flash_Led1H_Led2L_100ms(); // [RED] [     ]
+ 178   2            flash_Led1L_Led2L_100ms(); // [   ] [     ]
+ 179   2            flash_Led1H_Led2L_100ms(); // [RED] [     ]
+ 180   2            flash_Led1L_Led2L_100ms(); // [   ] [     ]
+ 181   2            flash_Led1H_Led2H_100ms(); // [RED] [GREEN]
+ 182   2            flash_Led1H_Led2H_100ms(); // [RED] [GREEN]
+ 183   2            
+ 184   2            //~ flash_Led1L_Led2L_100ms(); // [   ] [     ]
+ 185   2            //~ flash_Led1L_Led2L_100ms(); // [   ] [     ]
+ 186   2            //~ flash_Led1L_Led2L_100ms(); // [   ] [     ]
+ 187   2            //~ flash_Led1H_Led2L_100ms(); // [RED] [     ]
+ 188   2            //~ flash_Led1H_Led2L_100ms(); // [RED] [     ]
+ 189   2            //~ flash_Led1H_Led2L_100ms(); // [RED] [     ]
+ 190   2            //~ flash_Led1H_Led2L_100ms(); // [RED] [     ]
+ 191   2            //~ flash_Led1H_Led2L_100ms(); // [RED] [     ]
+ 192   2            //~ flash_Led1L_Led2L_100ms(); // [   ] [     ]
+ 193   2            //~ flash_Led1L_Led2L_100ms(); // [   ] [     ]
+ 194   2            //~ flash_Led1L_Led2L_100ms(); // [   ] [     ]
+ 195   2      #endif // SUPPORT_LED1_LED2_DIAGNOSTIC
+ 196   2         }
+ 197   1      #endif // SUPPORT_MAX30101
+ 198   1      #if SUPPORT_LIS2DH
+ 199   1         if (gLIS2DHdeviceAddress != 0) {
+ 200   2            // LIS2DH Accelerometer is found
+ 201   2      #if SUPPORT_LED1_LED2_DIAGNOSTIC
+ 202   2            flash_Led1Led2_East();
+ 203   2            //~ flash_Led1L_Led2L_100ms(); // [   ] [     ]
+ 204   2            //~ flash_Led1L_Led2L_100ms(); // [   ] [     ]
+ 205   2            //~ flash_Led1L_Led2L_100ms(); // [   ] [     ]
+ 206   2            //~ flash_Led1H_Led2L_100ms(); // [RED] [     ]
+ 207   2            //~ flash_Led1H_Led2L_100ms(); // [RED] [     ]
+ 208   2            //~ flash_Led1H_Led2L_100ms(); // [RED] [     ]
+ 209   2            //~ flash_Led1H_Led2L_100ms(); // [RED] [     ]
+ 210   2            //~ flash_Led1H_Led2L_100ms(); // [RED] [     ]
+ 211   2            //~ flash_Led1H_Led2H_100ms(); // [RED] [GREEN]
+ 212   2            //~ flash_Led1H_Led2H_100ms(); // [RED] [GREEN]
+ 213   2            //~ flash_Led1H_Led2H_100ms(); // [RED] [GREEN]
+ 214   2            //~ flash_Led1H_Led2H_100ms(); // [RED] [GREEN]
+ 215   2            //~ flash_Led1H_Led2H_100ms(); // [RED] [GREEN]
+ 216   2            //~ flash_Led1H_Led2L_100ms(); // [RED] [     ]
+ 217   2            //~ flash_Led1H_Led2L_100ms(); // [RED] [     ]
+ 218   2            //~ flash_Led1H_Led2L_100ms(); // [RED] [     ]
+ 219   2            //~ flash_Led1H_Led2L_100ms(); // [RED] [     ]
+ 220   2            //~ flash_Led1H_Led2L_100ms(); // [RED] [     ]
+ 221   2            //~ flash_Led1L_Led2L_100ms(); // [   ] [     ]
+ 222   2            //~ flash_Led1L_Led2L_100ms(); // [   ] [     ]
+ 223   2            //~ flash_Led1L_Led2L_100ms(); // [   ] [     ]
+ 224   2      #endif // SUPPORT_LED1_LED2_DIAGNOSTIC
+ 225   2         } else {
+ 226   2            // LIS2DH Accelerometer is not found
+ 227   2            // MAX30101EVKIT classic
+ 228   2            //
+ 229   2      #if SUPPORT_LED1_LED2_DIAGNOSTIC
+ 230   2            flash_Led1H_Led2H_100ms(); // [RED] [GREEN]
+ 231   2            flash_Led1H_Led2H_100ms(); // [RED] [GREEN]
+ 232   2            flash_Led1L_Led2L_100ms(); // [   ] [     ]
+ 233   2            flash_Led1L_Led2H_100ms(); // [   ] [GREEN]
+ 234   2            flash_Led1L_Led2L_100ms(); // [   ] [     ]
+ 235   2            flash_Led1L_Led2H_100ms(); // [   ] [GREEN]
+C51 COMPILER V9.51   F3XX_USB0_MAIN                                                        06/26/2015 13:32:25 PAGE 5   
+
+ 236   2            flash_Led1L_Led2L_100ms(); // [   ] [     ]
+ 237   2            flash_Led1L_Led2H_100ms(); // [   ] [GREEN]
+ 238   2            flash_Led1L_Led2L_100ms(); // [   ] [     ]
+ 239   2            //~ flash_Led1H_Led2L_100ms(); // [RED] [     ]
+ 240   2            //~ flash_Led1L_Led2L_100ms(); // [   ] [     ]
+ 241   2            //~ flash_Led1H_Led2L_100ms(); // [RED] [     ]
+ 242   2            //~ flash_Led1L_Led2L_100ms(); // [   ] [     ]
+ 243   2            //~ flash_Led1H_Led2L_100ms(); // [RED] [     ]
+ 244   2            //~ flash_Led1L_Led2L_100ms(); // [   ] [     ]
+ 245   2            flash_Led1H_Led2H_100ms(); // [RED] [GREEN]
+ 246   2            flash_Led1H_Led2H_100ms(); // [RED] [GREEN]
+ 247   2      #endif // SUPPORT_LED1_LED2_DIAGNOSTIC
+ 248   2            
+ 249   2         }
+ 250   1      #endif // SUPPORT_LIS2DH
+ 251   1      #if SUPPORT_MAX7311
+                 if (gMAX7311deviceAddress != 0) {
+                    // diagnostic: MAX7311 I/O expander attached to I2C bus
+                         max7311_RegWrite(max7311_Port0700Output, 0xAA); // bitmap of output pin drivers
+                         max7311_RegWrite(max7311_Port0700Output, 0x55); // bitmap of output pin drivers
+                         max7311_RegWrite(max7311_Port0700Output, 0xAA); // bitmap of output pin drivers
+                         max7311_RegWrite(max7311_Port0700Output, 0x55); // bitmap of output pin drivers
+                         max7311_RegWrite(max7311_Port0700Output, 0xAA); // bitmap of output pin drivers
+                         max7311_RegWrite(max7311_Port1508Output, 0xAA); // bitmap of output pin drivers
+                         max7311_RegWrite(max7311_Port0700Output, 0x55); // bitmap of output pin drivers
+                         max7311_RegWrite(max7311_Port1508Output, 0x55); // bitmap of output pin drivers
+                 } else {
+                    // normal: no MAX7311 I/O expander
+                 }
+              #endif // SUPPORT_MAX7311
+ 266   1         //
+ 267   1      #if SUPPORT_LED1_LED2_DIAGNOSTIC
+ 268   1         flash_Led1Led2_East();
+ 269   1      #endif // SUPPORT_LED1_LED2_DIAGNOSTIC
+ 270   1         //
+ 271   1      #if 0
+                 if (gLIS2DHdeviceAddress != 0) {
+                    flash_Led1Led2_Blink();
+                    flash_Led1Led2_Blink();
+                    flash_Led1Led2_Blink();
+                    flash_Led1Led2_East();
+              #if SUPPORT_MAX7311
+                         max7311_RegWrite(max7311_Port0700Output, 0xAA); // bitmap of output pin drivers
+                         max7311_RegWrite(max7311_Port0700Output, 0x55); // bitmap of output pin drivers
+                         max7311_RegWrite(max7311_Port0700Output, 0xAA); // bitmap of output pin drivers
+                         max7311_RegWrite(max7311_Port0700Output, 0x55); // bitmap of output pin drivers
+                         max7311_RegWrite(max7311_Port0700Output, 0xAA); // bitmap of output pin drivers
+                         max7311_RegWrite(max7311_Port1508Output, 0xAA); // bitmap of output pin drivers
+                         max7311_RegWrite(max7311_Port0700Output, 0x55); // bitmap of output pin drivers
+                         max7311_RegWrite(max7311_Port1508Output, 0x55); // bitmap of output pin drivers
+              #endif // SUPPORT_MAX7311
+                 } 
+                 else {
+              #if SUPPORT_MAX7311
+                         max7311_RegWrite(max7311_Port0700Output, 0x81); // bitmap of output pin drivers
+                         max7311_RegWrite(max7311_Port1508Output, 0x81); // bitmap of output pin drivers
+                         max7311_RegWrite(max7311_Port0700Output, 0x18); // bitmap of output pin drivers
+                         max7311_RegWrite(max7311_Port1508Output, 0x18); // bitmap of output pin drivers
+              #endif // SUPPORT_MAX7311
+                 }
+                 //~ flash_Led1H_Led2H_100ms(); // [RED] [GREEN]
+                 //~ flash_Led1L_Led2H_100ms(); // [   ] [GREEN]
+C51 COMPILER V9.51   F3XX_USB0_MAIN                                                        06/26/2015 13:32:25 PAGE 6   
+
+                 //~ flash_Led1L_Led2L_100ms(); // [   ] [     ]
+                 //~ flash_Led1H_Led2L_100ms(); // [RED] [     ]
+                 //~ flash_Led1H_Led2H_100ms(); // [RED] [GREEN]
+                 //~ flash_Led1L_Led2H_100ms(); // [   ] [GREEN]
+                 //~ flash_Led1L_Led2L_100ms(); // [   ] [     ]
+                 //~ flash_Led1H_Led2L_100ms(); // [RED] [     ]
+                 //~ flash_Led1H_Led2H_100ms(); // [RED] [GREEN]
+                 //~ flash_Led1L_Led2H_100ms(); // [   ] [GREEN]
+                 //~ flash_Led1L_Led2L_100ms(); // [   ] [     ]
+                 //~ flash_Led1H_Led2L_100ms(); // [RED] [     ]
+                 //~ flash_Led1H_Led2H_100ms(); // [RED] [GREEN]
+              #endif
+ 310   1         //
+ 311   1         while (1)
+ 312   1         {
+ 313   2            
+ 314   2            if (gOS21ready)
+ 315   2            {
+ 316   3               // read MAX30101 FIFO and (if present) LIS2DH FIFO; HID Report to host
+ 317   3               readOS21();
+ 318   3               //testOS21IntTiming();
+ 319   3      #if 1 // TODO1: OS24EVK-83 (firmware 2015-04-29) separate trigger for LIS2DH-only interrupt service
+ 320   3               if (gLIS2DHready) {
+ 321   4                  // when gLIS2DHready call readLIS2DH()
+ 322   4                  readLIS2DH();
+ 323   4               }
+ 324   3            } else if (gLIS2DHready) {
+ 325   3               // when gLIS2DHready call readLIS2DH()
+ 326   3               readLIS2DH();
+ 327   3      #endif // TODO1: OS24EVK-83 (firmware 2015-04-29) separate trigger for LIS2DH-only interrupt service
+ 328   3            } else {
+ 329   3               // idle
+ 330   3               
+ 331   3      #if SUPPORT_P20BTN_DIAGNOSTIC
+                       // VERIFY: OS24EVK-66 use diagnostic P20Btn to trigger readOS21()
+                       //   P2.0 = diagnostic pushbutton on C8051F321 daughtercard TOOLSTICK321DC (0=pressed; 1=not pres
+             -sed)
+                       if (P20Btn_Pressed()) {
+              #if 1 // OS24EVK-66 Firmware regresssion 2015-04-16_v1.1 (svn r=15232) vs 2015-04-15_v1.1 (svn r=15222): c
+             -rashes GUI and Console program on connect (API ReadFile error).
+                          uint8_t lis2dh_STATUS_REG2_value = 0; //!< (read-only) ZYXOR ZOR YOR XOR ZYXDA ZDA YDA XDA
+                          uint8_t lis2dh_FIFO_SRC_REG_value = 0; //!< (read-only) WTM OVRN_FIFO EMPTY FSS4 FSS3 FSS2 FSS
+             -1 FSS0
+                          //
+                          // C not C++, so all local variables must be declared before any statements
+                          //
+                          // TODO1: OS24EVK-66 P2.0 button diagnostic: debug what's happening when FIFO seems to be stuc
+             -k?
+                          lis2dh_RegRead(lis2dh_STATUS_REG2, &lis2dh_STATUS_REG2_value);
+                          lis2dh_RegRead(lis2dh_FIFO_SRC_REG, &lis2dh_FIFO_SRC_REG_value);
+                          //
+                          // TODO: Set Breakpoint Here
+                          //
+              #endif // OS24EVK-66 Firmware regresssion 2015-04-16_v1.1 (svn r=15232) vs 2015-04-15_v1.1 (svn r=15222): 
+             -crashes GUI and Console program on connect (API ReadFile error).
+                          readOS21();
+                       }
+              #endif // SUPPORT_P20BTN_DIAGNOSTIC
+ 351   3               //
+ 352   3            }
+ 353   2         }
+ 354   1      }
+C51 COMPILER V9.51   F3XX_USB0_MAIN                                                        06/26/2015 13:32:25 PAGE 7   
+
+ 355          
+ 356          void updateVersion(VersionStructure *versionInfo)
+ 357          {
+ 358   1          // TODO: Update Version Information
+ 359   1      #if SUPPORT_MAX30101
+ 360   1      # if USB_SUPPORT_SendPacketWaitEP1INready
+ 361   1         versionInfo->major = 1;      
+ 362   1         versionInfo->minor = 1;      
+ 363   1         versionInfo->year = 2015;
+ 364   1         // OS24EVK-66 Firmware regresssion 2015-04-16_v1.1 (svn r=15232) vs 2015-04-15_v1.1 (svn r=15222): cras
+             -hes GUI and Console program on connect (API ReadFile error).
+ 365   1         // TODO1: OS24EVK-72 (firmware 2015-04-24_v1.1) HID report 1 byte 3 = MAX30101_InterruptStatus1 (not MA
+             -X30101_OverFlowCounter)
+ 366   1         // firmware (2015-04-28) to test INT_ACC toggle and OS24EVK-83 enable LIS2DH interrupt 
+ 367   1         // https://svn.maxim-ic.com/svn/evkits/MAX30101/firmware/Uxx/tags/2015-04-28_v1.1_INT_AC_Test
+ 368   1         // 2015-05-01 debugging readLIS2DH()
+ 369   1         // 2015-05-02 singleReport = 1 unless HR mode, in readLIS2DH()
+ 370   1         // 2015-05-03 #define LIS2DH_DEFAULT_FIFOWATERMARKLEVEL 10
+ 371   1         // 2015-05-03 No ISR Poll for 0x27 STATUS_REG2 bit 0x08 ZYXDA
+ 372   1         // Why INT_AC stuck active(low) starting 150ms before first INT_OS pulse?
+ 373   1         // 2015-05-03 #define LIS2DH_DEFAULT_FIFOWATERMARKLEVEL 31
+ 374   1         // Much better, HR mode clearly shows INT_AC 50% duty cycle which matches the 50% data loss(overrun).
+ 375   1         // Now I have to wonder, why INT2 service only quells INT_AC for 100ms?
+ 376   1         // Is the interrupt only reading out a single 10-sample report?
+ 377   1         // And why is there no I2C bus activity in response to INT_AC falling edge?
+ 378   1         //
+ 379   1         // Maybe the issue is that there's a significant delay (>300ms) 
+ 380   1         // between when the firmware first enables LIS2DH FIFO streaming -- by  myHID.INT0Enable(1); --
+ 381   1         // and when the MAX30101 is actually configured for streaming -- by RegWrite(RegAddressEnum.ModeConfigu
+             -ration, regValue); --?
+ 382   1         //
+ 383   1         // OS24EVK-83 (firmware 2015-05-04) separate trigger for LIS2DH-only interrupt
+ 384   1         // 2015-05-04: move lis2dh_configure_FIFO(LIS2DH_DEFAULT_FIFOMODE) out of myHID.INT0Enable(1)
+ 385   1         // 2015-05-04: lis2dh_configure_FIFO(LIS2DH_DEFAULT_FIFOMODE) when max30101_RegWrite(RegAddressEnum.Mod
+             -eConfiguration,...)
+ 386   1         // Much improved, INT_AC duty cycle looks more reasonable.
+ 387   1         // Still have some data loss in HR mode, but not as much.
+ 388   1         //
+ 389   1         // OS24EVK-83 (firmware 2015-05-05) separate trigger for LIS2DH-only interrupt
+ 390   1         // 2015-05-05: #define LIS2DH_DEFAULT_FIFOWATERMARKLEVEL 15
+ 391   1         // Good INT_AC duty cycle, looks good.
+ 392   1         //
+ 393   1         // OS24EVK-83 (firmware 2015-05-06) separate trigger for LIS2DH-only interrupt
+ 394   1         // 2015-05-06: #define SUPPORT_MAX7311 0
+ 395   1         // 2015-05-06: #define SUPPORT_SPI 0
+ 396   1         // 2015-05-06: #define SUPPORT_P20BTN_DIAGNOSTIC 0
+ 397   1         // 2015-05-06: remove dead code lis2dh_configure_selfTest
+ 398   1         //
+ 399   1         // OS24EVK-83 (firmware 2015-05-07) separate trigger for LIS2DH-only interrupt
+ 400   1         // 2015-05-07: #define LIS2DH_DEFAULT_FIFOWATERMARKLEVEL 26
+ 401   1         // 2015-06-26: update firmware date to current date
+ 402   1         versionInfo->month = 6;
+ 403   1         versionInfo->day = 26;
+ 404   1      # else // USB_SUPPORT_SendPacketWaitEP1INready
+                 versionInfo->major = 1;      
+                 versionInfo->minor = 1;      
+                 versionInfo->year = 2015;
+                 versionInfo->month = 03;
+                 versionInfo->day = 31;
+              # endif // USB_SUPPORT_SendPacketWaitEP1INready
+ 411   1      #else
+                      // regression testing
+C51 COMPILER V9.51   F3XX_USB0_MAIN                                                        06/26/2015 13:32:25 PAGE 8   
+
+                      versionInfo->major = 1; 
+                      versionInfo->minor = 0; 
+                      versionInfo->year = 2014;
+                      versionInfo->month = 10;
+                      versionInfo->day = 30;
+              #endif
+ 419   1      }
+C51 COMPILER V9.51   F3XX_USB0_MAIN                                                        06/26/2015 13:32:25 PAGE 9   
+
+ASSEMBLY LISTING OF GENERATED OBJECT CODE
+
+
+             ; FUNCTION main (BEGIN)
+                                           ; SOURCE LINE # 86
+                                           ; SOURCE LINE # 87
+                                           ; SOURCE LINE # 88
+0000 900000      E     MOV     DPTR,#gSMBusClkFreq
+0003 120000      E     LCALL   ?C?LSTKXDATA
+0006 48                DB      048H
+0007 C3                DB      0C3H
+0008 50                DB      050H
+0009 00                DB      00H
+                                           ; SOURCE LINE # 89
+000A 120000      E     LCALL   System_Init
+                                           ; SOURCE LINE # 90
+000D 7B01              MOV     R3,#01H
+000F 7A00        R     MOV     R2,#HIGH versionInfo
+0011 7900        R     MOV     R1,#LOW versionInfo
+0013 120000      R     LCALL   _updateVersion
+                                           ; SOURCE LINE # 94
+0016 120000      E     LCALL   flash_Led1Led2_East
+                                           ; SOURCE LINE # 104
+0019 120000      E     LCALL   max30101_open
+                                           ; SOURCE LINE # 108
+001C 120000      E     LCALL   lis2dh_open
+                                           ; SOURCE LINE # 151
+001F 900000      E     MOV     DPTR,#gMAX30101deviceAddress
+0022 E0                MOVX    A,@DPTR
+0023 7021              JNZ     ?C0002
+                                           ; SOURCE LINE # 164
+0025         ?C0001:
+                                           ; SOURCE LINE # 170
+0025 120000      E     LCALL   flash_Led1H_Led2H_100ms
+                                           ; SOURCE LINE # 171
+0028 120000      E     LCALL   flash_Led1H_Led2H_100ms
+                                           ; SOURCE LINE # 174
+002B 120000      E     LCALL   flash_Led1L_Led2L_100ms
+                                           ; SOURCE LINE # 175
+002E 120000      E     LCALL   flash_Led1H_Led2L_100ms
+                                           ; SOURCE LINE # 176
+0031 120000      E     LCALL   flash_Led1L_Led2L_100ms
+                                           ; SOURCE LINE # 177
+0034 120000      E     LCALL   flash_Led1H_Led2L_100ms
+                                           ; SOURCE LINE # 178
+0037 120000      E     LCALL   flash_Led1L_Led2L_100ms
+                                           ; SOURCE LINE # 179
+003A 120000      E     LCALL   flash_Led1H_Led2L_100ms
+                                           ; SOURCE LINE # 180
+003D 120000      E     LCALL   flash_Led1L_Led2L_100ms
+                                           ; SOURCE LINE # 181
+0040 120000      E     LCALL   flash_Led1H_Led2H_100ms
+                                           ; SOURCE LINE # 182
+0043 120000      E     LCALL   flash_Led1H_Led2H_100ms
+                                           ; SOURCE LINE # 196
+0046         ?C0002:
+                                           ; SOURCE LINE # 199
+0046 900000      E     MOV     DPTR,#gLIS2DHdeviceAddress
+0049 E0                MOVX    A,@DPTR
+004A 6005              JZ      ?C0003
+                                           ; SOURCE LINE # 202
+004C 120000      E     LCALL   flash_Led1Led2_East
+C51 COMPILER V9.51   F3XX_USB0_MAIN                                                        06/26/2015 13:32:25 PAGE 10  
+
+                                           ; SOURCE LINE # 225
+004F 8021              SJMP    ?C0004
+0051         ?C0003:
+                                           ; SOURCE LINE # 230
+0051 120000      E     LCALL   flash_Led1H_Led2H_100ms
+                                           ; SOURCE LINE # 231
+0054 120000      E     LCALL   flash_Led1H_Led2H_100ms
+                                           ; SOURCE LINE # 232
+0057 120000      E     LCALL   flash_Led1L_Led2L_100ms
+                                           ; SOURCE LINE # 233
+005A 120000      E     LCALL   flash_Led1L_Led2H_100ms
+                                           ; SOURCE LINE # 234
+005D 120000      E     LCALL   flash_Led1L_Led2L_100ms
+                                           ; SOURCE LINE # 235
+0060 120000      E     LCALL   flash_Led1L_Led2H_100ms
+                                           ; SOURCE LINE # 236
+0063 120000      E     LCALL   flash_Led1L_Led2L_100ms
+                                           ; SOURCE LINE # 237
+0066 120000      E     LCALL   flash_Led1L_Led2H_100ms
+                                           ; SOURCE LINE # 238
+0069 120000      E     LCALL   flash_Led1L_Led2L_100ms
+                                           ; SOURCE LINE # 245
+006C 120000      E     LCALL   flash_Led1H_Led2H_100ms
+                                           ; SOURCE LINE # 246
+006F 120000      E     LCALL   flash_Led1H_Led2H_100ms
+                                           ; SOURCE LINE # 249
+0072         ?C0004:
+                                           ; SOURCE LINE # 268
+0072 120000      E     LCALL   flash_Led1Led2_East
+0075         ?C0005:
+                                           ; SOURCE LINE # 311
+                                           ; SOURCE LINE # 312
+                                           ; SOURCE LINE # 314
+0075 900000      E     MOV     DPTR,#gOS21ready
+0078 E0                MOVX    A,@DPTR
+0079 600E              JZ      ?C0007
+                                           ; SOURCE LINE # 315
+                                           ; SOURCE LINE # 317
+007B 120000      E     LCALL   readOS21
+                                           ; SOURCE LINE # 320
+007E 900000      E     MOV     DPTR,#gLIS2DHready
+0081 E0                MOVX    A,@DPTR
+0082 60F1              JZ      ?C0005
+                                           ; SOURCE LINE # 322
+0084 120000      E     LCALL   readLIS2DH
+                                           ; SOURCE LINE # 323
+                                           ; SOURCE LINE # 324
+0087 80EC              SJMP    ?C0005
+0089         ?C0007:
+0089 900000      E     MOV     DPTR,#gLIS2DHready
+008C E0                MOVX    A,@DPTR
+008D 60E6              JZ      ?C0005
+                                           ; SOURCE LINE # 326
+008F 120000      E     LCALL   readLIS2DH
+                                           ; SOURCE LINE # 328
+0092 80E1              SJMP    ?C0005
+             ; FUNCTION main (END)
+
+             ; FUNCTION _updateVersion (BEGIN)
+                                           ; SOURCE LINE # 356
+;---- Variable 'versionInfo' assigned to Register 'R1/R2/R3' ----
+                                           ; SOURCE LINE # 357
+C51 COMPILER V9.51   F3XX_USB0_MAIN                                                        06/26/2015 13:32:25 PAGE 11  
+
+                                           ; SOURCE LINE # 361
+0000 7401              MOV     A,#01H
+0002 120000      E     LCALL   ?C?CSTPTR
+                                           ; SOURCE LINE # 362
+0005 F582              MOV     DPL,A
+0007 758300            MOV     DPH,#00H
+000A 120000      E     LCALL   ?C?CSTOPTR
+                                           ; SOURCE LINE # 363
+000D 900002            MOV     DPTR,#02H
+0010 7407              MOV     A,#07H
+0012 75F0DF            MOV     B,#0DFH
+0015 120000      E     LCALL   ?C?ISTOPTR
+                                           ; SOURCE LINE # 402
+0018 900004            MOV     DPTR,#04H
+001B 7406              MOV     A,#06H
+001D 120000      E     LCALL   ?C?CSTOPTR
+                                           ; SOURCE LINE # 403
+0020 900005            MOV     DPTR,#05H
+0023 741A              MOV     A,#01AH
+0025 020000      E     LJMP    ?C?CSTOPTR
+             ; FUNCTION _updateVersion (END)
+
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    188    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =      6    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

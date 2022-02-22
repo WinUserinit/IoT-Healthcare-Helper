@@ -1,0 +1,2247 @@
+C51 COMPILER V9.51   F3XX_USB0_STANDARD_REQUESTS                                           06/26/2015 13:32:25 PAGE 1   
+
+
+C51 COMPILER V9.51, COMPILATION OF MODULE F3XX_USB0_STANDARD_REQUESTS
+OBJECT MODULE PLACED IN F3xx_USB0_Standard_Requests.OBJ
+COMPILER INVOKED BY: c:\keil\C51\BIN\C51.exe F3xx_USB0_Standard_Requests.c DB OE LARGE CD
+
+line level    source
+
+   1          //-----------------------------------------------------------------------------
+   2          // F3xx_USB0_Standard_Requests.c
+   3          //-----------------------------------------------------------------------------
+   4          // Copyright 2014
+   5          //
+   6          // Program Description:
+   7          //
+   8          // This source file contains the subroutines used to handle incoming
+   9          // setup packets. These are called by Handle_Setup in USB_ISR.c and used for
+  10          // USB chapter 9 compliance.
+  11          //
+  12          //
+  13          // FID:
+  14          // Target:         C8051F3xx
+  15          // Tool chain:     Keil C51 7.50 / Keil EVAL C51
+  16          //                 Silicon Laboratories IDE version 2.6
+  17          // Project Name:   generic
+  18          //
+  19          //
+  20          // Release 1.0
+  21          //    -140401 Initial Revision (Tushar Mazumder)
+  22          //
+  23          // Other than bug fixes or implementation changes, this file should not need to be updated.
+  24          
+  25          //-----------------------------------------------------------------------------
+  26          // Header Files
+  27          //-----------------------------------------------------------------------------
+  28          #include "c8051f3xx.h"
+  29          #include "F3xx_USB0_Register.h"
+  30          #include "F3xx_USB0_InterruptServiceRoutine.h"
+*** MESSAGE C286 IN LINE 169 OF ProjectDefines.h: writeReadHID() EP3OUT 256-byte buffer
+*** MESSAGE C286 IN LINE 170 OF ProjectDefines.h: writeReadHID() EP3IN 256-byte buffer
+*** MESSAGE C286 IN LINE 171 OF ProjectDefines.h: USB_EP_INDEX 3 for EP_STATUS[USB_EP_INDEX] and POLL_WRITE_BYTE (INDEX,
+             - USB_EP_INDEX);
+  31          #include "F3xx_USB0_Descriptor.h"
+  32          #include "F3xx_USB0_ReportHandler.h"
+  33          
+  34          //-----------------------------------------------------------------------------
+  35          // Variables
+  36          //-----------------------------------------------------------------------------
+  37          extern device_descriptor code DEVICEDESC;   // These are created in F3xx_USB0_Descriptor.h
+  38          extern uint8_t* STRINGDESCTABLE[];
+  39          
+  40          // Additional declarations for HID:
+  41          extern hid_configuration_descriptor HIDCONFIGDESC;
+  42          extern hid_report_descriptor code HIDREPORTDESC;
+  43          
+  44          extern setup_buffer SETUP;             // Buffer for current device request
+  45                                                 // information
+  46          extern uint16_t DATASIZE;
+  47          extern uint16_t DATASENT;
+  48          extern uint8_t* DATAPTR;
+  49          
+  50          // These are response packets used for
+  51          code uint8_t ONES_PACKET[2] = {0x01, 0x00};
+C51 COMPILER V9.51   F3XX_USB0_STANDARD_REQUESTS                                           06/26/2015 13:32:25 PAGE 2   
+
+  52          // Communication with host
+  53          code uint8_t ZERO_PACKET[2] = {0x00, 0x00};
+  54          
+  55          extern uint8_t USB0_STATE;       // Determines current usb device state
+  56          
+  57          //-----------------------------------------------------------------------------
+  58          // Definitions
+  59          //-----------------------------------------------------------------------------
+  60          // Redefine existing variable names to refer to the descriptors within the
+  61          // HID configuration descriptor.
+  62          // This minimizes the impact on the existing source code.
+  63          #define ConfigDesc              (HIDCONFIGDESC.hid_configuration_descriptor)
+  64          #define InterfaceDesc   (HIDCONFIGDESC.hid_interface_descriptor)
+  65          #define HidDesc                 (HIDCONFIGDESC.hid_descriptor)
+  66          #define Endpoint1Desc   (HIDCONFIGDESC.hid_endpoint_in_descriptor)
+  67          #define Endpoint2Desc   (HIDCONFIGDESC.hid_endpoint_out_descriptor)
+  68          
+  69          //-----------------------------------------------------------------------------
+  70          // Get_Status
+  71          //-----------------------------------------------------------------------------
+  72          //
+  73          // Return Value - None
+  74          // Parameters - None
+  75          //
+  76          // Standard request that should not change for custom HID designs.
+  77          //
+  78          // ----------------------------------------------------------------------------
+  79          void Get_Status (void)                 // This routine returns a two byte
+  80          {                                      // status packet to the host
+  81   1      
+  82   1         if (SETUP.wValue.c[MSB] || SETUP.wValue.c[LSB] ||
+  83   1                                             // If non-zero return length or data
+  84   1                                             // length not
+  85   1         SETUP.wLength.c[MSB]    || (SETUP.wLength.c[LSB] != 2))
+  86   1                                             // Equal to 2 then send a stall
+  87   1         {                                   // indicating invalid request
+  88   2            Force_Stall ();
+  89   2         }
+  90   1      
+  91   1         switch(SETUP.bmRequestType)         // Determine if recipient was device,
+  92   1         {                                                               // interface, or EP
+  93   2            case OUT_DEVICE:                 // If recipient was device
+  94   2               if (SETUP.wIndex.c[MSB] || SETUP.wIndex.c[LSB])
+  95   2               {
+  96   3                  Force_Stall ();            // Send stall if request is invalid
+  97   3               }
+  98   2               else
+  99   2               {
+ 100   3                              // Otherwise send 0x00, indicating bus power and no
+ 101   3                              // remote wake-up supported
+ 102   3                  DATAPTR = (uint8_t*)&ZERO_PACKET;
+ 103   3                  DATASIZE = 2;
+ 104   3               }
+ 105   2               break;
+ 106   2      
+ 107   2            case OUT_INTERFACE:              // See if recipient was interface
+ 108   2               if ((USB0_STATE != DEV_CONFIGURED) ||
+ 109   2               SETUP.wIndex.c[MSB] || SETUP.wIndex.c[LSB])
+ 110   2                                             // Only valid if device is configured
+ 111   2                                             // and non-zero index
+ 112   2               {
+ 113   3                  Force_Stall ();            // Otherwise send stall to host
+C51 COMPILER V9.51   F3XX_USB0_STANDARD_REQUESTS                                           06/26/2015 13:32:25 PAGE 3   
+
+ 114   3               }
+ 115   2               else
+ 116   2               {
+ 117   3                  // Status packet always returns 0x00
+ 118   3                  DATAPTR = (uint8_t*)&ZERO_PACKET;
+ 119   3                  DATASIZE = 2;
+ 120   3               }
+ 121   2               break;
+ 122   2      
+ 123   2            case OUT_ENDPOINT:               // See if recipient was an endpoint
+ 124   2               if ((USB0_STATE != DEV_CONFIGURED) ||
+ 125   2               SETUP.wIndex.c[MSB])          // Make sure device is configured
+ 126   2                                             // and index msb = 0x00
+ 127   2               {                             // otherwise return stall to host
+ 128   3                  Force_Stall();
+ 129   3               }
+ 130   2               else
+ 131   2               {
+ 132   3               // Handle case if request is directed to EP 1
+ 133   3                  if (SETUP.wIndex.c[LSB] == IN_EP1)
+ 134   3                  {
+ 135   4                     if (EP_STATUS[1] == EP_HALT)
+ 136   4                     {                       // If endpoint is halted,
+ 137   5                                             // return 0x01,0x00
+ 138   5                        DATAPTR = (uint8_t*)&ONES_PACKET;
+ 139   5                        DATASIZE = 2;
+ 140   5                     }
+ 141   4                     else
+ 142   4                     {
+ 143   5                        // Otherwise return 0x00,0x00 to indicate endpoint active
+ 144   5                        DATAPTR = (uint8_t*)&ZERO_PACKET;
+ 145   5                        DATASIZE = 2;
+ 146   5                     }
+ 147   4                  }
+ 148   3                  else
+ 149   3                  {
+ 150   4                     Force_Stall ();         // Send stall if unexpected data
+ 151   4                                            // encountered
+ 152   4                  }
+ 153   3               }
+ 154   2               break;
+ 155   2      
+ 156   2            default:
+ 157   2               Force_Stall ();
+ 158   2               break;
+ 159   2         }
+ 160   1         if (EP_STATUS[0] != EP_STALL)
+ 161   1         {
+ 162   2           // Set serviced SETUP Packet, Endpoint 0 in transmit mode, and
+ 163   2           // reset DATASENT counter
+ 164   2            POLL_WRITE_BYTE (E0CSR, rbSOPRDY);
+ 165   2            EP_STATUS[0] = EP_TX;
+ 166   2            DATASENT = 0;
+ 167   2         }
+ 168   1      }
+ 169          
+ 170          //-----------------------------------------------------------------------------
+ 171          // Clear_Feature
+ 172          //-----------------------------------------------------------------------------
+ 173          //
+ 174          // Return Value - None
+ 175          // Parameters - None
+C51 COMPILER V9.51   F3XX_USB0_STANDARD_REQUESTS                                           06/26/2015 13:32:25 PAGE 4   
+
+ 176          //
+ 177          // Standard request that should not change in custom HID designs.
+ 178          //
+ 179          //-----------------------------------------------------------------------------
+ 180          void Clear_Feature ()                  // This routine can clear Halt Endpoint
+ 181          {                                      // features on endpoint 1
+ 182   1      
+ 183   1         // Send procedural stall if device isn't configured
+ 184   1         if ( (USB0_STATE != DEV_CONFIGURED) ||
+ 185   1         // Or request is made to host(remote wakeup not supported)
+ 186   1         (SETUP.bmRequestType == IN_DEVICE) ||
+ 187   1         // Or request is made to interface
+ 188   1         (SETUP.bmRequestType == IN_INTERFACE) ||
+ 189   1         // Or msbs of value or index set to non-zero value
+ 190   1         SETUP.wValue.c[MSB]  || SETUP.wIndex.c[MSB] ||
+ 191   1         // Or data length set to non-zero.
+ 192   1         SETUP.wLength.c[MSB] || SETUP.wLength.c[LSB])
+ 193   1         {
+ 194   2            Force_Stall ();
+ 195   2         }
+ 196   1      
+ 197   1         else
+ 198   1         {
+ 199   2            // Verify that packet was directed at an endpoint
+ 200   2            if ( (SETUP.bmRequestType == IN_ENDPOINT)&&
+ 201   2            // The feature selected was HALT_ENDPOINT
+ 202   2            (SETUP.wValue.c[LSB] == ENDPOINT_HALT)  &&
+ 203   2            // And that the request was directed at EP 1 in
+ 204   2            ((SETUP.wIndex.c[LSB] == IN_EP1) ) )
+ 205   2            {
+ 206   3               if (SETUP.wIndex.c[LSB] == IN_EP1)
+ 207   3               {
+ 208   4      #if USB_writeReadHID_EP1OUT_EP1IN
+                 // VERIFY: OS24EVK-66 Support USB_writeReadHID_EP3OUT_EP3IN use EP3IN/EP3OUT for writeReadHID() command
+             -s
+                 // # pragma message("writeReadHID() EP1OUT 64-byte buffer")
+                 // # pragma message("writeReadHID() EP1IN  64-byte buffer")
+              #elif USB_writeReadHID_EP2OUT_EP2IN
+                 // # pragma message("writeReadHID() EP2OUT 128-byte buffer")
+                 // # pragma message("writeReadHID() EP2IN  128-byte buffer")
+              #elif USB_writeReadHID_EP3OUT_EP3IN
+ 216   4         // # pragma message("writeReadHID() EP3OUT 256-byte buffer")
+ 217   4         // # pragma message("writeReadHID() EP3IN  256-byte buffer")
+ 218   4      #endif // USB_writeReadHID_EP1OUT_EP1IN
+ 219   4                  // VERIFY: OS24EVK-66 USB_EP_INDEX 1 for EP_STATUS[USB_EP_INDEX] and POLL_WRITE_BYTE (INDEX, U
+             -SB_EP_INDEX)
+ 220   4                  POLL_WRITE_BYTE (INDEX, USB_EP_INDEX);// Clear feature endpoint 1 halt
+ 221   4                  POLL_WRITE_BYTE (EINCSR1, rbInCLRDT);
+ 222   4                  EP_STATUS[USB_EP_INDEX] = EP_IDLE;    // Set endpoint 1 status back to idle
+ 223   4               }
+ 224   3            }
+ 225   2            else
+ 226   2            {
+ 227   3               Force_Stall ();               // Send procedural stall
+ 228   3            }
+ 229   2         }
+ 230   1         POLL_WRITE_BYTE (INDEX, 0);         // Reset Index to 0
+ 231   1         if (EP_STATUS[0] != EP_STALL)
+ 232   1         {
+ 233   2            POLL_WRITE_BYTE (E0CSR, (rbSOPRDY | rbDATAEND));
+ 234   2                                             // Set Serviced Out packet ready and
+ 235   2                                             // data end to indicate transaction
+C51 COMPILER V9.51   F3XX_USB0_STANDARD_REQUESTS                                           06/26/2015 13:32:25 PAGE 5   
+
+ 236   2                                             // is over
+ 237   2         }
+ 238   1      }
+ 239          
+ 240          //-----------------------------------------------------------------------------
+ 241          // Set_Feature
+ 242          //-----------------------------------------------------------------------------
+ 243          //
+ 244          // Return Value - None
+ 245          // Parameters - None
+ 246          //
+ 247          // Standard request that should not change in custom HID designs.
+ 248          //
+ 249          //-----------------------------------------------------------------------------
+ 250          void Set_Feature (void)                // This routine will set the EP Halt
+ 251          {                                      // feature for endpoint 1
+ 252   1      
+ 253   1         // Make sure device is configured, SETUP data
+ 254   1         if ((USB0_STATE != DEV_CONFIGURED) ||
+ 255   1         // is all valid and that request is directed at an endpoint
+ 256   1         (SETUP.bmRequestType == IN_DEVICE) ||
+ 257   1         (SETUP.bmRequestType == IN_INTERFACE) ||
+ 258   1         SETUP.wValue.c[MSB]  || SETUP.wIndex.c[MSB] ||
+ 259   1         SETUP.wLength.c[MSB] || SETUP.wLength.c[LSB])
+ 260   1         {
+ 261   2            Force_Stall ();                  // Otherwise send stall to host
+ 262   2         }
+ 263   1      
+ 264   1         else
+ 265   1         {
+ 266   2                // Make sure endpoint exists and that halt
+ 267   2            if ( (SETUP.bmRequestType == IN_ENDPOINT)&&
+ 268   2            // endpoint feature is selected
+ 269   2            (SETUP.wValue.c[LSB] == ENDPOINT_HALT) &&
+ 270   2            ((SETUP.wIndex.c[LSB] == IN_EP1)        ||
+ 271   2            (SETUP.wIndex.c[LSB] == OUT_EP2) ) )
+ 272   2            {
+ 273   3               // VERIFY: OS24EVK-66 USB_EP_INDEX 1 for EP_STATUS[USB_EP_INDEX] and POLL_WRITE_BYTE (INDEX, USB_
+             -EP_INDEX)
+ 274   3      #if USB_writeReadHID_EP1OUT_EP1IN
+                 // VERIFY: OS24EVK-66 Support USB_writeReadHID_EP3OUT_EP3IN use EP3IN/EP3OUT for writeReadHID() command
+             -s
+                 // # pragma message("writeReadHID() EP1OUT 64-byte buffer")
+                 // # pragma message("writeReadHID() EP1IN  64-byte buffer")
+                       if (SETUP.wIndex.c[LSB] == IN_EP1)
+                       {
+                          POLL_WRITE_BYTE (INDEX, 1);// Set feature endpoint 1 halt
+                          POLL_WRITE_BYTE (EINCSR1, rbInSDSTL);
+                          EP_STATUS[1] = EP_HALT;
+                       }
+              #elif USB_writeReadHID_EP2OUT_EP2IN
+                 // # pragma message("writeReadHID() EP2OUT 128-byte buffer")
+                 // # pragma message("writeReadHID() EP2IN  128-byte buffer")
+                       if (SETUP.wIndex.c[LSB] == IN_EP2)
+                       {
+                          POLL_WRITE_BYTE (INDEX, 2);// Set feature endpoint 1 halt
+                          POLL_WRITE_BYTE (EINCSR1, rbInSDSTL);
+                          EP_STATUS[2] = EP_HALT;
+                       }
+              #elif USB_writeReadHID_EP3OUT_EP3IN
+ 294   3         // # pragma message("writeReadHID() EP3OUT 256-byte buffer")
+ 295   3         // # pragma message("writeReadHID() EP3IN  256-byte buffer")
+C51 COMPILER V9.51   F3XX_USB0_STANDARD_REQUESTS                                           06/26/2015 13:32:25 PAGE 6   
+
+ 296   3               if (SETUP.wIndex.c[LSB] == IN_EP3)
+ 297   3               {
+ 298   4                  POLL_WRITE_BYTE (INDEX, 3);// Set feature endpoint 1 halt
+ 299   4                  POLL_WRITE_BYTE (EINCSR1, rbInSDSTL);
+ 300   4                  EP_STATUS[3] = EP_HALT;
+ 301   4               }
+ 302   3      #endif // USB_writeReadHID_EP1OUT_EP1IN
+ 303   3            }
+ 304   2            else
+ 305   2            {
+ 306   3               Force_Stall ();               // Send procedural stall
+ 307   3            }
+ 308   2         }
+ 309   1         POLL_WRITE_BYTE (INDEX, 0);
+ 310   1         if (EP_STATUS[0] != EP_STALL)
+ 311   1         {
+ 312   2            POLL_WRITE_BYTE (E0CSR, (rbSOPRDY | rbDATAEND));
+ 313   2                                             // Indicate SETUP packet has been
+ 314   2                                             // serviced
+ 315   2         }
+ 316   1      }
+ 317          
+ 318          //-----------------------------------------------------------------------------
+ 319          // Set_Address
+ 320          //-----------------------------------------------------------------------------
+ 321          //
+ 322          // Return Value - None
+ 323          // Parameters - None
+ 324          //
+ 325          // Standard request that should not change in custom HID designs.
+ 326          //
+ 327          //-----------------------------------------------------------------------------
+ 328          void Set_Address (void)                // Set new function address
+ 329          {
+ 330   1         // Request must be directed to device
+ 331   1         if ((SETUP.bmRequestType != IN_DEVICE) ||
+ 332   1         // with index and length set to zero.
+ 333   1         SETUP.wIndex.c[MSB]  || SETUP.wIndex.c[LSB]||
+ 334   1         SETUP.wLength.c[MSB] || SETUP.wLength.c[LSB]||
+ 335   1         SETUP.wValue.c[MSB]  || (SETUP.wValue.c[LSB] & 0x80))
+ 336   1         {
+ 337   2           Force_Stall ();                   // Send stall if SETUP data invalid
+ 338   2         }
+ 339   1      
+ 340   1         EP_STATUS[0] = EP_ADDRESS;          // Set endpoint zero to update
+ 341   1                                             // address next status phase
+ 342   1         if (SETUP.wValue.c[LSB] != 0)
+ 343   1         {
+ 344   2            USB0_STATE = DEV_ADDRESS;        // Indicate that device state is now
+ 345   2                                             // address
+ 346   2         }
+ 347   1         else
+ 348   1         {
+ 349   2            USB0_STATE = DEV_DEFAULT;        // If new address was 0x00, return
+ 350   2         }                                   // device to default state
+ 351   1         if (EP_STATUS[0] != EP_STALL)
+ 352   1         {
+ 353   2            POLL_WRITE_BYTE (E0CSR, (rbSOPRDY | rbDATAEND));
+ 354   2                                             // Indicate SETUP packet has
+ 355   2                                             // been serviced
+ 356   2         }
+ 357   1      }
+C51 COMPILER V9.51   F3XX_USB0_STANDARD_REQUESTS                                           06/26/2015 13:32:25 PAGE 7   
+
+ 358          
+ 359          //-----------------------------------------------------------------------------
+ 360          // Get_Descriptor
+ 361          //-----------------------------------------------------------------------------
+ 362          //
+ 363          // Return Value - None
+ 364          // Parameters - None
+ 365          //
+ 366          // Standard request that should not change in custom HID designs.
+ 367          //
+ 368          //-----------------------------------------------------------------------------
+ 369          void Get_Descriptor (void)             // This routine sets the data pointer
+ 370          {                                      // and size to correct descriptor and
+ 371   1                                             // sets the endpoint status to transmit
+ 372   1      
+ 373   1         switch(SETUP.wValue.c[MSB])         // Determine which type of descriptor
+ 374   1         {                                   // was requested, and set data ptr and
+ 375   2            case DSC_DEVICE:                 // size accordingly
+ 376   2               DATAPTR = (uint8_t*) &DEVICEDESC;
+ 377   2               DATASIZE = DEVICEDESC.bLength;
+ 378   2               break;
+ 379   2      
+ 380   2            case DSC_CONFIG:
+ 381   2               DATAPTR = (uint8_t*) &ConfigDesc;
+ 382   2                                             // Compiler Specific - The next statement
+ 383   2                                             // reverses the bytes in the configuration
+ 384   2                                             // descriptor for the compiler
+ 385   2               DATASIZE = ConfigDesc.wTotalLength.c[MSB] +
+ 386   2                          256*ConfigDesc.wTotalLength.c[LSB];
+ 387   2               break;
+ 388   2      
+ 389   2                case DSC_STRING:
+ 390   2                       //  NOTE: if strings are added to this project, the hard-coded
+ 391   2               // value of 2 will need to be increased
+ 392   2               // Assuming global STRINGDESCTABLE[] has 3 entries, 
+ 393   2               // so STRINGDESCTABLE[2] is the last valid string descriptor
+ 394   2               if (SETUP.wValue.c[LSB] > 2)   // If asking for string that's N/A
+ 395   2               {
+ 396   3                  Force_Stall();
+ 397   3               }
+ 398   2               else
+ 399   2               {
+ 400   3                  DATAPTR = STRINGDESCTABLE[SETUP.wValue.c[LSB]];
+ 401   3                                                     // Can have a maximum of 255 strings
+ 402   3                  DATASIZE = *DATAPTR;
+ 403   3               }
+ 404   2               break;
+ 405   2      
+ 406   2            case DSC_INTERFACE:
+ 407   2               DATAPTR = (uint8_t*) &InterfaceDesc;
+ 408   2               DATASIZE = InterfaceDesc.bLength;
+ 409   2               break;
+ 410   2      
+ 411   2            case DSC_ENDPOINT:
+ 412   2               // This example splits endpoint 1 into an
+ 413   2               // IN endpoint and an OUT endpoint
+ 414   2               // In the ...Descriptor.c and ...Descriptor.h files,
+ 415   2               // OUT endpoint 1 is referred to as Endpoint 2.
+ 416   2      #if USB_writeReadHID_EP1OUT_EP1IN
+                 // VERIFY: OS24EVK-66 Support USB_writeReadHID_EP3OUT_EP3IN use EP3IN/EP3OUT for writeReadHID() command
+             -s
+                 // # pragma message("writeReadHID() EP1OUT 64-byte buffer")
+C51 COMPILER V9.51   F3XX_USB0_STANDARD_REQUESTS                                           06/26/2015 13:32:25 PAGE 8   
+
+                 // # pragma message("writeReadHID() EP1IN  64-byte buffer")
+                       if ( (SETUP.wValue.c[LSB] == IN_EP1) )
+                       {
+                          DATAPTR = (uint8_t*) &Endpoint1Desc;
+                          DATASIZE = Endpoint1Desc.bLength;
+                       }
+                       else if ( (SETUP.wValue.c[LSB] == OUT_EP1) )
+                       {
+                          DATAPTR = (uint8_t*) &Endpoint2Desc; // the OUT endpoint, not necessarily EP2
+                          DATASIZE = Endpoint2Desc.bLength;
+                       }
+              #elif USB_writeReadHID_EP2OUT_EP2IN
+                 // # pragma message("writeReadHID() EP2OUT 128-byte buffer")
+                 // # pragma message("writeReadHID() EP2IN  128-byte buffer")
+                       if ( (SETUP.wValue.c[LSB] == IN_EP2) )
+                       {
+                          DATAPTR = (uint8_t*) &Endpoint1Desc;
+                          DATASIZE = Endpoint1Desc.bLength;
+                       }
+                       else if ( (SETUP.wValue.c[LSB] == OUT_EP2) )
+                       {
+                          DATAPTR = (uint8_t*) &Endpoint2Desc; // the OUT endpoint, not necessarily EP2
+                          DATASIZE = Endpoint2Desc.bLength;
+                       }
+              #elif USB_writeReadHID_EP3OUT_EP3IN
+ 444   2         // # pragma message("writeReadHID() EP3OUT 256-byte buffer")
+ 445   2         // # pragma message("writeReadHID() EP3IN  256-byte buffer")
+ 446   2               if ( (SETUP.wValue.c[LSB] == IN_EP3) )
+ 447   2               {
+ 448   3                  DATAPTR = (uint8_t*) &Endpoint1Desc;
+ 449   3                  DATASIZE = Endpoint1Desc.bLength;
+ 450   3               }
+ 451   2               else if ( (SETUP.wValue.c[LSB] == OUT_EP3) )
+ 452   2               {
+ 453   3                  DATAPTR = (uint8_t*) &Endpoint2Desc; // the OUT endpoint, not necessarily EP2
+ 454   3                  DATASIZE = Endpoint2Desc.bLength;
+ 455   3               }
+ 456   2      #endif // USB_writeReadHID_EP1OUT_EP1IN
+ 457   2               else
+ 458   2               {
+ 459   3                  Force_Stall();
+ 460   3               }
+ 461   2               break;
+ 462   2      
+ 463   2         case DSC_HID:                       // HID Specific (HID class descriptor)
+ 464   2            DATAPTR = (uint8_t*)&HidDesc;
+ 465   2            DATASIZE = HidDesc.bLength;
+ 466   2            break;
+ 467   2      
+ 468   2         case DSC_HID_REPORT:                // HID Specific (HID report descriptor)
+ 469   2            DATAPTR = (uint8_t*)&HIDREPORTDESC;
+ 470   2            DATASIZE = HID_REPORT_DESCRIPTOR_SIZE;
+ 471   2            break;
+ 472   2      
+ 473   2            default:
+ 474   2               Force_Stall ();               // Send Stall if unsupported request
+ 475   2               break;
+ 476   2         }
+ 477   1      
+ 478   1         // Verify that the requested descriptor is valid
+ 479   1         if (SETUP.wValue.c[MSB] == DSC_DEVICE ||
+ 480   1         SETUP.wValue.c[MSB] == DSC_CONFIG     ||
+C51 COMPILER V9.51   F3XX_USB0_STANDARD_REQUESTS                                           06/26/2015 13:32:25 PAGE 9   
+
+ 481   1         SETUP.wValue.c[MSB] == DSC_STRING     ||
+ 482   1         SETUP.wValue.c[MSB] == DSC_INTERFACE  ||
+ 483   1         SETUP.wValue.c[MSB] == DSC_ENDPOINT)
+ 484   1         {
+ 485   2            if ((SETUP.wLength.c[LSB] < DATASIZE) &&
+ 486   2            (SETUP.wLength.c[MSB] == 0))
+ 487   2            {
+ 488   3               DATASIZE = SETUP.wLength.i;   // Send only requested amount of data
+ 489   3            }
+ 490   2         }
+ 491   1         if (EP_STATUS[0] != EP_STALL)       // Make sure endpoint not in stall mode
+ 492   1         {
+ 493   2           POLL_WRITE_BYTE (E0CSR, rbSOPRDY);// Service SETUP Packet
+ 494   2           EP_STATUS[0] = EP_TX;             // Put endpoint in transmit mode
+ 495   2           DATASENT = 0;                     // Reset Data Sent counter
+ 496   2         }
+ 497   1      }
+ 498          
+ 499          //-----------------------------------------------------------------------------
+ 500          // Get_Configuration
+ 501          //-----------------------------------------------------------------------------
+ 502          //
+ 503          // Return Value - None
+ 504          // Parameters - None
+ 505          //
+ 506          // Standard request that should not change in custom HID designs.
+ 507          //
+ 508          //-----------------------------------------------------------------------------
+ 509          void Get_Configuration (void)          // This routine returns current
+ 510          {                                      // configuration value
+ 511   1         // This request must be directed to the device
+ 512   1         if ( (SETUP.bmRequestType != OUT_DEVICE)    ||
+ 513   1         // With value word set to zero
+ 514   1         SETUP.wValue.c[MSB]  || SETUP.wValue.c[LSB]||
+ 515   1         // And index set to zero
+ 516   1         SETUP.wIndex.c[MSB]  || SETUP.wIndex.c[LSB]||
+ 517   1         // And SETUP length set to one
+ 518   1         SETUP.wLength.c[MSB] || (SETUP.wLength.c[LSB] != 1) )
+ 519   1         {
+ 520   2            Force_Stall ();                  // Otherwise send a stall to host
+ 521   2         }
+ 522   1      
+ 523   1         else
+ 524   1         {
+ 525   2            if (USB0_STATE == DEV_CONFIGURED)// If the device is configured, then
+ 526   2            {                                // return value 0x01 since this software
+ 527   3                                             // only supports one configuration
+ 528   3               DATAPTR = (uint8_t*)&ONES_PACKET;
+ 529   3               DATASIZE = 1;
+ 530   3            }
+ 531   2            if (USB0_STATE == DEV_ADDRESS)   // If the device is in address state, it
+ 532   2            {                                // is not configured, so return 0x00
+ 533   3               DATAPTR = (uint8_t*)&ZERO_PACKET;
+ 534   3               DATASIZE = 1;
+ 535   3            }
+ 536   2         }
+ 537   1         if (EP_STATUS[0] != EP_STALL)
+ 538   1         {
+ 539   2            // Set Serviced Out Packet bit
+ 540   2            POLL_WRITE_BYTE (E0CSR, rbSOPRDY);
+ 541   2            EP_STATUS[0] = EP_TX;            // Put endpoint into transmit mode
+ 542   2            DATASENT = 0;                    // Reset Data Sent counter to zero
+C51 COMPILER V9.51   F3XX_USB0_STANDARD_REQUESTS                                           06/26/2015 13:32:25 PAGE 10  
+
+ 543   2         }
+ 544   1      }
+ 545          
+ 546          //-----------------------------------------------------------------------------
+ 547          // Set_Configuration
+ 548          //-----------------------------------------------------------------------------
+ 549          //
+ 550          // Return Value - None
+ 551          // Parameters - None
+ 552          //
+ 553          // Standard request that should not change in custom HID designs.
+ 554          //
+ 555          //-----------------------------------------------------------------------------
+ 556          void Set_Configuration (void)          // This routine allows host to change
+ 557          {                                      // current device configuration value
+ 558   1      
+ 559   1         // Device must be addressed before configured
+ 560   1         if ((USB0_STATE == DEV_DEFAULT) ||
+ 561   1         // and request recipient must be the device
+ 562   1         (SETUP.bmRequestType != IN_DEVICE) ||
+ 563   1         // the index and length words must be zero
+ 564   1         SETUP.wIndex.c[MSB]  || SETUP.wIndex.c[LSB]||
+ 565   1         SETUP.wLength.c[MSB] || SETUP.wLength.c[LSB] ||
+ 566   1         SETUP.wValue.c[MSB]  || (SETUP.wValue.c[LSB] > 1))
+ 567   1         // This software only supports config = 0,1
+ 568   1         {
+ 569   2            Force_Stall ();                  // Send stall if SETUP data is invalid
+ 570   2         }
+ 571   1      
+ 572   1         else
+ 573   1         {
+ 574   2            if (SETUP.wValue.c[LSB] > 0)     // Any positive configuration request
+ 575   2            {                                // results in configuration being set
+ 576   3                                                                         // to 1
+ 577   3               USB0_STATE = DEV_CONFIGURED;
+ 578   3               // VERIFY: OS24EVK-66 USB_EP_INDEX 1 for EP_STATUS[USB_EP_INDEX] and POLL_WRITE_BYTE (INDEX, USB_
+             -EP_INDEX)
+ 579   3               EP_STATUS[USB_EP_INDEX] = EP_IDLE;       // Set endpoint status to idle (enabled)
+ 580   3      
+ 581   3               POLL_WRITE_BYTE (INDEX, USB_EP_INDEX);   // Change index to endpoint 1
+ 582   3               // Set DIRSEL to indicate endpoint 1 is IN/OUT
+ 583   3               POLL_WRITE_BYTE (EINCSR2, rbInSPLIT);
+ 584   3               POLL_WRITE_BYTE (INDEX, 0);   // Set index back to endpoint 0
+ 585   3      
+ 586   3      #if USB_writeReadHID_EP1OUT_EP1IN
+                       // VERIFY: OS24EVK-66 Support USB_writeReadHID_EP3OUT_EP3IN use EP3IN/EP3OUT for writeReadHID() c
+             -ommands
+                       // # pragma message("writeReadHID() EP1OUT 64-byte buffer")
+                       // # pragma message("writeReadHID() EP1IN  64-byte buffer")
+                       Handle_In1();
+              #elif USB_writeReadHID_EP2OUT_EP2IN
+                       // # pragma message("writeReadHID() EP2OUT 128-byte buffer")
+                       // # pragma message("writeReadHID() EP2IN  128-byte buffer")
+                       Handle_In2();
+              #elif USB_writeReadHID_EP3OUT_EP3IN
+ 596   3               // # pragma message("writeReadHID() EP3OUT 256-byte buffer")
+ 597   3               // # pragma message("writeReadHID() EP3IN  256-byte buffer")
+ 598   3               Handle_In3();
+ 599   3      #endif // USB_writeReadHID_EP1OUT_EP1IN
+ 600   3            }
+ 601   2            else
+ 602   2            {
+C51 COMPILER V9.51   F3XX_USB0_STANDARD_REQUESTS                                           06/26/2015 13:32:25 PAGE 11  
+
+ 603   3               USB0_STATE = DEV_ADDRESS;     // Unconfigures device by setting state
+ 604   3               EP_STATUS[1] = EP_HALT;       // to address, and changing endpoint
+ 605   3                                             // 1 and 2
+ 606   3            }
+ 607   2         }
+ 608   1         if (EP_STATUS[0] != EP_STALL)
+ 609   1         {
+ 610   2            POLL_WRITE_BYTE (E0CSR, (rbSOPRDY | rbDATAEND));
+ 611   2                                             // Indicate SETUP packet has been
+ 612   2                                             // serviced
+ 613   2         }
+ 614   1      }
+ 615          
+ 616          //-----------------------------------------------------------------------------
+ 617          // Get_Interface
+ 618          //-----------------------------------------------------------------------------
+ 619          //
+ 620          // Return Value - None
+ 621          // Parameters - Non
+ 622          //
+ 623          // Standard request that should not change in custom HID designs.
+ 624          //
+ 625          //-----------------------------------------------------------------------------
+ 626          void Get_Interface (void)              // This routine returns 0x00, since
+ 627          {                                      // only one interface is supported by
+ 628   1                                             // this firmware
+ 629   1      
+ 630   1         // If device is not configured
+ 631   1         if ((USB0_STATE != DEV_CONFIGURED) ||
+ 632   1         // or recipient is not an interface
+ 633   1         (SETUP.bmRequestType != OUT_INTERFACE) ||
+ 634   1         // or non-zero value or index fields
+ 635   1         SETUP.wValue.c[MSB]  ||SETUP.wValue.c[LSB] ||
+ 636   1         // or data length not equal to one
+ 637   1         SETUP.wIndex.c[MSB]  ||SETUP.wIndex.c[LSB] ||
+ 638   1         SETUP.wLength.c[MSB] ||(SETUP.wLength.c[LSB] != 1))
+ 639   1         {
+ 640   2            Force_Stall ();                  // Then return stall due to invalid
+ 641   2                                             // request
+ 642   2         }
+ 643   1      
+ 644   1         else
+ 645   1         {
+ 646   2           // Otherwise, return 0x00 to host
+ 647   2            DATAPTR = (uint8_t*)&ZERO_PACKET;
+ 648   2            DATASIZE = 1;
+ 649   2         }
+ 650   1         if (EP_STATUS[0] != EP_STALL)
+ 651   1         {
+ 652   2           // Set Serviced SETUP packet, put endpoint in transmit mode and reset
+ 653   2           // Data sent counter
+ 654   2            POLL_WRITE_BYTE (E0CSR, rbSOPRDY);
+ 655   2            EP_STATUS[0] = EP_TX;
+ 656   2            DATASENT = 0;
+ 657   2         }
+ 658   1      }
+ 659          
+ 660          //-----------------------------------------------------------------------------
+ 661          // Set_Interface
+ 662          //-----------------------------------------------------------------------------
+ 663          //
+ 664          // Return Value - None
+C51 COMPILER V9.51   F3XX_USB0_STANDARD_REQUESTS                                           06/26/2015 13:32:25 PAGE 12  
+
+ 665          // Parameters - None
+ 666          //
+ 667          // Standard request that should not change in custom HID designs.
+ 668          //
+ 669          //-----------------------------------------------------------------------------
+ 670          void Set_Interface (void)
+ 671          {
+ 672   1         // Make sure request is directed at interface
+ 673   1         if ((SETUP.bmRequestType != IN_INTERFACE)  ||
+ 674   1         // and all other packet values are set to zero
+ 675   1         SETUP.wLength.c[MSB] ||SETUP.wLength.c[LSB]||
+ 676   1         SETUP.wValue.c[MSB]  ||SETUP.wValue.c[LSB] ||
+ 677   1         SETUP.wIndex.c[MSB]  ||SETUP.wIndex.c[LSB])
+ 678   1         {
+ 679   2            Force_Stall ();                  // Othewise send a stall to host
+ 680   2         }
+ 681   1         if (EP_STATUS[0] != EP_STALL)
+ 682   1         {
+ 683   2            POLL_WRITE_BYTE (E0CSR, (rbSOPRDY | rbDATAEND));
+ 684   2                                             // Indicate SETUP packet has been
+ 685   2                                             // serviced
+ 686   2         }
+ 687   1      }
+ 688          
+ 689          //-----------------------------------------------------------------------------
+ 690          // Get_Idle
+ 691          //-----------------------------------------------------------------------------
+ 692          // Not supported.
+ 693          //
+ 694          //-----------------------------------------------------------------------------
+ 695          void Get_Idle(void) {
+ 696   1      }
+ 697          
+ 698          //-----------------------------------------------------------------------------
+ 699          
+ 700          //-----------------------------------------------------------------------------
+ 701          // Get_Protocol
+ 702          //-----------------------------------------------------------------------------
+ 703          // Not supported.
+ 704          //
+ 705          //-----------------------------------------------------------------------------
+ 706          void Get_Protocol(void) { }
+ 707          
+ 708          //-----------------------------------------------------------------------------
+ 709          // Set_Protocol
+ 710          //-----------------------------------------------------------------------------
+ 711          // Not supported.
+ 712          //
+ 713          //-----------------------------------------------------------------------------
+ 714          void Set_Protocol (void) { }
+ 715          
+ 716          
+ 717          
+ 718          //-----------------------------------------------------------------------------
+ 719          // Set_Idle()
+ 720          //-----------------------------------------------------------------------------
+ 721          //
+ 722          // Return Value - None
+ 723          // Parameters - None
+ 724          //
+ 725          // Description: Sets the idle feature on interrupt in endpoint.
+ 726          //-----------------------------------------------------------------------------
+C51 COMPILER V9.51   F3XX_USB0_STANDARD_REQUESTS                                           06/26/2015 13:32:25 PAGE 13  
+
+ 727          void Set_Idle (void)
+ 728          {
+ 729   1      
+ 730   1         if (EP_STATUS[0] != EP_STALL)
+ 731   1         {
+ 732   2            // Set serviced SETUP Packet
+ 733   2            POLL_WRITE_BYTE (E0CSR, (rbSOPRDY | rbDATAEND));
+ 734   2         }
+ 735   1      
+ 736   1      }
+ 737          
+ 738          
+ 739          
+ 740          //-----------------------------------------------------------------------------
+ 741          // Get_Report()
+ 742          //-----------------------------------------------------------------------------
+ 743          //
+ 744          // Return Value - None
+ 745          // Parameters - None
+ 746          //
+ 747          // Description: Sends a given report type to the host.
+ 748          //
+ 749          //-----------------------------------------------------------------------------
+ 750          void Get_Report (void)
+ 751          {
+ 752   1         // call appropriate handler to prepare buffer
+ 753   1         //ReportHandler_IN_ISR(SETUP.wValue.c[LSB]);
+ 754   1         // set DATAPTR to buffer used inside Control Endpoint
+ 755   1         DATAPTR = IO_BUFFER.Ptr;
+ 756   1         DATASIZE = IO_BUFFER.Length;
+ 757   1      
+ 758   1         if (EP_STATUS[0] != EP_STALL)
+ 759   1         {
+ 760   2           // Set serviced SETUP Packet
+ 761   2            POLL_WRITE_BYTE (E0CSR, rbSOPRDY);
+ 762   2            EP_STATUS[0] = EP_TX;            // Endpoint 0 in transmit mode
+ 763   2            DATASENT = 0;                    // Reset DATASENT counter
+ 764   2         }
+ 765   1      }
+ 766          
+ 767          
+ 768          
+ 769          //-----------------------------------------------------------------------------
+ 770          // Set_Report()
+ 771          //-----------------------------------------------------------------------------
+ 772          //
+ 773          // Return Value - None
+ 774          // Parameters - None
+ 775          //
+ 776          // Description: Receives a report sent from the host.
+ 777          //
+ 778          //-----------------------------------------------------------------------------
+ 779          void Set_Report (void)
+ 780          {
+ 781   1         // prepare buffer for OUT packet
+ 782   1         Setup_IO_BUFFER ();
+ 783   1      
+ 784   1         // set DATAPTR to buffer
+ 785   1         DATAPTR = IO_BUFFER.Ptr;
+ 786   1         DATASIZE = SETUP.wLength.i;
+ 787   1      
+ 788   1         if (EP_STATUS[0] != EP_STALL)
+C51 COMPILER V9.51   F3XX_USB0_STANDARD_REQUESTS                                           06/26/2015 13:32:25 PAGE 14  
+
+ 789   1         {
+ 790   2           // Set serviced SETUP Packet
+ 791   2            POLL_WRITE_BYTE (E0CSR, rbSOPRDY);
+ 792   2            EP_STATUS[0] = EP_RX;            // Endpoint 0 in transmit mode
+ 793   2            DATASENT = 0;                    // Reset DATASENT counter
+ 794   2         }
+ 795   1      }
+ 796          
+ 797          
+ 798          
+C51 COMPILER V9.51   F3XX_USB0_STANDARD_REQUESTS                                           06/26/2015 13:32:25 PAGE 15  
+
+ASSEMBLY LISTING OF GENERATED OBJECT CODE
+
+
+             ; FUNCTION Get_Status (BEGIN)
+                                           ; SOURCE LINE # 79
+                                           ; SOURCE LINE # 80
+                                           ; SOURCE LINE # 82
+0000 900000      E     MOV     DPTR,#SETUP+02H
+0003 E0                MOVX    A,@DPTR
+0004 7010              JNZ     ?C0002
+0006 A3                INC     DPTR
+0007 E0                MOVX    A,@DPTR
+0008 700C              JNZ     ?C0002
+000A 900000      E     MOV     DPTR,#SETUP+06H
+000D E0                MOVX    A,@DPTR
+000E 7006              JNZ     ?C0002
+0010 A3                INC     DPTR
+0011 E0                MOVX    A,@DPTR
+0012 6402              XRL     A,#02H
+0014 6003              JZ      ?C0001
+0016         ?C0002:
+                                           ; SOURCE LINE # 87
+                                           ; SOURCE LINE # 88
+0016 120000      E     LCALL   Force_Stall
+                                           ; SOURCE LINE # 89
+0019         ?C0001:
+                                           ; SOURCE LINE # 91
+0019 900000      E     MOV     DPTR,#SETUP
+001C E0                MOVX    A,@DPTR
+001D 247F              ADD     A,#07FH
+001F 6013              JZ      ?C0008
+0021 14                DEC     A
+0022 6032              JZ      ?C0012
+0024 2402              ADD     A,#02H
+0026 7072              JNZ     ?C0020
+                                           ; SOURCE LINE # 92
+                                           ; SOURCE LINE # 93
+0028         ?C0004:
+                                           ; SOURCE LINE # 94
+0028 900000      E     MOV     DPTR,#SETUP+04H
+002B E0                MOVX    A,@DPTR
+002C 706C              JNZ     ?C0148
+002E A3                INC     DPTR
+002F E0                MOVX    A,@DPTR
+0030 6015              JZ      ?C0144
+0032         ?C0006:
+                                           ; SOURCE LINE # 95
+                                           ; SOURCE LINE # 96
+                                           ; SOURCE LINE # 97
+0032 8066              SJMP    ?C0148
+                                           ; SOURCE LINE # 107
+0034         ?C0008:
+                                           ; SOURCE LINE # 108
+0034 900000      E     MOV     DPTR,#USB0_STATE
+0037 E0                MOVX    A,@DPTR
+0038 B4040A            CJNE    A,#04H,?C0010
+003B 900000      E     MOV     DPTR,#SETUP+04H
+003E E0                MOVX    A,@DPTR
+003F 7004              JNZ     ?C0010
+0041 A3                INC     DPTR
+0042 E0                MOVX    A,@DPTR
+0043 6002              JZ      ?C0009
+C51 COMPILER V9.51   F3XX_USB0_STANDARD_REQUESTS                                           06/26/2015 13:32:25 PAGE 16  
+
+0045         ?C0010:
+                                           ; SOURCE LINE # 112
+                                           ; SOURCE LINE # 113
+0045         ?C0143:
+                                           ; SOURCE LINE # 114
+0045 8053              SJMP    ?C0148
+0047         ?C0009:
+                                           ; SOURCE LINE # 116
+                                           ; SOURCE LINE # 118
+0047         ?C0144:
+0047 900000      E     MOV     DPTR,#DATAPTR
+004A 74FF              MOV     A,#0FFH
+004C F0                MOVX    @DPTR,A
+004D A3                INC     DPTR
+004E 7400        R     MOV     A,#HIGH ZERO_PACKET
+0050 F0                MOVX    @DPTR,A
+0051 A3                INC     DPTR
+0052 7400        R     MOV     A,#LOW ZERO_PACKET
+                                           ; SOURCE LINE # 119
+                                           ; SOURCE LINE # 120
+                                           ; SOURCE LINE # 121
+0054 8036              SJMP    ?C0146
+                                           ; SOURCE LINE # 123
+0056         ?C0012:
+                                           ; SOURCE LINE # 124
+0056 900000      E     MOV     DPTR,#USB0_STATE
+0059 E0                MOVX    A,@DPTR
+005A B40406            CJNE    A,#04H,?C0014
+005D 900000      E     MOV     DPTR,#SETUP+04H
+0060 E0                MOVX    A,@DPTR
+0061 6002              JZ      ?C0013
+0063         ?C0014:
+                                           ; SOURCE LINE # 127
+                                           ; SOURCE LINE # 128
+0063         ?C0145:
+                                           ; SOURCE LINE # 129
+0063 8035              SJMP    ?C0148
+0065         ?C0013:
+                                           ; SOURCE LINE # 131
+                                           ; SOURCE LINE # 133
+0065 900000      E     MOV     DPTR,#SETUP+05H
+0068 E0                MOVX    A,@DPTR
+0069 B4812C            CJNE    A,#081H,?C0016
+                                           ; SOURCE LINE # 134
+                                           ; SOURCE LINE # 135
+006C 900000      E     MOV     DPTR,#EP_STATUS+01H
+006F E0                MOVX    A,@DPTR
+0070 900000      E     MOV     DPTR,#DATAPTR
+0073 B4030C            CJNE    A,#03H,?C0017
+                                           ; SOURCE LINE # 136
+                                           ; SOURCE LINE # 138
+0076 74FF              MOV     A,#0FFH
+0078 F0                MOVX    @DPTR,A
+0079 A3                INC     DPTR
+007A 7400        R     MOV     A,#HIGH ONES_PACKET
+007C F0                MOVX    @DPTR,A
+007D A3                INC     DPTR
+007E 7400        R     MOV     A,#LOW ONES_PACKET
+                                           ; SOURCE LINE # 139
+                                           ; SOURCE LINE # 140
+0080 800A              SJMP    ?C0142
+0082         ?C0017:
+C51 COMPILER V9.51   F3XX_USB0_STANDARD_REQUESTS                                           06/26/2015 13:32:25 PAGE 17  
+
+                                           ; SOURCE LINE # 142
+                                           ; SOURCE LINE # 144
+0082 74FF              MOV     A,#0FFH
+0084 F0                MOVX    @DPTR,A
+0085 A3                INC     DPTR
+0086 7400        R     MOV     A,#HIGH ZERO_PACKET
+0088 F0                MOVX    @DPTR,A
+0089 A3                INC     DPTR
+008A 7400        R     MOV     A,#LOW ZERO_PACKET
+008C         ?C0142:
+008C         ?C0146:
+008C F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 145
+008D 900000      E     MOV     DPTR,#DATASIZE
+0090 E4                CLR     A
+0091 F0                MOVX    @DPTR,A
+0092 A3                INC     DPTR
+0093 7402              MOV     A,#02H
+0095 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 146
+                                           ; SOURCE LINE # 147
+0096 8005              SJMP    ?C0003
+0098         ?C0016:
+                                           ; SOURCE LINE # 149
+                                           ; SOURCE LINE # 150
+0098         ?C0147:
+                                           ; SOURCE LINE # 152
+                                           ; SOURCE LINE # 153
+                                           ; SOURCE LINE # 154
+0098 8000              SJMP    ?C0148
+                                           ; SOURCE LINE # 156
+009A         ?C0020:
+                                           ; SOURCE LINE # 157
+009A         ?C0148:
+009A 120000      E     LCALL   Force_Stall
+                                           ; SOURCE LINE # 158
+                                           ; SOURCE LINE # 159
+009D         ?C0003:
+                                           ; SOURCE LINE # 160
+009D 900000      E     MOV     DPTR,#EP_STATUS
+00A0 E0                MOVX    A,@DPTR
+00A1 6404              XRL     A,#04H
+00A3 6018              JZ      ?C0024
+                                           ; SOURCE LINE # 161
+00A5         ?C0022:
+                                           ; SOURCE LINE # 164
+00A5 E596              MOV     A,USB0ADR
+00A7 20E7FB            JB      ACC.7,?C0022
+00AA         ?C0023:
+00AA 759611            MOV     USB0ADR,#011H
+00AD 759740            MOV     USB0DAT,#040H
+                                           ; SOURCE LINE # 165
+00B0 900000      E     MOV     DPTR,#EP_STATUS
+00B3 7401              MOV     A,#01H
+00B5 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 166
+00B6 E4                CLR     A
+00B7 900000      E     MOV     DPTR,#DATASENT
+00BA F0                MOVX    @DPTR,A
+00BB A3                INC     DPTR
+00BC F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 167
+C51 COMPILER V9.51   F3XX_USB0_STANDARD_REQUESTS                                           06/26/2015 13:32:25 PAGE 18  
+
+                                           ; SOURCE LINE # 168
+00BD         ?C0024:
+00BD 22                RET     
+             ; FUNCTION Get_Status (END)
+
+             ; FUNCTION Clear_Feature (BEGIN)
+                                           ; SOURCE LINE # 180
+                                           ; SOURCE LINE # 181
+                                           ; SOURCE LINE # 184
+0000 900000      E     MOV     DPTR,#USB0_STATE
+0003 E0                MOVX    A,@DPTR
+0004 6404              XRL     A,#04H
+0006 705B              JNZ     ?C0149
+0008 900000      E     MOV     DPTR,#SETUP
+000B E0                MOVX    A,@DPTR
+000C FF                MOV     R7,A
+000D 6054              JZ      ?C0149
+000F 6401              XRL     A,#01H
+0011 6050              JZ      ?C0149
+0013 900000      E     MOV     DPTR,#SETUP+02H
+0016 E0                MOVX    A,@DPTR
+0017 704A              JNZ     ?C0149
+0019 900000      E     MOV     DPTR,#SETUP+04H
+001C E0                MOVX    A,@DPTR
+001D 7044              JNZ     ?C0149
+001F 900000      E     MOV     DPTR,#SETUP+06H
+0022 E0                MOVX    A,@DPTR
+0023 703E              JNZ     ?C0149
+0025 A3                INC     DPTR
+0026 E0                MOVX    A,@DPTR
+0027 6002              JZ      ?C0025
+0029         ?C0026:
+                                           ; SOURCE LINE # 193
+                                           ; SOURCE LINE # 194
+                                           ; SOURCE LINE # 195
+0029 8038              SJMP    ?C0149
+002B         ?C0025:
+                                           ; SOURCE LINE # 198
+                                           ; SOURCE LINE # 200
+002B 900000      E     MOV     DPTR,#SETUP
+002E E0                MOVX    A,@DPTR
+002F 6402              XRL     A,#02H
+0031 7030              JNZ     ?C0028
+0033 900000      E     MOV     DPTR,#SETUP+03H
+0036 E0                MOVX    A,@DPTR
+0037 702A              JNZ     ?C0028
+0039 900000      E     MOV     DPTR,#SETUP+05H
+003C E0                MOVX    A,@DPTR
+003D FF                MOV     R7,A
+003E 6481              XRL     A,#081H
+0040 7021              JNZ     ?C0028
+                                           ; SOURCE LINE # 205
+                                           ; SOURCE LINE # 206
+0042 EF                MOV     A,R7
+0043 B48120            CJNE    A,#081H,?C0035
+                                           ; SOURCE LINE # 207
+0046         ?C0030:
+                                           ; SOURCE LINE # 220
+0046 E596              MOV     A,USB0ADR
+0048 20E7FB            JB      ACC.7,?C0030
+004B         ?C0031:
+004B 75960E            MOV     USB0ADR,#0EH
+C51 COMPILER V9.51   F3XX_USB0_STANDARD_REQUESTS                                           06/26/2015 13:32:25 PAGE 19  
+
+004E 759703            MOV     USB0DAT,#03H
+0051         ?C0032:
+                                           ; SOURCE LINE # 221
+0051 E596              MOV     A,USB0ADR
+0053 20E7FB            JB      ACC.7,?C0032
+0056         ?C0033:
+0056 759611            MOV     USB0ADR,#011H
+0059 759740            MOV     USB0DAT,#040H
+                                           ; SOURCE LINE # 222
+005C E4                CLR     A
+005D 900000      E     MOV     DPTR,#EP_STATUS+03H
+0060 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 223
+                                           ; SOURCE LINE # 224
+0061 8003              SJMP    ?C0035
+0063         ?C0028:
+                                           ; SOURCE LINE # 226
+                                           ; SOURCE LINE # 227
+0063         ?C0149:
+0063 120000      E     LCALL   Force_Stall
+                                           ; SOURCE LINE # 228
+                                           ; SOURCE LINE # 229
+0066         ?C0035:
+                                           ; SOURCE LINE # 230
+0066 E596              MOV     A,USB0ADR
+0068 20E7FB            JB      ACC.7,?C0035
+006B         ?C0036:
+006B 75960E            MOV     USB0ADR,#0EH
+006E E4                CLR     A
+006F F597              MOV     USB0DAT,A
+                                           ; SOURCE LINE # 231
+0071 900000      E     MOV     DPTR,#EP_STATUS
+0074 E0                MOVX    A,@DPTR
+0075 6404              XRL     A,#04H
+0077 600B              JZ      ?C0040
+                                           ; SOURCE LINE # 232
+0079         ?C0038:
+                                           ; SOURCE LINE # 233
+0079 E596              MOV     A,USB0ADR
+007B 20E7FB            JB      ACC.7,?C0038
+007E         ?C0039:
+007E 759611            MOV     USB0ADR,#011H
+0081 759748            MOV     USB0DAT,#048H
+                                           ; SOURCE LINE # 237
+                                           ; SOURCE LINE # 238
+0084         ?C0040:
+0084 22                RET     
+             ; FUNCTION Clear_Feature (END)
+
+             ; FUNCTION Set_Feature (BEGIN)
+                                           ; SOURCE LINE # 250
+                                           ; SOURCE LINE # 251
+                                           ; SOURCE LINE # 254
+0000 900000      E     MOV     DPTR,#USB0_STATE
+0003 E0                MOVX    A,@DPTR
+0004 6404              XRL     A,#04H
+0006 7061              JNZ     ?C0150
+0008 900000      E     MOV     DPTR,#SETUP
+000B E0                MOVX    A,@DPTR
+000C FF                MOV     R7,A
+000D 605A              JZ      ?C0150
+000F 6401              XRL     A,#01H
+C51 COMPILER V9.51   F3XX_USB0_STANDARD_REQUESTS                                           06/26/2015 13:32:25 PAGE 20  
+
+0011 6056              JZ      ?C0150
+0013 900000      E     MOV     DPTR,#SETUP+02H
+0016 E0                MOVX    A,@DPTR
+0017 7050              JNZ     ?C0150
+0019 900000      E     MOV     DPTR,#SETUP+04H
+001C E0                MOVX    A,@DPTR
+001D 704A              JNZ     ?C0150
+001F 900000      E     MOV     DPTR,#SETUP+06H
+0022 E0                MOVX    A,@DPTR
+0023 7044              JNZ     ?C0150
+0025 A3                INC     DPTR
+0026 E0                MOVX    A,@DPTR
+0027 6002              JZ      ?C0041
+0029         ?C0042:
+                                           ; SOURCE LINE # 260
+                                           ; SOURCE LINE # 261
+                                           ; SOURCE LINE # 262
+0029 803E              SJMP    ?C0150
+002B         ?C0041:
+                                           ; SOURCE LINE # 265
+                                           ; SOURCE LINE # 267
+002B 900000      E     MOV     DPTR,#SETUP
+002E E0                MOVX    A,@DPTR
+002F 6402              XRL     A,#02H
+0031 7036              JNZ     ?C0044
+0033 900000      E     MOV     DPTR,#SETUP+03H
+0036 E0                MOVX    A,@DPTR
+0037 7030              JNZ     ?C0044
+0039 900000      E     MOV     DPTR,#SETUP+05H
+003C E0                MOVX    A,@DPTR
+003D FF                MOV     R7,A
+003E 6481              XRL     A,#081H
+0040 6005              JZ      ?C0045
+0042 EF                MOV     A,R7
+0043 6402              XRL     A,#02H
+0045 7022              JNZ     ?C0044
+0047         ?C0045:
+                                           ; SOURCE LINE # 272
+                                           ; SOURCE LINE # 296
+0047 EF                MOV     A,R7
+0048 B48321            CJNE    A,#083H,?C0052
+                                           ; SOURCE LINE # 297
+004B         ?C0047:
+                                           ; SOURCE LINE # 298
+004B E596              MOV     A,USB0ADR
+004D 20E7FB            JB      ACC.7,?C0047
+0050         ?C0048:
+0050 75960E            MOV     USB0ADR,#0EH
+0053 759703            MOV     USB0DAT,#03H
+0056         ?C0049:
+                                           ; SOURCE LINE # 299
+0056 E596              MOV     A,USB0ADR
+0058 20E7FB            JB      ACC.7,?C0049
+005B         ?C0050:
+005B 759611            MOV     USB0ADR,#011H
+005E 759710            MOV     USB0DAT,#010H
+                                           ; SOURCE LINE # 300
+0061 900000      E     MOV     DPTR,#EP_STATUS+03H
+0064 7403              MOV     A,#03H
+0066 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 301
+                                           ; SOURCE LINE # 303
+C51 COMPILER V9.51   F3XX_USB0_STANDARD_REQUESTS                                           06/26/2015 13:32:25 PAGE 21  
+
+0067 8003              SJMP    ?C0052
+0069         ?C0044:
+                                           ; SOURCE LINE # 305
+                                           ; SOURCE LINE # 306
+0069         ?C0150:
+0069 120000      E     LCALL   Force_Stall
+                                           ; SOURCE LINE # 307
+                                           ; SOURCE LINE # 308
+006C         ?C0052:
+                                           ; SOURCE LINE # 309
+006C E596              MOV     A,USB0ADR
+006E 20E7FB            JB      ACC.7,?C0052
+0071         ?C0053:
+0071 75960E            MOV     USB0ADR,#0EH
+0074 E4                CLR     A
+0075 F597              MOV     USB0DAT,A
+                                           ; SOURCE LINE # 310
+0077 900000      E     MOV     DPTR,#EP_STATUS
+007A E0                MOVX    A,@DPTR
+007B 6404              XRL     A,#04H
+007D 600B              JZ      ?C0057
+                                           ; SOURCE LINE # 311
+007F         ?C0055:
+                                           ; SOURCE LINE # 312
+007F E596              MOV     A,USB0ADR
+0081 20E7FB            JB      ACC.7,?C0055
+0084         ?C0056:
+0084 759611            MOV     USB0ADR,#011H
+0087 759748            MOV     USB0DAT,#048H
+                                           ; SOURCE LINE # 315
+                                           ; SOURCE LINE # 316
+008A         ?C0057:
+008A 22                RET     
+             ; FUNCTION Set_Feature (END)
+
+             ; FUNCTION Set_Address (BEGIN)
+                                           ; SOURCE LINE # 328
+                                           ; SOURCE LINE # 329
+                                           ; SOURCE LINE # 331
+0000 900000      E     MOV     DPTR,#SETUP
+0003 E0                MOVX    A,@DPTR
+0004 701D              JNZ     ?C0059
+0006 900000      E     MOV     DPTR,#SETUP+04H
+0009 E0                MOVX    A,@DPTR
+000A 7017              JNZ     ?C0059
+000C A3                INC     DPTR
+000D E0                MOVX    A,@DPTR
+000E 7013              JNZ     ?C0059
+0010 A3                INC     DPTR
+0011 E0                MOVX    A,@DPTR
+0012 700F              JNZ     ?C0059
+0014 A3                INC     DPTR
+0015 E0                MOVX    A,@DPTR
+0016 700B              JNZ     ?C0059
+0018 900000      E     MOV     DPTR,#SETUP+02H
+001B E0                MOVX    A,@DPTR
+001C 7005              JNZ     ?C0059
+001E A3                INC     DPTR
+001F E0                MOVX    A,@DPTR
+0020 30E703            JNB     ACC.7,?C0058
+0023         ?C0059:
+                                           ; SOURCE LINE # 336
+C51 COMPILER V9.51   F3XX_USB0_STANDARD_REQUESTS                                           06/26/2015 13:32:25 PAGE 22  
+
+                                           ; SOURCE LINE # 337
+0023 120000      E     LCALL   Force_Stall
+                                           ; SOURCE LINE # 338
+0026         ?C0058:
+                                           ; SOURCE LINE # 340
+0026 900000      E     MOV     DPTR,#EP_STATUS
+0029 7405              MOV     A,#05H
+002B F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 342
+002C 900000      E     MOV     DPTR,#SETUP+03H
+002F E0                MOVX    A,@DPTR
+0030 900000      E     MOV     DPTR,#USB0_STATE
+0033 6005              JZ      ?C0060
+                                           ; SOURCE LINE # 343
+                                           ; SOURCE LINE # 344
+0035 7403              MOV     A,#03H
+0037 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 346
+0038 8003              SJMP    ?C0061
+003A         ?C0060:
+                                           ; SOURCE LINE # 348
+                                           ; SOURCE LINE # 349
+003A 7402              MOV     A,#02H
+003C F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 350
+003D         ?C0061:
+                                           ; SOURCE LINE # 351
+003D 900000      E     MOV     DPTR,#EP_STATUS
+0040 E0                MOVX    A,@DPTR
+0041 6404              XRL     A,#04H
+0043 600B              JZ      ?C0065
+                                           ; SOURCE LINE # 352
+0045         ?C0063:
+                                           ; SOURCE LINE # 353
+0045 E596              MOV     A,USB0ADR
+0047 20E7FB            JB      ACC.7,?C0063
+004A         ?C0064:
+004A 759611            MOV     USB0ADR,#011H
+004D 759748            MOV     USB0DAT,#048H
+                                           ; SOURCE LINE # 356
+                                           ; SOURCE LINE # 357
+0050         ?C0065:
+0050 22                RET     
+             ; FUNCTION Set_Address (END)
+
+             ; FUNCTION Get_Descriptor (BEGIN)
+                                           ; SOURCE LINE # 369
+                                           ; SOURCE LINE # 370
+                                           ; SOURCE LINE # 373
+0000 900000      E     MOV     DPTR,#SETUP+02H
+0003 E0                MOVX    A,@DPTR
+0004 24DF              ADD     A,#0DFH
+0006 7003              JNZ     $ + 5H
+0008 020000      R     LJMP    ?C0078
+000B 14                DEC     A
+000C 7003              JNZ     $ + 5H
+000E 020000      R     LJMP    ?C0079
+0011 2421              ADD     A,#021H
+0013 B40500            CJNE    A,#05H,?C0140
+0016         ?C0140:
+0016 4003              JC      $ + 5H
+0018 020000      R     LJMP    ?C0080
+C51 COMPILER V9.51   F3XX_USB0_STANDARD_REQUESTS                                           06/26/2015 13:32:25 PAGE 23  
+
+001B 900000      R     MOV     DPTR,#?C0141
+001E 75F003            MOV     B,#03H
+0021 A4                MUL     AB
+0022 C583              XCH     A,DPH
+0024 25F0              ADD     A,B
+0026 C583              XCH     A,DPH
+0028 73                JMP     @A+DPTR
+0029         ?C0141:
+0029 020000      R     LJMP    ?C0067
+002C 020000      R     LJMP    ?C0068
+002F 020000      R     LJMP    ?C0069
+0032 020000      R     LJMP    ?C0072
+0035 020000      R     LJMP    ?C0073
+                                           ; SOURCE LINE # 374
+                                           ; SOURCE LINE # 375
+0038         ?C0067:
+                                           ; SOURCE LINE # 376
+0038 900000      E     MOV     DPTR,#DATAPTR
+003B 74FF              MOV     A,#0FFH
+003D F0                MOVX    @DPTR,A
+003E A3                INC     DPTR
+003F 7400        E     MOV     A,#HIGH DEVICEDESC
+0041 F0                MOVX    @DPTR,A
+0042 A3                INC     DPTR
+0043 7400        E     MOV     A,#LOW DEVICEDESC
+0045 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 377
+0046 900000      E     MOV     DPTR,#DEVICEDESC
+                                           ; SOURCE LINE # 378
+0049 8072              SJMP    ?C0151
+                                           ; SOURCE LINE # 380
+004B         ?C0068:
+                                           ; SOURCE LINE # 381
+004B 900000      E     MOV     DPTR,#DATAPTR
+004E 74FF              MOV     A,#0FFH
+0050 F0                MOVX    @DPTR,A
+0051 A3                INC     DPTR
+0052 7400        E     MOV     A,#HIGH HIDCONFIGDESC
+0054 F0                MOVX    @DPTR,A
+0055 A3                INC     DPTR
+0056 7400        E     MOV     A,#LOW HIDCONFIGDESC
+0058 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 385
+0059 900000      E     MOV     DPTR,#HIDCONFIGDESC+03H
+005C E4                CLR     A
+005D 93                MOVC    A,@A+DPTR
+005E FE                MOV     R6,A
+005F 900000      E     MOV     DPTR,#HIDCONFIGDESC+02H
+0062 E4                CLR     A
+0063 93                MOVC    A,@A+DPTR
+0064 7C00              MOV     R4,#00H
+0066 2400              ADD     A,#00H
+0068 FF                MOV     R7,A
+0069 EC                MOV     A,R4
+006A 3E                ADDC    A,R6
+006B 900000      E     MOV     DPTR,#DATASIZE
+                                           ; SOURCE LINE # 387
+006E 020000      R     LJMP    ?C0156
+                                           ; SOURCE LINE # 389
+0071         ?C0069:
+                                           ; SOURCE LINE # 394
+0071 900000      E     MOV     DPTR,#SETUP+03H
+C51 COMPILER V9.51   F3XX_USB0_STANDARD_REQUESTS                                           06/26/2015 13:32:25 PAGE 24  
+
+0074 E0                MOVX    A,@DPTR
+0075 D3                SETB    C
+0076 9402              SUBB    A,#02H
+0078 4003              JC      ?C0070
+                                           ; SOURCE LINE # 395
+                                           ; SOURCE LINE # 396
+                                           ; SOURCE LINE # 397
+007A 020000      R     LJMP    ?C0157
+007D         ?C0070:
+                                           ; SOURCE LINE # 399
+                                           ; SOURCE LINE # 400
+007D 900000      E     MOV     DPTR,#SETUP+03H
+0080 E0                MOVX    A,@DPTR
+0081 75F003            MOV     B,#03H
+0084 A4                MUL     AB
+0085 2400        E     ADD     A,#LOW STRINGDESCTABLE
+0087 F582              MOV     DPL,A
+0089 E5F0              MOV     A,B
+008B 3400        E     ADDC    A,#HIGH STRINGDESCTABLE
+008D F583              MOV     DPH,A
+008F E0                MOVX    A,@DPTR
+0090 FB                MOV     R3,A
+0091 A3                INC     DPTR
+0092 E0                MOVX    A,@DPTR
+0093 FA                MOV     R2,A
+0094 A3                INC     DPTR
+0095 E0                MOVX    A,@DPTR
+0096 F9                MOV     R1,A
+0097 900000      E     MOV     DPTR,#DATAPTR
+009A EB                MOV     A,R3
+009B F0                MOVX    @DPTR,A
+009C A3                INC     DPTR
+009D EA                MOV     A,R2
+009E F0                MOVX    @DPTR,A
+009F A3                INC     DPTR
+00A0 E9                MOV     A,R1
+00A1 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 402
+00A2 120000      E     LCALL   ?C?CLDPTR
+00A5 FF                MOV     R7,A
+00A6 900000      E     MOV     DPTR,#DATASIZE
+00A9 E4                CLR     A
+00AA         ?C0152:
+                                           ; SOURCE LINE # 403
+                                           ; SOURCE LINE # 404
+00AA 8078              SJMP    ?C0156
+                                           ; SOURCE LINE # 406
+00AC         ?C0072:
+                                           ; SOURCE LINE # 407
+00AC 900000      E     MOV     DPTR,#DATAPTR
+00AF 74FF              MOV     A,#0FFH
+00B1 F0                MOVX    @DPTR,A
+00B2 A3                INC     DPTR
+00B3 7400        E     MOV     A,#HIGH HIDCONFIGDESC+09H
+00B5 F0                MOVX    @DPTR,A
+00B6 A3                INC     DPTR
+00B7 7400        E     MOV     A,#LOW HIDCONFIGDESC+09H
+00B9 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 408
+00BA 900000      E     MOV     DPTR,#HIDCONFIGDESC+09H
+00BD         ?C0151:
+00BD E4                CLR     A
+C51 COMPILER V9.51   F3XX_USB0_STANDARD_REQUESTS                                           06/26/2015 13:32:25 PAGE 25  
+
+00BE 93                MOVC    A,@A+DPTR
+00BF FF                MOV     R7,A
+00C0 900000      E     MOV     DPTR,#DATASIZE
+00C3 E4                CLR     A
+00C4         ?C0154:
+                                           ; SOURCE LINE # 409
+00C4 805E              SJMP    ?C0156
+                                           ; SOURCE LINE # 411
+00C6         ?C0073:
+                                           ; SOURCE LINE # 446
+00C6 900000      E     MOV     DPTR,#SETUP+03H
+00C9 E0                MOVX    A,@DPTR
+00CA FF                MOV     R7,A
+00CB B4831E            CJNE    A,#083H,?C0074
+                                           ; SOURCE LINE # 447
+                                           ; SOURCE LINE # 448
+00CE 900000      E     MOV     DPTR,#DATAPTR
+00D1 74FF              MOV     A,#0FFH
+00D3 F0                MOVX    @DPTR,A
+00D4 A3                INC     DPTR
+00D5 7400        E     MOV     A,#HIGH HIDCONFIGDESC+01BH
+00D7 F0                MOVX    @DPTR,A
+00D8 A3                INC     DPTR
+00D9 7400        E     MOV     A,#LOW HIDCONFIGDESC+01BH
+00DB F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 449
+00DC 900000      E     MOV     DPTR,#HIDCONFIGDESC+01BH
+00DF E4                CLR     A
+00E0 93                MOVC    A,@A+DPTR
+00E1 FD                MOV     R5,A
+00E2 900000      E     MOV     DPTR,#DATASIZE
+00E5 E4                CLR     A
+00E6 F0                MOVX    @DPTR,A
+00E7 A3                INC     DPTR
+00E8 ED                MOV     A,R5
+00E9 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 450
+00EA 805A              SJMP    ?C0066
+00EC         ?C0074:
+                                           ; SOURCE LINE # 451
+00EC EF                MOV     A,R7
+00ED B4031A            CJNE    A,#03H,?C0076
+                                           ; SOURCE LINE # 452
+                                           ; SOURCE LINE # 453
+00F0 900000      E     MOV     DPTR,#DATAPTR
+00F3 74FF              MOV     A,#0FFH
+00F5 F0                MOVX    @DPTR,A
+00F6 A3                INC     DPTR
+00F7 7400        E     MOV     A,#HIGH HIDCONFIGDESC+022H
+00F9 F0                MOVX    @DPTR,A
+00FA A3                INC     DPTR
+00FB 7400        E     MOV     A,#LOW HIDCONFIGDESC+022H
+00FD F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 454
+00FE 900000      E     MOV     DPTR,#HIDCONFIGDESC+022H
+0101 E4                CLR     A
+0102 93                MOVC    A,@A+DPTR
+0103 FF                MOV     R7,A
+0104 900000      E     MOV     DPTR,#DATASIZE
+0107 E4                CLR     A
+0108         ?C0155:
+                                           ; SOURCE LINE # 455
+C51 COMPILER V9.51   F3XX_USB0_STANDARD_REQUESTS                                           06/26/2015 13:32:25 PAGE 26  
+
+0108 801A              SJMP    ?C0156
+010A         ?C0076:
+                                           ; SOURCE LINE # 458
+                                           ; SOURCE LINE # 459
+010A         ?C0153:
+                                           ; SOURCE LINE # 460
+                                           ; SOURCE LINE # 461
+010A 8037              SJMP    ?C0157
+                                           ; SOURCE LINE # 463
+010C         ?C0078:
+                                           ; SOURCE LINE # 464
+010C 900000      E     MOV     DPTR,#DATAPTR
+010F 74FF              MOV     A,#0FFH
+0111 F0                MOVX    @DPTR,A
+0112 A3                INC     DPTR
+0113 7400        E     MOV     A,#HIGH HIDCONFIGDESC+012H
+0115 F0                MOVX    @DPTR,A
+0116 A3                INC     DPTR
+0117 7400        E     MOV     A,#LOW HIDCONFIGDESC+012H
+0119 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 465
+011A 900000      E     MOV     DPTR,#HIDCONFIGDESC+012H
+011D E4                CLR     A
+011E 93                MOVC    A,@A+DPTR
+011F FF                MOV     R7,A
+0120 900000      E     MOV     DPTR,#DATASIZE
+0123 E4                CLR     A
+0124         ?C0156:
+0124 F0                MOVX    @DPTR,A
+0125 A3                INC     DPTR
+0126 EF                MOV     A,R7
+0127 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 466
+0128 801C              SJMP    ?C0066
+                                           ; SOURCE LINE # 468
+012A         ?C0079:
+                                           ; SOURCE LINE # 469
+012A 900000      E     MOV     DPTR,#DATAPTR
+012D 74FF              MOV     A,#0FFH
+012F F0                MOVX    @DPTR,A
+0130 A3                INC     DPTR
+0131 7400        E     MOV     A,#HIGH HIDREPORTDESC
+0133 F0                MOVX    @DPTR,A
+0134 A3                INC     DPTR
+0135 7400        E     MOV     A,#LOW HIDREPORTDESC
+0137 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 470
+0138 900000      E     MOV     DPTR,#DATASIZE
+013B E4                CLR     A
+013C F0                MOVX    @DPTR,A
+013D A3                INC     DPTR
+013E 7428              MOV     A,#028H
+0140 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 471
+0141 8003              SJMP    ?C0066
+                                           ; SOURCE LINE # 473
+0143         ?C0080:
+                                           ; SOURCE LINE # 474
+0143         ?C0157:
+0143 120000      E     LCALL   Force_Stall
+                                           ; SOURCE LINE # 475
+                                           ; SOURCE LINE # 476
+C51 COMPILER V9.51   F3XX_USB0_STANDARD_REQUESTS                                           06/26/2015 13:32:25 PAGE 27  
+
+0146         ?C0066:
+                                           ; SOURCE LINE # 479
+0146 900000      E     MOV     DPTR,#SETUP+02H
+0149 E0                MOVX    A,@DPTR
+014A FF                MOV     R7,A
+014B 6401              XRL     A,#01H
+014D 6013              JZ      ?C0082
+014F EF                MOV     A,R7
+0150 6402              XRL     A,#02H
+0152 600E              JZ      ?C0082
+0154 EF                MOV     A,R7
+0155 6403              XRL     A,#03H
+0157 6009              JZ      ?C0082
+0159 EF                MOV     A,R7
+015A 6404              XRL     A,#04H
+015C 6004              JZ      ?C0082
+015E EF                MOV     A,R7
+015F B40523            CJNE    A,#05H,?C0081
+0162         ?C0082:
+                                           ; SOURCE LINE # 484
+                                           ; SOURCE LINE # 485
+0162 900000      E     MOV     DPTR,#SETUP+07H
+0165 E0                MOVX    A,@DPTR
+0166 FF                MOV     R7,A
+0167 D3                SETB    C
+0168 900000      E     MOV     DPTR,#DATASIZE+01H
+016B E0                MOVX    A,@DPTR
+016C 9F                SUBB    A,R7
+016D 900000      E     MOV     DPTR,#DATASIZE
+0170 E0                MOVX    A,@DPTR
+0171 9400              SUBB    A,#00H
+0173 4010              JC      ?C0081
+0175 900000      E     MOV     DPTR,#SETUP+06H
+0178 E0                MOVX    A,@DPTR
+0179 700A              JNZ     ?C0081
+                                           ; SOURCE LINE # 487
+                                           ; SOURCE LINE # 488
+017B E0                MOVX    A,@DPTR
+017C FE                MOV     R6,A
+017D 900000      E     MOV     DPTR,#DATASIZE
+0180 EE                MOV     A,R6
+0181 F0                MOVX    @DPTR,A
+0182 A3                INC     DPTR
+0183 EF                MOV     A,R7
+0184 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 489
+                                           ; SOURCE LINE # 490
+0185         ?C0081:
+                                           ; SOURCE LINE # 491
+0185 900000      E     MOV     DPTR,#EP_STATUS
+0188 E0                MOVX    A,@DPTR
+0189 6404              XRL     A,#04H
+018B 6018              JZ      ?C0087
+                                           ; SOURCE LINE # 492
+018D         ?C0085:
+                                           ; SOURCE LINE # 493
+018D E596              MOV     A,USB0ADR
+018F 20E7FB            JB      ACC.7,?C0085
+0192         ?C0086:
+0192 759611            MOV     USB0ADR,#011H
+0195 759740            MOV     USB0DAT,#040H
+                                           ; SOURCE LINE # 494
+C51 COMPILER V9.51   F3XX_USB0_STANDARD_REQUESTS                                           06/26/2015 13:32:25 PAGE 28  
+
+0198 900000      E     MOV     DPTR,#EP_STATUS
+019B 7401              MOV     A,#01H
+019D F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 495
+019E E4                CLR     A
+019F 900000      E     MOV     DPTR,#DATASENT
+01A2 F0                MOVX    @DPTR,A
+01A3 A3                INC     DPTR
+01A4 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 496
+                                           ; SOURCE LINE # 497
+01A5         ?C0087:
+01A5 22                RET     
+             ; FUNCTION Get_Descriptor (END)
+
+             ; FUNCTION Get_Configuration (BEGIN)
+                                           ; SOURCE LINE # 509
+                                           ; SOURCE LINE # 510
+                                           ; SOURCE LINE # 512
+0000 900000      E     MOV     DPTR,#SETUP
+0003 E0                MOVX    A,@DPTR
+0004 6480              XRL     A,#080H
+0006 701C              JNZ     ?C0089
+0008 900000      E     MOV     DPTR,#SETUP+02H
+000B E0                MOVX    A,@DPTR
+000C 7016              JNZ     ?C0089
+000E A3                INC     DPTR
+000F E0                MOVX    A,@DPTR
+0010 7012              JNZ     ?C0089
+0012 A3                INC     DPTR
+0013 E0                MOVX    A,@DPTR
+0014 700E              JNZ     ?C0089
+0016 A3                INC     DPTR
+0017 E0                MOVX    A,@DPTR
+0018 700A              JNZ     ?C0089
+001A A3                INC     DPTR
+001B E0                MOVX    A,@DPTR
+001C 7006              JNZ     ?C0089
+001E A3                INC     DPTR
+001F E0                MOVX    A,@DPTR
+0020 6401              XRL     A,#01H
+0022 6005              JZ      ?C0088
+0024         ?C0089:
+                                           ; SOURCE LINE # 519
+                                           ; SOURCE LINE # 520
+0024 120000      E     LCALL   Force_Stall
+                                           ; SOURCE LINE # 521
+0027 8038              SJMP    ?C0090
+0029         ?C0088:
+                                           ; SOURCE LINE # 524
+                                           ; SOURCE LINE # 525
+0029 900000      E     MOV     DPTR,#USB0_STATE
+002C E0                MOVX    A,@DPTR
+002D FF                MOV     R7,A
+002E B40416            CJNE    A,#04H,?C0091
+                                           ; SOURCE LINE # 526
+                                           ; SOURCE LINE # 528
+0031 900000      E     MOV     DPTR,#DATAPTR
+0034 74FF              MOV     A,#0FFH
+0036 F0                MOVX    @DPTR,A
+0037 A3                INC     DPTR
+0038 7400        R     MOV     A,#HIGH ONES_PACKET
+C51 COMPILER V9.51   F3XX_USB0_STANDARD_REQUESTS                                           06/26/2015 13:32:25 PAGE 29  
+
+003A F0                MOVX    @DPTR,A
+003B A3                INC     DPTR
+003C 7400        R     MOV     A,#LOW ONES_PACKET
+003E F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 529
+003F 900000      E     MOV     DPTR,#DATASIZE
+0042 E4                CLR     A
+0043 F0                MOVX    @DPTR,A
+0044 A3                INC     DPTR
+0045 04                INC     A
+0046 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 530
+0047         ?C0091:
+                                           ; SOURCE LINE # 531
+0047 EF                MOV     A,R7
+0048 B40316            CJNE    A,#03H,?C0090
+                                           ; SOURCE LINE # 532
+                                           ; SOURCE LINE # 533
+004B 900000      E     MOV     DPTR,#DATAPTR
+004E 74FF              MOV     A,#0FFH
+0050 F0                MOVX    @DPTR,A
+0051 A3                INC     DPTR
+0052 7400        R     MOV     A,#HIGH ZERO_PACKET
+0054 F0                MOVX    @DPTR,A
+0055 A3                INC     DPTR
+0056 7400        R     MOV     A,#LOW ZERO_PACKET
+0058 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 534
+0059 900000      E     MOV     DPTR,#DATASIZE
+005C E4                CLR     A
+005D F0                MOVX    @DPTR,A
+005E A3                INC     DPTR
+005F 04                INC     A
+0060 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 535
+                                           ; SOURCE LINE # 536
+0061         ?C0090:
+                                           ; SOURCE LINE # 537
+0061 900000      E     MOV     DPTR,#EP_STATUS
+0064 E0                MOVX    A,@DPTR
+0065 6404              XRL     A,#04H
+0067 6018              JZ      ?C0096
+                                           ; SOURCE LINE # 538
+0069         ?C0094:
+                                           ; SOURCE LINE # 540
+0069 E596              MOV     A,USB0ADR
+006B 20E7FB            JB      ACC.7,?C0094
+006E         ?C0095:
+006E 759611            MOV     USB0ADR,#011H
+0071 759740            MOV     USB0DAT,#040H
+                                           ; SOURCE LINE # 541
+0074 900000      E     MOV     DPTR,#EP_STATUS
+0077 7401              MOV     A,#01H
+0079 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 542
+007A E4                CLR     A
+007B 900000      E     MOV     DPTR,#DATASENT
+007E F0                MOVX    @DPTR,A
+007F A3                INC     DPTR
+0080 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 543
+                                           ; SOURCE LINE # 544
+C51 COMPILER V9.51   F3XX_USB0_STANDARD_REQUESTS                                           06/26/2015 13:32:25 PAGE 30  
+
+0081         ?C0096:
+0081 22                RET     
+             ; FUNCTION Get_Configuration (END)
+
+             ; FUNCTION Set_Configuration (BEGIN)
+                                           ; SOURCE LINE # 556
+                                           ; SOURCE LINE # 557
+                                           ; SOURCE LINE # 560
+0000 900000      E     MOV     DPTR,#USB0_STATE
+0003 E0                MOVX    A,@DPTR
+0004 6402              XRL     A,#02H
+0006 6025              JZ      ?C0098
+0008 900000      E     MOV     DPTR,#SETUP
+000B E0                MOVX    A,@DPTR
+000C 701F              JNZ     ?C0098
+000E 900000      E     MOV     DPTR,#SETUP+04H
+0011 E0                MOVX    A,@DPTR
+0012 7019              JNZ     ?C0098
+0014 A3                INC     DPTR
+0015 E0                MOVX    A,@DPTR
+0016 7015              JNZ     ?C0098
+0018 A3                INC     DPTR
+0019 E0                MOVX    A,@DPTR
+001A 7011              JNZ     ?C0098
+001C A3                INC     DPTR
+001D E0                MOVX    A,@DPTR
+001E 700D              JNZ     ?C0098
+0020 900000      E     MOV     DPTR,#SETUP+02H
+0023 E0                MOVX    A,@DPTR
+0024 7007              JNZ     ?C0098
+0026 A3                INC     DPTR
+0027 E0                MOVX    A,@DPTR
+0028 D3                SETB    C
+0029 9401              SUBB    A,#01H
+002B 4005              JC      ?C0097
+002D         ?C0098:
+                                           ; SOURCE LINE # 568
+                                           ; SOURCE LINE # 569
+002D 120000      E     LCALL   Force_Stall
+                                           ; SOURCE LINE # 570
+0030 8044              SJMP    ?C0099
+0032         ?C0097:
+                                           ; SOURCE LINE # 573
+                                           ; SOURCE LINE # 574
+0032 900000      E     MOV     DPTR,#SETUP+03H
+0035 E0                MOVX    A,@DPTR
+0036 D3                SETB    C
+0037 9400              SUBB    A,#00H
+0039 4031              JC      ?C0100
+                                           ; SOURCE LINE # 575
+                                           ; SOURCE LINE # 577
+003B 900000      E     MOV     DPTR,#USB0_STATE
+003E 7404              MOV     A,#04H
+0040 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 579
+0041 E4                CLR     A
+0042 900000      E     MOV     DPTR,#EP_STATUS+03H
+0045 F0                MOVX    @DPTR,A
+0046         ?C0101:
+                                           ; SOURCE LINE # 581
+0046 E596              MOV     A,USB0ADR
+0048 20E7FB            JB      ACC.7,?C0101
+C51 COMPILER V9.51   F3XX_USB0_STANDARD_REQUESTS                                           06/26/2015 13:32:25 PAGE 31  
+
+004B         ?C0102:
+004B 75960E            MOV     USB0ADR,#0EH
+004E 759703            MOV     USB0DAT,#03H
+0051         ?C0103:
+                                           ; SOURCE LINE # 583
+0051 E596              MOV     A,USB0ADR
+0053 20E7FB            JB      ACC.7,?C0103
+0056         ?C0104:
+0056 759612            MOV     USB0ADR,#012H
+0059 759704            MOV     USB0DAT,#04H
+005C         ?C0105:
+                                           ; SOURCE LINE # 584
+005C E596              MOV     A,USB0ADR
+005E 20E7FB            JB      ACC.7,?C0105
+0061         ?C0106:
+0061 75960E            MOV     USB0ADR,#0EH
+0064 E4                CLR     A
+0065 F597              MOV     USB0DAT,A
+                                           ; SOURCE LINE # 598
+0067 120000      E     LCALL   Handle_In3
+                                           ; SOURCE LINE # 600
+006A 800A              SJMP    ?C0099
+006C         ?C0100:
+                                           ; SOURCE LINE # 602
+                                           ; SOURCE LINE # 603
+006C 900000      E     MOV     DPTR,#USB0_STATE
+006F 7403              MOV     A,#03H
+0071 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 604
+0072 900000      E     MOV     DPTR,#EP_STATUS+01H
+0075 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 606
+                                           ; SOURCE LINE # 607
+0076         ?C0099:
+                                           ; SOURCE LINE # 608
+0076 900000      E     MOV     DPTR,#EP_STATUS
+0079 E0                MOVX    A,@DPTR
+007A 6404              XRL     A,#04H
+007C 600B              JZ      ?C0111
+                                           ; SOURCE LINE # 609
+007E         ?C0109:
+                                           ; SOURCE LINE # 610
+007E E596              MOV     A,USB0ADR
+0080 20E7FB            JB      ACC.7,?C0109
+0083         ?C0110:
+0083 759611            MOV     USB0ADR,#011H
+0086 759748            MOV     USB0DAT,#048H
+                                           ; SOURCE LINE # 613
+                                           ; SOURCE LINE # 614
+0089         ?C0111:
+0089 22                RET     
+             ; FUNCTION Set_Configuration (END)
+
+             ; FUNCTION Get_Interface (BEGIN)
+                                           ; SOURCE LINE # 626
+                                           ; SOURCE LINE # 627
+                                           ; SOURCE LINE # 631
+0000 900000      E     MOV     DPTR,#USB0_STATE
+0003 E0                MOVX    A,@DPTR
+0004 6404              XRL     A,#04H
+0006 7024              JNZ     ?C0113
+0008 900000      E     MOV     DPTR,#SETUP
+C51 COMPILER V9.51   F3XX_USB0_STANDARD_REQUESTS                                           06/26/2015 13:32:25 PAGE 32  
+
+000B E0                MOVX    A,@DPTR
+000C 6481              XRL     A,#081H
+000E 701C              JNZ     ?C0113
+0010 900000      E     MOV     DPTR,#SETUP+02H
+0013 E0                MOVX    A,@DPTR
+0014 7016              JNZ     ?C0113
+0016 A3                INC     DPTR
+0017 E0                MOVX    A,@DPTR
+0018 7012              JNZ     ?C0113
+001A A3                INC     DPTR
+001B E0                MOVX    A,@DPTR
+001C 700E              JNZ     ?C0113
+001E A3                INC     DPTR
+001F E0                MOVX    A,@DPTR
+0020 700A              JNZ     ?C0113
+0022 A3                INC     DPTR
+0023 E0                MOVX    A,@DPTR
+0024 7006              JNZ     ?C0113
+0026 A3                INC     DPTR
+0027 E0                MOVX    A,@DPTR
+0028 6401              XRL     A,#01H
+002A 6005              JZ      ?C0112
+002C         ?C0113:
+                                           ; SOURCE LINE # 639
+                                           ; SOURCE LINE # 640
+002C 120000      E     LCALL   Force_Stall
+                                           ; SOURCE LINE # 642
+002F 8016              SJMP    ?C0114
+0031         ?C0112:
+                                           ; SOURCE LINE # 645
+                                           ; SOURCE LINE # 647
+0031 900000      E     MOV     DPTR,#DATAPTR
+0034 74FF              MOV     A,#0FFH
+0036 F0                MOVX    @DPTR,A
+0037 A3                INC     DPTR
+0038 7400        R     MOV     A,#HIGH ZERO_PACKET
+003A F0                MOVX    @DPTR,A
+003B A3                INC     DPTR
+003C 7400        R     MOV     A,#LOW ZERO_PACKET
+003E F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 648
+003F 900000      E     MOV     DPTR,#DATASIZE
+0042 E4                CLR     A
+0043 F0                MOVX    @DPTR,A
+0044 A3                INC     DPTR
+0045 04                INC     A
+0046 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 649
+0047         ?C0114:
+                                           ; SOURCE LINE # 650
+0047 900000      E     MOV     DPTR,#EP_STATUS
+004A E0                MOVX    A,@DPTR
+004B 6404              XRL     A,#04H
+004D 6018              JZ      ?C0118
+                                           ; SOURCE LINE # 651
+004F         ?C0116:
+                                           ; SOURCE LINE # 654
+004F E596              MOV     A,USB0ADR
+0051 20E7FB            JB      ACC.7,?C0116
+0054         ?C0117:
+0054 759611            MOV     USB0ADR,#011H
+0057 759740            MOV     USB0DAT,#040H
+C51 COMPILER V9.51   F3XX_USB0_STANDARD_REQUESTS                                           06/26/2015 13:32:25 PAGE 33  
+
+                                           ; SOURCE LINE # 655
+005A 900000      E     MOV     DPTR,#EP_STATUS
+005D 7401              MOV     A,#01H
+005F F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 656
+0060 E4                CLR     A
+0061 900000      E     MOV     DPTR,#DATASENT
+0064 F0                MOVX    @DPTR,A
+0065 A3                INC     DPTR
+0066 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 657
+                                           ; SOURCE LINE # 658
+0067         ?C0118:
+0067 22                RET     
+             ; FUNCTION Get_Interface (END)
+
+             ; FUNCTION Set_Interface (BEGIN)
+                                           ; SOURCE LINE # 670
+                                           ; SOURCE LINE # 671
+                                           ; SOURCE LINE # 673
+0000 900000      E     MOV     DPTR,#SETUP
+0003 E0                MOVX    A,@DPTR
+0004 6401              XRL     A,#01H
+0006 701C              JNZ     ?C0120
+0008 900000      E     MOV     DPTR,#SETUP+06H
+000B E0                MOVX    A,@DPTR
+000C 7016              JNZ     ?C0120
+000E A3                INC     DPTR
+000F E0                MOVX    A,@DPTR
+0010 7012              JNZ     ?C0120
+0012 900000      E     MOV     DPTR,#SETUP+02H
+0015 E0                MOVX    A,@DPTR
+0016 700C              JNZ     ?C0120
+0018 A3                INC     DPTR
+0019 E0                MOVX    A,@DPTR
+001A 7008              JNZ     ?C0120
+001C A3                INC     DPTR
+001D E0                MOVX    A,@DPTR
+001E 7004              JNZ     ?C0120
+0020 A3                INC     DPTR
+0021 E0                MOVX    A,@DPTR
+0022 6003              JZ      ?C0119
+0024         ?C0120:
+                                           ; SOURCE LINE # 678
+                                           ; SOURCE LINE # 679
+0024 120000      E     LCALL   Force_Stall
+                                           ; SOURCE LINE # 680
+0027         ?C0119:
+                                           ; SOURCE LINE # 681
+0027 900000      E     MOV     DPTR,#EP_STATUS
+002A E0                MOVX    A,@DPTR
+002B 6404              XRL     A,#04H
+002D 600B              JZ      ?C0124
+                                           ; SOURCE LINE # 682
+002F         ?C0122:
+                                           ; SOURCE LINE # 683
+002F E596              MOV     A,USB0ADR
+0031 20E7FB            JB      ACC.7,?C0122
+0034         ?C0123:
+0034 759611            MOV     USB0ADR,#011H
+0037 759748            MOV     USB0DAT,#048H
+                                           ; SOURCE LINE # 686
+C51 COMPILER V9.51   F3XX_USB0_STANDARD_REQUESTS                                           06/26/2015 13:32:25 PAGE 34  
+
+                                           ; SOURCE LINE # 687
+003A         ?C0124:
+003A 22                RET     
+             ; FUNCTION Set_Interface (END)
+
+             ; FUNCTION Get_Idle (BEGIN)
+                                           ; SOURCE LINE # 695
+                                           ; SOURCE LINE # 696
+0000 22                RET     
+             ; FUNCTION Get_Idle (END)
+
+             ; FUNCTION Get_Protocol (BEGIN)
+                                           ; SOURCE LINE # 706
+0000 22                RET     
+             ; FUNCTION Get_Protocol (END)
+
+             ; FUNCTION Set_Protocol (BEGIN)
+                                           ; SOURCE LINE # 714
+0000 22                RET     
+             ; FUNCTION Set_Protocol (END)
+
+             ; FUNCTION Set_Idle (BEGIN)
+                                           ; SOURCE LINE # 727
+                                           ; SOURCE LINE # 728
+                                           ; SOURCE LINE # 730
+0000 900000      E     MOV     DPTR,#EP_STATUS
+0003 E0                MOVX    A,@DPTR
+0004 6404              XRL     A,#04H
+0006 600B              JZ      ?C0131
+                                           ; SOURCE LINE # 731
+0008         ?C0129:
+                                           ; SOURCE LINE # 733
+0008 E596              MOV     A,USB0ADR
+000A 20E7FB            JB      ACC.7,?C0129
+000D         ?C0130:
+000D 759611            MOV     USB0ADR,#011H
+0010 759748            MOV     USB0DAT,#048H
+                                           ; SOURCE LINE # 734
+                                           ; SOURCE LINE # 736
+0013         ?C0131:
+0013 22                RET     
+             ; FUNCTION Set_Idle (END)
+
+             ; FUNCTION Get_Report (BEGIN)
+                                           ; SOURCE LINE # 750
+                                           ; SOURCE LINE # 751
+                                           ; SOURCE LINE # 755
+0000 900000      E     MOV     DPTR,#IO_BUFFER+01H
+0003 E0                MOVX    A,@DPTR
+0004 F9                MOV     R1,A
+0005 A3                INC     DPTR
+0006 E0                MOVX    A,@DPTR
+0007 FA                MOV     R2,A
+0008 A3                INC     DPTR
+0009 E0                MOVX    A,@DPTR
+000A 900000      E     MOV     DPTR,#DATAPTR
+000D C9                XCH     A,R1
+000E F0                MOVX    @DPTR,A
+000F A3                INC     DPTR
+0010 EA                MOV     A,R2
+0011 F0                MOVX    @DPTR,A
+0012 A3                INC     DPTR
+C51 COMPILER V9.51   F3XX_USB0_STANDARD_REQUESTS                                           06/26/2015 13:32:25 PAGE 35  
+
+0013 E9                MOV     A,R1
+0014 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 756
+0015 900000      E     MOV     DPTR,#IO_BUFFER
+0018 E0                MOVX    A,@DPTR
+0019 FF                MOV     R7,A
+001A 900000      E     MOV     DPTR,#DATASIZE
+001D E4                CLR     A
+001E F0                MOVX    @DPTR,A
+001F A3                INC     DPTR
+0020 EF                MOV     A,R7
+0021 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 758
+0022 900000      E     MOV     DPTR,#EP_STATUS
+0025 E0                MOVX    A,@DPTR
+0026 6404              XRL     A,#04H
+0028 6018              JZ      ?C0135
+                                           ; SOURCE LINE # 759
+002A         ?C0133:
+                                           ; SOURCE LINE # 761
+002A E596              MOV     A,USB0ADR
+002C 20E7FB            JB      ACC.7,?C0133
+002F         ?C0134:
+002F 759611            MOV     USB0ADR,#011H
+0032 759740            MOV     USB0DAT,#040H
+                                           ; SOURCE LINE # 762
+0035 900000      E     MOV     DPTR,#EP_STATUS
+0038 7401              MOV     A,#01H
+003A F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 763
+003B E4                CLR     A
+003C 900000      E     MOV     DPTR,#DATASENT
+003F F0                MOVX    @DPTR,A
+0040 A3                INC     DPTR
+0041 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 764
+                                           ; SOURCE LINE # 765
+0042         ?C0135:
+0042 22                RET     
+             ; FUNCTION Get_Report (END)
+
+             ; FUNCTION Set_Report (BEGIN)
+                                           ; SOURCE LINE # 779
+                                           ; SOURCE LINE # 780
+                                           ; SOURCE LINE # 782
+0000 120000      E     LCALL   Setup_IO_BUFFER
+                                           ; SOURCE LINE # 785
+0003 900000      E     MOV     DPTR,#IO_BUFFER+01H
+0006 E0                MOVX    A,@DPTR
+0007 F9                MOV     R1,A
+0008 A3                INC     DPTR
+0009 E0                MOVX    A,@DPTR
+000A FA                MOV     R2,A
+000B A3                INC     DPTR
+000C E0                MOVX    A,@DPTR
+000D 900000      E     MOV     DPTR,#DATAPTR
+0010 C9                XCH     A,R1
+0011 F0                MOVX    @DPTR,A
+0012 A3                INC     DPTR
+0013 EA                MOV     A,R2
+0014 F0                MOVX    @DPTR,A
+0015 A3                INC     DPTR
+C51 COMPILER V9.51   F3XX_USB0_STANDARD_REQUESTS                                           06/26/2015 13:32:25 PAGE 36  
+
+0016 E9                MOV     A,R1
+0017 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 786
+0018 900000      E     MOV     DPTR,#SETUP+06H
+001B E0                MOVX    A,@DPTR
+001C FF                MOV     R7,A
+001D A3                INC     DPTR
+001E E0                MOVX    A,@DPTR
+001F 900000      E     MOV     DPTR,#DATASIZE
+0022 CF                XCH     A,R7
+0023 F0                MOVX    @DPTR,A
+0024 A3                INC     DPTR
+0025 EF                MOV     A,R7
+0026 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 788
+0027 900000      E     MOV     DPTR,#EP_STATUS
+002A E0                MOVX    A,@DPTR
+002B 6404              XRL     A,#04H
+002D 6018              JZ      ?C0139
+                                           ; SOURCE LINE # 789
+002F         ?C0137:
+                                           ; SOURCE LINE # 791
+002F E596              MOV     A,USB0ADR
+0031 20E7FB            JB      ACC.7,?C0137
+0034         ?C0138:
+0034 759611            MOV     USB0ADR,#011H
+0037 759740            MOV     USB0DAT,#040H
+                                           ; SOURCE LINE # 792
+003A 900000      E     MOV     DPTR,#EP_STATUS
+003D 7402              MOV     A,#02H
+003F F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 793
+0040 E4                CLR     A
+0041 900000      E     MOV     DPTR,#DATASENT
+0044 F0                MOVX    @DPTR,A
+0045 A3                INC     DPTR
+0046 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 794
+                                           ; SOURCE LINE # 795
+0047         ?C0139:
+0047 22                RET     
+             ; FUNCTION Set_Report (END)
+
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1558    ----
+   CONSTANT SIZE    =      4    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

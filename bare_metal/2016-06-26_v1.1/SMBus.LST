@@ -1,0 +1,1092 @@
+C51 COMPILER V9.51   SMBUS                                                                 06/26/2015 13:32:25 PAGE 1   
+
+
+C51 COMPILER V9.51, COMPILATION OF MODULE SMBUS
+OBJECT MODULE PLACED IN SMBus.OBJ
+COMPILER INVOKED BY: c:\keil\C51\BIN\C51.exe SMBus.c DB OE LARGE CD
+
+line level    source
+
+   1          //-----------------------------------------------------------------------------
+   2          // SMBus_ISR.c
+   3          //-----------------------------------------------------------------------------
+   4          // Copyright 2014
+   5          //
+   6          // Program Description:
+   7          //
+   8          // Source file for SMBus Interrupt Service Routine and supporting functions.
+   9          //
+  10          //
+  11          // FID:            
+  12          // Target:         C8051F32x/C8051F340
+  13          // Tool chain:     Keil C51 7.50 / Keil EVAL C51
+  14          //                 Silicon Laboratories IDE version 2.6
+  15          // Project Name:   generic
+  16          //
+  17          //
+  18          // Release 1.0
+  19          //              -140401 Initial Revision (Tushar Mazumder)
+  20          //
+  21          // Other than bug fixes or implementation changes, this file should not need to be updated.
+  22          
+  23          // Project-level preprocessor #defines effective across all *.c files
+  24          #include "ProjectDefines.h"
+*** MESSAGE C286 IN LINE 169 OF ProjectDefines.h: writeReadHID() EP3OUT 256-byte buffer
+*** MESSAGE C286 IN LINE 170 OF ProjectDefines.h: writeReadHID() EP3IN 256-byte buffer
+*** MESSAGE C286 IN LINE 171 OF ProjectDefines.h: USB_EP_INDEX 3 for EP_STATUS[USB_EP_INDEX] and POLL_WRITE_BYTE (INDEX,
+             - USB_EP_INDEX);
+  25          
+  26          #include "c8051f3xx.h"
+  27          #include "F3xx_USB0_Descriptor.h"
+  28          #include "SMBus.h"
+  29          
+  30          sbit SDA = P0^4;
+  31          sbit SCL = P0^5;
+  32          
+  33          uint8_t *gpSMBdata;                             // Global pointer to SMBus register and data bytes
+  34                                                 
+  35          
+  36          uint8_t gSMBnumBytesToTransfer; // Global holder for number of data bytes to send or receive in the curren
+             -t SMBus transfer.
+  37          
+  38          uint8_t gSMBlenStartRegister;           // length of the starting register address (in bytes) to handle multi-byte 
+             -addresses; used in random read/write
+  39          
+  40          // gSMBslaveAddress contains the I2C device address (slave address on I2C bus), 8-bits, LEFT-justified.
+  41          uint8_t gSMBslaveAddress;                       // Target SMBus slave address
+  42          
+  43          bit gSMBbusy = 0;                                               // Software flag to indicate when the i2c_read() or i2c_write() functions have clai
+             -med the SMBus
+  44          
+  45          bit gSMBrw;                                                             // Software flag to indicate the direction of the current transfer
+  46          
+  47          bit gSMBsendStartRegister;                              // When set, this flag causes the ISR to send the starting register after se
+             -nding the slave address. Used in random read/write
+C51 COMPILER V9.51   SMBUS                                                                 06/26/2015 13:32:25 PAGE 2   
+
+  48          
+  49          
+  50          bit gSMBrandomRead;                                             // When set, this flag causes the ISR to send a START signal after sending the wo
+             -rd address.
+  51                                                                                          // A random read (a read from a particular address in memory) starts as a write then
+  52                                                                                          // changes to a read after the repeated start is sent. The ISR handles this switchover if the <g
+             -SMBrandomRead>
+  53                                                                                          // bit is set.
+  54          
+  55          bit gSMBackPoll;                                                // When set, this flag causes the ISR to send a repeated START until the slave has a
+             -cknowledged its address
+  56          
+  57          bit gSMBrepeatedStart;                                  // When set, this flag allows the ISR to do a repeated start (instead of stop/s
+             -tart) on random reads, 
+  58          
+  59          bit gSMBstoppedWrite;                                   // When set, this flag allows the ISR to emulate the jungo driver version on psu
+             -edo-random reads, 
+  60                                                                                          // where the slave address is written with the write bit set, immediately proceeeded 
+  61                                                                                          // by a stop/start (or repeated start) before sending the slave address with the read bit set.
+  62          
+  63          // TODO: OS24EVK-66 2015-05-20: firmware xxxx-xx-xx_v1.1 gSMBrepeatedStart 
+  64          // gI2Cflags bit 0x01 gSMBrepeatedStart  Use I2C repeated start between write and read
+  65          // gI2Cflags bit 0x02 debug: jungo emulation
+  66          // gI2Cflags bit 0x04 gSMBackPoll Enable Acknowledge Polling
+  67          uint8_t gI2Cflags = 1; // previously 0
+  68          
+  69          extern uint8_t gOffset;
+  70          
+  71          //-----------------------------------------------------------------------------
+  72          // SMBus0 Interface Interrupt Service Routine (ISR)
+  73          //-----------------------------------------------------------------------------
+  74          // SMBus ISR state machine
+  75          // - Master only implementation - no slave or arbitration states defined
+  76          // - gSMBslaveAddress contains the I2C device address (slave address on I2C bus), 8-bits, LEFT-justified.
+  77          // - All master-receive incoming data is written starting at the global pointer gpSMBdata
+  78          // -- gpSMBdata[0+gOffset] contains status
+  79          // -- gpSMBdata[1+gOffset] contains first master-receive byte
+  80          // -- gpSMBdata[2+gOffset] contains second master-receive byte etc.
+  81          // -- gpSMBdata[4+gOffset] contains "start register" i.e. regAddress i.e. register address within the devi
+             -ce
+  82          // - All master-transmit outgoing data is read from the global pointer gpSMBdata
+  83          // -- gpSMBdata[5 + offset + gSMBlenStartRegister] contains first master-transmit byte
+  84          //
+  85          // - (obsolete) All incoming data is written starting at the global pointer <gpSMBdataIn>
+  86          // - (obsolete) All outgoing data is read from the global pointer <gpSMBdataOut>
+  87          //
+  88          void SMBus_ISR (void) interrupt INTERRUPT_SMBUS0 /* interrupt 7 */
+  89          {
+  90   1              bit FAIL = 0;                       // Used by the ISR to flag failed
+  91   1                                             // transfers
+  92   1      
+  93   1              static int8_t dataByte;                      // Used by the ISR to count the
+  94   1                                             // number of data bytes sent or
+  95   1                                             // received
+  96   1      
+  97   1              static int8_t regByte; 
+  98   1      
+  99   1              static bit SEND_START = 0;          // Send a start. Used when switching to read mode.
+ 100   1      
+ 101   1              switch (SMB0CN & 0xF0)              // Status vector
+ 102   1              {
+ 103   2                      // Master Transmitter/Receiver: START condition transmitted.
+C51 COMPILER V9.51   SMBUS                                                                 06/26/2015 13:32:25 PAGE 3   
+
+ 104   2                      case SMB_MTSTA:
+ 105   2                              SMB0DAT = gSMBslaveAddress;             // Load address of the target slave
+ 106   2                              SMB0DAT &= 0xFE;              // Clear the LSbit of the address for the
+ 107   2                                                                                      // R/W bit
+ 108   2                              SMB0DAT |= gSMBrw;            // Load R/W bit
+ 109   2                              STA = 0;                      // Manually clear START bit
+ 110   2                              dataByte = 0;                        // Reset data byte counter
+ 111   2                              regByte = 0;
+ 112   2                              break;
+ 113   2      
+ 114   2                      // Master Transmitter: Data byte (or Slave Address) transmitted
+ 115   2                      case SMB_MTDB:
+ 116   2                              if (ACK)                      // Slave Address or Data Byte
+ 117   2                              {                             // Acknowledged?
+ 118   3                                      if (SEND_START)
+ 119   3                                      {
+ 120   4                                              if (!gSMBrepeatedStart)
+ 121   4                                                      STO = 1;                                // Set STO to terminate previous transfer (write register)
+ 122   4                                              STA = 1;
+ 123   4                                              SEND_START = 0;
+ 124   4                                              break;
+ 125   4                                      }
+ 126   3                                      if (gSMBstoppedWrite)                   // only can occur when before a read
+ 127   3                                      {
+ 128   4                                              gSMBrw = READ;
+ 129   4                                              gSMBstoppedWrite = 0;
+ 130   4                                              if (!gSMBrepeatedStart)
+ 131   4                                                      STO = 1;
+ 132   4                                              STA = 1;
+ 133   4                                              break;
+ 134   4                                      }
+ 135   3                                      if(gSMBsendStartRegister)       // Are we sending the start register?
+ 136   3                                      {
+ 137   4                                              SMB0DAT = *(gpSMBdata + 4 + gOffset + regByte++);       // Send start register (regAddress)
+ 138   4                                                                                      
+ 139   4                                              if (regByte == gSMBlenStartRegister) 
+ 140   4                                              {
+ 141   5                                                      gSMBsendStartRegister = 0;   // Clear flag
+ 142   5                                                      if (gSMBrandomRead)
+ 143   5                                                      {
+ 144   6                                                              SEND_START = 1;      // Send a START after the next ACK cycle
+ 145   6                                                              gSMBrw = READ;
+ 146   6                                                      }
+ 147   5                                              }
+ 148   4                                              break;
+ 149   4                                      }
+ 150   3      
+ 151   3                                      if (gSMBrw==WRITE)         // Is this transfer a WRITE?
+ 152   3                                      {
+ 153   4                                              if (dataByte < gSMBnumBytesToTransfer)   // Is there data to send?
+ 154   4                                                      SMB0DAT = *(gpSMBdata + 4 + gOffset + gSMBlenStartRegister + dataByte++); // master-transmit data st
+             -arts at (5 + offset + gSMBlenStartRegister) byte
+ 155   4                                              else
+ 156   4                                              {
+ 157   5                                                      STO = 1;              // Set STO to terminate transfer
+ 158   5                                                      gSMBbusy = 0;         // Clear software busy flag
+ 159   5                                                      *(gpSMBdata + gOffset) = 0;                     // status = 0, no errors
+ 160   5                                              }
+ 161   4                                      } 
+ 162   3                              }
+ 163   2                              else                          // If slave NACK,
+ 164   2                                      if(gSMBackPoll)
+C51 COMPILER V9.51   SMBUS                                                                 06/26/2015 13:32:25 PAGE 4   
+
+ 165   2                                              STA = 1;                // Restart transfer
+ 166   2                                      else
+ 167   2                                              FAIL = 1;               // Indicate failed transfer and handle at end of ISR
+ 168   2                              break;
+ 169   2      
+ 170   2                      // Master Receiver: byte received
+ 171   2                      case SMB_MRDB:
+ 172   2                              if ( dataByte < gSMBnumBytesToTransfer )       // Is there any data remaining?
+ 173   2                              {
+ 174   3                                      *(gpSMBdata + 1 + gOffset + dataByte++) = SMB0DAT;   // Store received byte starting in the (2+offset)
+             - position; first position contains status
+ 175   3                                      if (dataByte < gSMBnumBytesToTransfer)
+ 176   3                                              ACK = 1;                   // Set ACK bit (may be cleared later in the code)
+ 177   3                                      else if (dataByte == gSMBnumBytesToTransfer)        // This is the last byte
+ 178   3                                      {
+ 179   4                                              gSMBbusy = 0;              // Free SMBus interface
+ 180   4                                              ACK = 0;                   // Send NACK to indicate last byte of this transfer
+ 181   4                                              STO = 1;                   // Send STOP to terminate transfer
+ 182   4                                              *(gpSMBdata + gOffset) = 0;                             // error status = 0; should be no errors if we got past the write port
+             -ion
+ 183   4                                      }
+ 184   3                              }
+ 185   2                              break;
+ 186   2      
+ 187   2                      default:
+ 188   2                              FAIL = 1;                     // Indicate failed transfer
+ 189   2                                             // and handle at end of ISR
+ 190   2                              break;
+ 191   2              }
+ 192   1      
+ 193   1              if (FAIL)                           // If the transfer failed,
+ 194   1              {
+ 195   2                      SMB0CF &= ~0x80;                 // Reset communication
+ 196   2                      SMB0CF |= 0x80;
+ 197   2                      STA = 0;
+ 198   2                      STO = 0;
+ 199   2                      ACK = 0;
+ 200   2      
+ 201   2                      gSMBbusy = 0;                    // Free SMBus
+ 202   2      
+ 203   2                      FAIL = 0;
+ 204   2                      *(gpSMBdata + gOffset) = 1;                                     // status = 1, NACK error
+ 205   2              }
+ 206   1      
+ 207   1              SI = 0;                             // Clear interrupt flag
+ 208   1      }
+ 209          
+ 210          //-----------------------------------------------------------------------------
+ 211          // Support Functions
+ 212          //-----------------------------------------------------------------------------
+ 213          
+ 214          //-----------------------------------------------------------------------------
+ 215          // i2c_write ()
+ 216          //-----------------------------------------------------------------------------
+ 217          //
+ 218          // Return Value : None
+ 219          // Parameters   :
+ 220          //   1) uint8_t slaveAddress - address of the i2c slave
+ 221          //
+ 222          //   2) uint8_t* pData - pointer to the buffer containing the register address (optional) and data to be w
+             -ritten
+ 223          //
+C51 COMPILER V9.51   SMBUS                                                                 06/26/2015 13:32:25 PAGE 5   
+
+ 224          //   3) uint8_t lenStartReg - starting register byte length (i.e., 2 = 2 bytes long); 0 indicates a non-ra
+             -ndom write
+ 225          //
+ 226          //   4) uint8_t lenData - number of data bytes to be written to the i2c slave
+ 227          //       
+ 228          //
+ 229          void i2c_write(uint8_t slaveAddress, uint8_t *pData, uint8_t lenData, uint8_t lenStartReg)
+ 230          {
+ 231   1              while (gSMBbusy);                                                       // Wait for SMBus to be free.
+ 232   1              gSMBbusy = 1;                                                           // Claim SMBus (set to busy)
+ 233   1      
+ 234   1              gSMBslaveAddress = slaveAddress;                        // Set target slave address
+ 235   1              gSMBrw = WRITE;                                                         // Mark next transfer as a write
+ 236   1              if (lenStartReg == 0)                                           // no address bytes, so not a random write
+ 237   1                      gSMBsendStartRegister = 0;               
+ 238   1              else                                                                            // random write; send register address after slave address
+ 239   1                      gSMBsendStartRegister = 1;                              
+ 240   1              gSMBrandomRead = 0;                                                     // Do not send a START signal after the register address since this is a write
+ 241   1              gSMBackPoll = gI2Cflags & 4;                                    // Enable Acknowledge Polling (The ISR will automatically restart the tr
+             -ansfer if the slave does not acknowledge its address.
+ 242   1      
+ 243   1              *pData = SHORT_REPORT_ID; // HID_REPORT_ID_1
+ 244   1              gpSMBdata = pData;
+ 245   1              gSMBlenStartRegister = lenStartReg;                     // byte length of start register (stop or repeated start occurs aft
+             -er the last byte)
+ 246   1              gSMBnumBytesToTransfer = lenData;                       // byte length of data
+ 247   1      
+ 248   1              gSMBstoppedWrite = 0;                                           // not used in write
+ 249   1      
+ 250   1              STA = 1;
+ 251   1              while (gSMBbusy);                                                       // Stall the software here until the I2C transaction is complete
+ 252   1      }
+ 253          
+ 254          //-----------------------------------------------------------------------------
+ 255          // i2c_read ()
+ 256          //-----------------------------------------------------------------------------
+ 257          //
+ 258          // Return Value : None
+ 259          // Parameters   :
+ 260          //   1) uint8_t slaveAddress - address of the i2c slave
+ 261          //
+ 262          //   2) uint8_t* pData - pointer to the buffer containing the register address (optional)
+ 263          //
+ 264          //   3) uint8_t lenStartReg - starting register byte length (i.e., 2 = 2 bytes long); 0 indicates a non-ra
+             -ndom read
+ 265          //
+ 266          //   4) uint8_t lenData - number of data bytes to be read from the i2c slave
+ 267          //       
+ 268          //
+ 269          void i2c_read (uint8_t slaveAddress, uint8_t *pData, uint8_t lenData, uint8_t lenStartReg)
+ 270          {
+ 271   1              while (gSMBbusy);                                               // Wait for SMBus to be free.
+ 272   1              gSMBbusy = 1;                                                   // Claim SMBus (set to busy)
+ 273   1      
+ 274   1              gSMBslaveAddress = slaveAddress;                // Set target slave address
+ 275   1        
+ 276   1              if (lenStartReg == 0)                                   // non-random read
+ 277   1              {
+ 278   2                      gSMBrw = READ;
+ 279   2                      gSMBsendStartRegister = 0;
+ 280   2              }
+ 281   1              else                                                                    // random read; send starting register first
+C51 COMPILER V9.51   SMBUS                                                                 06/26/2015 13:32:25 PAGE 6   
+
+ 282   1              {
+ 283   2                      gSMBrw = WRITE;                     // A random read starts as a write then changes to a read after the 
+             -repeated start is sent. 
+ 284   2                                                                                              // The ISR handles this switchover if the <gSMBrandomRead> bit is set.
+ 285   2                      gSMBsendStartRegister = 1;                      // Send starting register address after slave address
+ 286   2              }
+ 287   1              if (gI2Cflags & 2)                                              // pseudo random read; pretend to send the starting register by sending slave add
+             -ress with write bit set, but don't send it (this is to emulate the jungo version for debug)
+ 288   1              {
+ 289   2                      gSMBstoppedWrite = 1;
+ 290   2                      gSMBsendStartRegister = 0;
+ 291   2              }
+ 292   1              else                                                                    // normal operation
+ 293   1                      gSMBstoppedWrite = 0;
+ 294   1                              
+ 295   1              gSMBrandomRead = 1;                     // Send a START after the register address
+ 296   1              gSMBrepeatedStart = gI2Cflags & 1;              // indicate whether or not to send STOP before the START after write 
+             -(including stopped write, so don't move this to the non-random read section of the above 'if')
+ 297   1              
+ 298   1              gSMBackPoll = gI2Cflags & 4;                            // Enable Acknowledge Polling
+ 299   1      
+ 300   1              *pData = SHORT_REPORT_ID; // HID_REPORT_ID_1
+ 301   1              gpSMBdata = pData;
+ 302   1              gSMBlenStartRegister = lenStartReg;             // byte length of start register (stop or repeated start occurs afte
+             -r the last byte)
+ 303   1              gSMBnumBytesToTransfer = lenData;               // byte length of data
+ 304   1      
+ 305   1              STA = 1;
+ 306   1              while(gSMBbusy);                                                // Stall the software here until the I2C transaction is complete
+ 307   1         
+ 308   1         // NACK error is indicated by *(gpSMBdata + gOffset) = 1; // status = 1, NACK error
+ 309   1      }
+ 310          
+ 311          
+ 312          // If slave is holding SDA low because of an improper SMBus reset or error
+ 313          // Provide clock pulses to allow the slave to advance out
+ 314          // of its current state. This will allow it to release SDA.
+ 315          // (This function is recommended by SiLabs, but it doesn't seem to do anything because you can't force SCL
+             - if it's configured for SMBus)
+ 316          int16_t clearSDA()
+ 317          {
+ 318   1              uint16_t count = 0;
+ 319   1              uint16_t i;
+ 320   1      
+ 321   1              while(!SDA && (count < 10))
+ 322   1              {
+ 323   2                      SCL = 0; // Drive the clock low
+ 324   2                      for(i = 0; i < 255; i++); // Hold the clock low
+ 325   2                      SCL = 1; // Release the clock
+ 326   2                      while(!SCL); // Wait for open-drain clock output to rise
+ 327   2                      for(i = 0; i < 10; i++); // Hold the clock high
+ 328   2                      count++;
+ 329   2              }
+ 330   1              (count == 10) ? (count = 1) : (count = 0);
+ 331   1              return count;
+ 332   1      }
+C51 COMPILER V9.51   SMBUS                                                                 06/26/2015 13:32:25 PAGE 7   
+
+ASSEMBLY LISTING OF GENERATED OBJECT CODE
+
+
+             ; FUNCTION SMBus_ISR (BEGIN)
+0000 C0E0              PUSH    ACC
+0002 C083              PUSH    DPH
+0004 C082              PUSH    DPL
+0006 C0D0              PUSH    PSW
+0008 75D000            MOV     PSW,#00H
+000B C000              PUSH    AR0
+000D C001              PUSH    AR1
+000F C002              PUSH    AR2
+0011 C003              PUSH    AR3
+0013 C004              PUSH    AR4
+0015 C005              PUSH    AR5
+0017 C006              PUSH    AR6
+0019 C007              PUSH    AR7
+                                           ; SOURCE LINE # 88
+                                           ; SOURCE LINE # 90
+001B C200        R     CLR     FAIL
+                                           ; SOURCE LINE # 101
+001D E5C0              MOV     A,SMB0CN
+001F 54F0              ANL     A,#0F0H
+0021 2480              ADD     A,#080H
+0023 7003              JNZ     $ + 5H
+0025 020000      R     LJMP    ?C0018
+0028 24C0              ADD     A,#0C0H
+002A 6022              JZ      ?C0003
+002C 24E0              ADD     A,#0E0H
+002E 6003              JZ      $ + 5H
+0030 020000      R     LJMP    ?C0023
+                                           ; SOURCE LINE # 102
+                                           ; SOURCE LINE # 104
+0033         ?C0002:
+                                           ; SOURCE LINE # 105
+0033 900000      R     MOV     DPTR,#gSMBslaveAddress
+0036 E0                MOVX    A,@DPTR
+0037 F5C2              MOV     SMB0DAT,A
+                                           ; SOURCE LINE # 106
+0039 53C2FE            ANL     SMB0DAT,#0FEH
+                                           ; SOURCE LINE # 108
+003C A200        R     MOV     C,gSMBrw
+003E E4                CLR     A
+003F 33                RLC     A
+0040 42C2              ORL     SMB0DAT,A
+                                           ; SOURCE LINE # 109
+0042 C2C5              CLR     STA
+                                           ; SOURCE LINE # 110
+0044 900000      R     MOV     DPTR,#dataByte
+0047 E4                CLR     A
+0048 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 111
+0049 A3                INC     DPTR
+004A F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 112
+004B 020000      R     LJMP    ?C0001
+                                           ; SOURCE LINE # 115
+004E         ?C0003:
+                                           ; SOURCE LINE # 116
+004E 20C103            JB      ACK,$ + 6H
+0051 020000      R     LJMP    ?C0004
+                                           ; SOURCE LINE # 117
+C51 COMPILER V9.51   SMBUS                                                                 06/26/2015 13:32:25 PAGE 8   
+
+                                           ; SOURCE LINE # 118
+0054 30000C      R     JNB     SEND_START,?C0005
+                                           ; SOURCE LINE # 119
+                                           ; SOURCE LINE # 120
+0057 200002      R     JB      gSMBrepeatedStart,?C0006
+                                           ; SOURCE LINE # 121
+005A D2C4              SETB    STO
+005C         ?C0006:
+                                           ; SOURCE LINE # 122
+005C D2C5              SETB    STA
+                                           ; SOURCE LINE # 123
+005E C200        R     CLR     SEND_START
+                                           ; SOURCE LINE # 124
+0060 020000      R     LJMP    ?C0001
+                                           ; SOURCE LINE # 125
+0063         ?C0005:
+                                           ; SOURCE LINE # 126
+0063 30000E      R     JNB     gSMBstoppedWrite,?C0007
+                                           ; SOURCE LINE # 127
+                                           ; SOURCE LINE # 128
+0066 D200        R     SETB    gSMBrw
+                                           ; SOURCE LINE # 129
+0068 C200        R     CLR     gSMBstoppedWrite
+                                           ; SOURCE LINE # 130
+006A 200002      R     JB      gSMBrepeatedStart,?C0008
+                                           ; SOURCE LINE # 131
+006D D2C4              SETB    STO
+006F         ?C0008:
+                                           ; SOURCE LINE # 132
+006F D2C5              SETB    STA
+                                           ; SOURCE LINE # 133
+0071 020000      R     LJMP    ?C0001
+                                           ; SOURCE LINE # 134
+0074         ?C0007:
+                                           ; SOURCE LINE # 135
+0074 300050      R     JNB     gSMBsendStartRegister,?C0009
+                                           ; SOURCE LINE # 136
+                                           ; SOURCE LINE # 137
+0077 900000      R     MOV     DPTR,#gpSMBdata
+007A E0                MOVX    A,@DPTR
+007B FB                MOV     R3,A
+007C A3                INC     DPTR
+007D E0                MOVX    A,@DPTR
+007E FA                MOV     R2,A
+007F A3                INC     DPTR
+0080 E0                MOVX    A,@DPTR
+0081 2404              ADD     A,#04H
+0083 F9                MOV     R1,A
+0084 E4                CLR     A
+0085 3A                ADDC    A,R2
+0086 FA                MOV     R2,A
+0087 900000      E     MOV     DPTR,#gOffset
+008A E0                MOVX    A,@DPTR
+008B 7E00              MOV     R6,#00H
+008D 29                ADD     A,R1
+008E F9                MOV     R1,A
+008F EE                MOV     A,R6
+0090 3A                ADDC    A,R2
+0091 FA                MOV     R2,A
+0092 900000      R     MOV     DPTR,#regByte
+0095 E0                MOVX    A,@DPTR
+0096 FF                MOV     R7,A
+C51 COMPILER V9.51   SMBUS                                                                 06/26/2015 13:32:25 PAGE 9   
+
+0097 04                INC     A
+0098 F0                MOVX    @DPTR,A
+0099 EF                MOV     A,R7
+009A 33                RLC     A
+009B 95E0              SUBB    A,ACC
+009D FE                MOV     R6,A
+009E E9                MOV     A,R1
+009F 2F                ADD     A,R7
+00A0 F9                MOV     R1,A
+00A1 EA                MOV     A,R2
+00A2 3E                ADDC    A,R6
+00A3 FA                MOV     R2,A
+00A4 120000      E     LCALL   ?C?CLDPTR
+00A7 F5C2              MOV     SMB0DAT,A
+                                           ; SOURCE LINE # 139
+00A9 900000      R     MOV     DPTR,#regByte
+00AC E0                MOVX    A,@DPTR
+00AD FF                MOV     R7,A
+00AE 900000      R     MOV     DPTR,#gSMBlenStartRegister
+00B1 E0                MOVX    A,@DPTR
+00B2 6F                XRL     A,R7
+00B3 6003              JZ      $ + 5H
+00B5 020000      R     LJMP    ?C0001
+                                           ; SOURCE LINE # 140
+                                           ; SOURCE LINE # 141
+00B8 C200        R     CLR     gSMBsendStartRegister
+                                           ; SOURCE LINE # 142
+00BA 200003      R     JB      gSMBrandomRead,$ + 6H
+00BD 020000      R     LJMP    ?C0001
+                                           ; SOURCE LINE # 143
+                                           ; SOURCE LINE # 144
+00C0 D200        R     SETB    SEND_START
+                                           ; SOURCE LINE # 145
+00C2 D200        R     SETB    gSMBrw
+                                           ; SOURCE LINE # 146
+                                           ; SOURCE LINE # 147
+                                           ; SOURCE LINE # 148
+00C4 020000      R     LJMP    ?C0001
+                                           ; SOURCE LINE # 149
+00C7         ?C0009:
+                                           ; SOURCE LINE # 151
+00C7 300003      R     JNB     gSMBrw,$ + 6H
+00CA 020000      R     LJMP    ?C0001
+                                           ; SOURCE LINE # 152
+                                           ; SOURCE LINE # 153
+00CD 900000      R     MOV     DPTR,#gSMBnumBytesToTransfer
+00D0 E0                MOVX    A,@DPTR
+00D1 FF                MOV     R7,A
+00D2 900000      R     MOV     DPTR,#dataByte
+00D5 E0                MOVX    A,@DPTR
+00D6 FD                MOV     R5,A
+00D7 33                RLC     A
+00D8 95E0              SUBB    A,ACC
+00DA FC                MOV     R4,A
+00DB C3                CLR     C
+00DC ED                MOV     A,R5
+00DD 9F                SUBB    A,R7
+00DE 7480              MOV     A,#080H
+00E0 F8                MOV     R0,A
+00E1 6C                XRL     A,R4
+00E2 98                SUBB    A,R0
+00E3 503E              JNC     ?C0013
+C51 COMPILER V9.51   SMBUS                                                                 06/26/2015 13:32:25 PAGE 10  
+
+                                           ; SOURCE LINE # 154
+00E5 900000      R     MOV     DPTR,#gpSMBdata
+00E8 E0                MOVX    A,@DPTR
+00E9 FB                MOV     R3,A
+00EA A3                INC     DPTR
+00EB E0                MOVX    A,@DPTR
+00EC FA                MOV     R2,A
+00ED A3                INC     DPTR
+00EE E0                MOVX    A,@DPTR
+00EF 2404              ADD     A,#04H
+00F1 F9                MOV     R1,A
+00F2 E4                CLR     A
+00F3 3A                ADDC    A,R2
+00F4 FA                MOV     R2,A
+00F5 900000      E     MOV     DPTR,#gOffset
+00F8 E0                MOVX    A,@DPTR
+00F9 7E00              MOV     R6,#00H
+00FB 29                ADD     A,R1
+00FC F9                MOV     R1,A
+00FD EE                MOV     A,R6
+00FE 3A                ADDC    A,R2
+00FF FA                MOV     R2,A
+0100 900000      R     MOV     DPTR,#gSMBlenStartRegister
+0103 E0                MOVX    A,@DPTR
+0104 29                ADD     A,R1
+0105 F9                MOV     R1,A
+0106 EE                MOV     A,R6
+0107 3A                ADDC    A,R2
+0108 FA                MOV     R2,A
+0109 900000      R     MOV     DPTR,#dataByte
+010C E0                MOVX    A,@DPTR
+010D FF                MOV     R7,A
+010E 04                INC     A
+010F F0                MOVX    @DPTR,A
+0110 EF                MOV     A,R7
+0111 33                RLC     A
+0112 95E0              SUBB    A,ACC
+0114 FE                MOV     R6,A
+0115 E9                MOV     A,R1
+0116 2F                ADD     A,R7
+0117 F9                MOV     R1,A
+0118 EA                MOV     A,R2
+0119 3E                ADDC    A,R6
+011A FA                MOV     R2,A
+011B 120000      E     LCALL   ?C?CLDPTR
+011E F5C2              MOV     SMB0DAT,A
+0120 020000      R     LJMP    ?C0001
+0123         ?C0013:
+                                           ; SOURCE LINE # 156
+                                           ; SOURCE LINE # 157
+0123 D2C4              SETB    STO
+                                           ; SOURCE LINE # 158
+0125 C200        R     CLR     gSMBbusy
+                                           ; SOURCE LINE # 159
+                                           ; SOURCE LINE # 160
+                                           ; SOURCE LINE # 161
+                                           ; SOURCE LINE # 162
+0127 807E              SJMP    ?C0058
+0129         ?C0004:
+                                           ; SOURCE LINE # 164
+0129 300005      R     JNB     gSMBackPoll,?C0016
+                                           ; SOURCE LINE # 165
+C51 COMPILER V9.51   SMBUS                                                                 06/26/2015 13:32:25 PAGE 11  
+
+012C D2C5              SETB    STA
+012E 020000      R     LJMP    ?C0001
+0131         ?C0016:
+                                           ; SOURCE LINE # 167
+0131 D200        R     SETB    FAIL
+                                           ; SOURCE LINE # 168
+0133 020000      R     LJMP    ?C0001
+                                           ; SOURCE LINE # 171
+0136         ?C0018:
+                                           ; SOURCE LINE # 172
+0136 900000      R     MOV     DPTR,#gSMBnumBytesToTransfer
+0139 E0                MOVX    A,@DPTR
+013A FF                MOV     R7,A
+013B 900000      R     MOV     DPTR,#dataByte
+013E E0                MOVX    A,@DPTR
+013F FD                MOV     R5,A
+0140 33                RLC     A
+0141 95E0              SUBB    A,ACC
+0143 FC                MOV     R4,A
+0144 C3                CLR     C
+0145 ED                MOV     A,R5
+0146 9F                SUBB    A,R7
+0147 7480              MOV     A,#080H
+0149 F8                MOV     R0,A
+014A 6C                XRL     A,R4
+014B 98                SUBB    A,R0
+014C 5075              JNC     ?C0001
+                                           ; SOURCE LINE # 173
+                                           ; SOURCE LINE # 174
+014E 900000      R     MOV     DPTR,#gpSMBdata
+0151 E0                MOVX    A,@DPTR
+0152 FB                MOV     R3,A
+0153 A3                INC     DPTR
+0154 E0                MOVX    A,@DPTR
+0155 FA                MOV     R2,A
+0156 A3                INC     DPTR
+0157 E0                MOVX    A,@DPTR
+0158 2401              ADD     A,#01H
+015A F9                MOV     R1,A
+015B E4                CLR     A
+015C 3A                ADDC    A,R2
+015D FA                MOV     R2,A
+015E 900000      E     MOV     DPTR,#gOffset
+0161 E0                MOVX    A,@DPTR
+0162 7E00              MOV     R6,#00H
+0164 29                ADD     A,R1
+0165 F9                MOV     R1,A
+0166 EE                MOV     A,R6
+0167 3A                ADDC    A,R2
+0168 FA                MOV     R2,A
+0169 900000      R     MOV     DPTR,#dataByte
+016C E0                MOVX    A,@DPTR
+016D FF                MOV     R7,A
+016E 04                INC     A
+016F F0                MOVX    @DPTR,A
+0170 EF                MOV     A,R7
+0171 33                RLC     A
+0172 95E0              SUBB    A,ACC
+0174 FE                MOV     R6,A
+0175 E9                MOV     A,R1
+0176 2F                ADD     A,R7
+0177 F9                MOV     R1,A
+C51 COMPILER V9.51   SMBUS                                                                 06/26/2015 13:32:25 PAGE 12  
+
+0178 EA                MOV     A,R2
+0179 3E                ADDC    A,R6
+017A FA                MOV     R2,A
+017B E5C2              MOV     A,SMB0DAT
+017D 120000      E     LCALL   ?C?CSTPTR
+                                           ; SOURCE LINE # 175
+0180 900000      R     MOV     DPTR,#gSMBnumBytesToTransfer
+0183 E0                MOVX    A,@DPTR
+0184 FF                MOV     R7,A
+0185 FD                MOV     R5,A
+0186 900000      R     MOV     DPTR,#dataByte
+0189 E0                MOVX    A,@DPTR
+018A FE                MOV     R6,A
+018B FB                MOV     R3,A
+018C 33                RLC     A
+018D 95E0              SUBB    A,ACC
+018F FA                MOV     R2,A
+0190 C3                CLR     C
+0191 EB                MOV     A,R3
+0192 9D                SUBB    A,R5
+0193 7480              MOV     A,#080H
+0195 6A                XRL     A,R2
+0196 98                SUBB    A,R0
+0197 5004              JNC     ?C0020
+                                           ; SOURCE LINE # 176
+0199 D2C1              SETB    ACK
+019B 8026              SJMP    ?C0001
+019D         ?C0020:
+                                           ; SOURCE LINE # 177
+019D EF                MOV     A,R7
+019E B50622            CJNE    A,AR6,?C0001
+                                           ; SOURCE LINE # 178
+                                           ; SOURCE LINE # 179
+01A1 C200        R     CLR     gSMBbusy
+                                           ; SOURCE LINE # 180
+01A3 C2C1              CLR     ACK
+                                           ; SOURCE LINE # 181
+01A5 D2C4              SETB    STO
+                                           ; SOURCE LINE # 182
+01A7         ?C0058:
+01A7 900000      R     MOV     DPTR,#gpSMBdata
+01AA E0                MOVX    A,@DPTR
+01AB FB                MOV     R3,A
+01AC A3                INC     DPTR
+01AD E0                MOVX    A,@DPTR
+01AE FA                MOV     R2,A
+01AF A3                INC     DPTR
+01B0 E0                MOVX    A,@DPTR
+01B1 F9                MOV     R1,A
+01B2 900000      E     MOV     DPTR,#gOffset
+01B5 E0                MOVX    A,@DPTR
+01B6 F582              MOV     DPL,A
+01B8 758300            MOV     DPH,#00H
+01BB E4                CLR     A
+01BC 120000      E     LCALL   ?C?CSTOPTR
+                                           ; SOURCE LINE # 183
+                                           ; SOURCE LINE # 184
+                                           ; SOURCE LINE # 185
+01BF 8002              SJMP    ?C0001
+                                           ; SOURCE LINE # 187
+01C1         ?C0023:
+                                           ; SOURCE LINE # 188
+C51 COMPILER V9.51   SMBUS                                                                 06/26/2015 13:32:25 PAGE 13  
+
+01C1 D200        R     SETB    FAIL
+                                           ; SOURCE LINE # 190
+                                           ; SOURCE LINE # 191
+01C3         ?C0001:
+                                           ; SOURCE LINE # 193
+01C3 300029      R     JNB     FAIL,?C0024
+                                           ; SOURCE LINE # 194
+                                           ; SOURCE LINE # 195
+01C6 53C17F            ANL     SMB0CF,#07FH
+                                           ; SOURCE LINE # 196
+01C9 43C180            ORL     SMB0CF,#080H
+                                           ; SOURCE LINE # 197
+01CC C2C5              CLR     STA
+                                           ; SOURCE LINE # 198
+01CE C2C4              CLR     STO
+                                           ; SOURCE LINE # 199
+01D0 C2C1              CLR     ACK
+                                           ; SOURCE LINE # 201
+01D2 C200        R     CLR     gSMBbusy
+                                           ; SOURCE LINE # 203
+01D4 C200        R     CLR     FAIL
+                                           ; SOURCE LINE # 204
+01D6 900000      R     MOV     DPTR,#gpSMBdata
+01D9 E0                MOVX    A,@DPTR
+01DA FB                MOV     R3,A
+01DB A3                INC     DPTR
+01DC E0                MOVX    A,@DPTR
+01DD FA                MOV     R2,A
+01DE A3                INC     DPTR
+01DF E0                MOVX    A,@DPTR
+01E0 F9                MOV     R1,A
+01E1 900000      E     MOV     DPTR,#gOffset
+01E4 E0                MOVX    A,@DPTR
+01E5 F582              MOV     DPL,A
+01E7 758300            MOV     DPH,#00H
+01EA 7401              MOV     A,#01H
+01EC 120000      E     LCALL   ?C?CSTOPTR
+                                           ; SOURCE LINE # 205
+01EF         ?C0024:
+                                           ; SOURCE LINE # 207
+01EF C2C0              CLR     SI
+                                           ; SOURCE LINE # 208
+01F1 D007              POP     AR7
+01F3 D006              POP     AR6
+01F5 D005              POP     AR5
+01F7 D004              POP     AR4
+01F9 D003              POP     AR3
+01FB D002              POP     AR2
+01FD D001              POP     AR1
+01FF D000              POP     AR0
+0201 D0D0              POP     PSW
+0203 D082              POP     DPL
+0205 D083              POP     DPH
+0207 D0E0              POP     ACC
+0209 32                RETI    
+             ; FUNCTION SMBus_ISR (END)
+
+             ; FUNCTION _i2c_write (BEGIN)
+                                           ; SOURCE LINE # 229
+;---- Variable 'pData' assigned to Register 'R1/R2/R3' ----
+;---- Variable 'slaveAddress' assigned to Register 'R7' ----
+                                           ; SOURCE LINE # 230
+C51 COMPILER V9.51   SMBUS                                                                 06/26/2015 13:32:25 PAGE 14  
+
+0000         ?C0026:
+                                           ; SOURCE LINE # 231
+0000 2000FD      R     JB      gSMBbusy,?C0026
+0003         ?C0027:
+                                           ; SOURCE LINE # 232
+0003 D200        R     SETB    gSMBbusy
+                                           ; SOURCE LINE # 234
+0005 900000      R     MOV     DPTR,#gSMBslaveAddress
+0008 EF                MOV     A,R7
+0009 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 235
+000A C200        R     CLR     gSMBrw
+                                           ; SOURCE LINE # 236
+000C 900000      R     MOV     DPTR,#lenStartReg
+000F E0                MOVX    A,@DPTR
+0010 7004              JNZ     ?C0028
+                                           ; SOURCE LINE # 237
+0012 C200        R     CLR     gSMBsendStartRegister
+0014 8002              SJMP    ?C0029
+0016         ?C0028:
+                                           ; SOURCE LINE # 239
+0016 D200        R     SETB    gSMBsendStartRegister
+0018         ?C0029:
+                                           ; SOURCE LINE # 240
+0018 C200        R     CLR     gSMBrandomRead
+                                           ; SOURCE LINE # 241
+001A 900000      R     MOV     DPTR,#gI2Cflags
+001D E0                MOVX    A,@DPTR
+001E A2E2              MOV     C,ACC.2
+0020 9200        R     MOV     gSMBackPoll,C
+                                           ; SOURCE LINE # 243
+0022 7401              MOV     A,#01H
+0024 120000      E     LCALL   ?C?CSTPTR
+                                           ; SOURCE LINE # 244
+0027 900000      R     MOV     DPTR,#gpSMBdata
+002A EB                MOV     A,R3
+002B F0                MOVX    @DPTR,A
+002C A3                INC     DPTR
+002D EA                MOV     A,R2
+002E F0                MOVX    @DPTR,A
+002F A3                INC     DPTR
+0030 E9                MOV     A,R1
+0031 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 245
+0032 900000      R     MOV     DPTR,#lenStartReg
+0035 E0                MOVX    A,@DPTR
+0036 900000      R     MOV     DPTR,#gSMBlenStartRegister
+0039 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 246
+003A 900000      R     MOV     DPTR,#lenData
+003D E0                MOVX    A,@DPTR
+003E 900000      R     MOV     DPTR,#gSMBnumBytesToTransfer
+0041 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 248
+0042 C200        R     CLR     gSMBstoppedWrite
+                                           ; SOURCE LINE # 250
+0044 D2C5              SETB    STA
+0046         ?C0030:
+                                           ; SOURCE LINE # 251
+0046 2000FD      R     JB      gSMBbusy,?C0030
+0049         ?C0031:
+                                           ; SOURCE LINE # 252
+C51 COMPILER V9.51   SMBUS                                                                 06/26/2015 13:32:25 PAGE 15  
+
+0049         ?C0032:
+0049 22                RET     
+             ; FUNCTION _i2c_write (END)
+
+             ; FUNCTION _i2c_read (BEGIN)
+                                           ; SOURCE LINE # 269
+;---- Variable 'pData' assigned to Register 'R1/R2/R3' ----
+;---- Variable 'slaveAddress' assigned to Register 'R7' ----
+                                           ; SOURCE LINE # 270
+0000         ?C0033:
+                                           ; SOURCE LINE # 271
+0000 2000FD      R     JB      gSMBbusy,?C0033
+0003         ?C0034:
+                                           ; SOURCE LINE # 272
+0003 D200        R     SETB    gSMBbusy
+                                           ; SOURCE LINE # 274
+0005 900000      R     MOV     DPTR,#gSMBslaveAddress
+0008 EF                MOV     A,R7
+0009 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 276
+000A 900000      R     MOV     DPTR,#lenStartReg
+000D E0                MOVX    A,@DPTR
+000E 7006              JNZ     ?C0035
+                                           ; SOURCE LINE # 277
+                                           ; SOURCE LINE # 278
+0010 D200        R     SETB    gSMBrw
+                                           ; SOURCE LINE # 279
+0012 C200        R     CLR     gSMBsendStartRegister
+                                           ; SOURCE LINE # 280
+0014 8004              SJMP    ?C0036
+0016         ?C0035:
+                                           ; SOURCE LINE # 282
+                                           ; SOURCE LINE # 283
+0016 C200        R     CLR     gSMBrw
+                                           ; SOURCE LINE # 285
+0018 D200        R     SETB    gSMBsendStartRegister
+                                           ; SOURCE LINE # 286
+001A         ?C0036:
+                                           ; SOURCE LINE # 287
+001A 900000      R     MOV     DPTR,#gI2Cflags
+001D E0                MOVX    A,@DPTR
+001E FF                MOV     R7,A
+001F 30E106            JNB     ACC.1,?C0037
+                                           ; SOURCE LINE # 288
+                                           ; SOURCE LINE # 289
+0022 D200        R     SETB    gSMBstoppedWrite
+                                           ; SOURCE LINE # 290
+0024 C200        R     CLR     gSMBsendStartRegister
+                                           ; SOURCE LINE # 291
+0026 8002              SJMP    ?C0038
+0028         ?C0037:
+                                           ; SOURCE LINE # 293
+0028 C200        R     CLR     gSMBstoppedWrite
+002A         ?C0038:
+                                           ; SOURCE LINE # 295
+002A D200        R     SETB    gSMBrandomRead
+                                           ; SOURCE LINE # 296
+002C EF                MOV     A,R7
+002D 13                RRC     A
+002E 9200        R     MOV     gSMBrepeatedStart,C
+                                           ; SOURCE LINE # 298
+0030 EF                MOV     A,R7
+C51 COMPILER V9.51   SMBUS                                                                 06/26/2015 13:32:25 PAGE 16  
+
+0031 A2E2              MOV     C,ACC.2
+0033 9200        R     MOV     gSMBackPoll,C
+                                           ; SOURCE LINE # 300
+0035 7401              MOV     A,#01H
+0037 120000      E     LCALL   ?C?CSTPTR
+                                           ; SOURCE LINE # 301
+003A 900000      R     MOV     DPTR,#gpSMBdata
+003D EB                MOV     A,R3
+003E F0                MOVX    @DPTR,A
+003F A3                INC     DPTR
+0040 EA                MOV     A,R2
+0041 F0                MOVX    @DPTR,A
+0042 A3                INC     DPTR
+0043 E9                MOV     A,R1
+0044 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 302
+0045 900000      R     MOV     DPTR,#lenStartReg
+0048 E0                MOVX    A,@DPTR
+0049 900000      R     MOV     DPTR,#gSMBlenStartRegister
+004C F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 303
+004D 900000      R     MOV     DPTR,#lenData
+0050 E0                MOVX    A,@DPTR
+0051 900000      R     MOV     DPTR,#gSMBnumBytesToTransfer
+0054 F0                MOVX    @DPTR,A
+                                           ; SOURCE LINE # 305
+0055 D2C5              SETB    STA
+0057         ?C0039:
+                                           ; SOURCE LINE # 306
+0057 2000FD      R     JB      gSMBbusy,?C0039
+005A         ?C0040:
+                                           ; SOURCE LINE # 309
+005A         ?C0041:
+005A 22                RET     
+             ; FUNCTION _i2c_read (END)
+
+             ; FUNCTION clearSDA (BEGIN)
+                                           ; SOURCE LINE # 316
+                                           ; SOURCE LINE # 317
+                                           ; SOURCE LINE # 318
+;---- Variable 'count' assigned to Register 'R6/R7' ----
+0000 E4                CLR     A
+0001 FF                MOV     R7,A
+0002 FE                MOV     R6,A
+0003         ?C0042:
+                                           ; SOURCE LINE # 321
+0003 208432            JB      SDA,?C0043
+0006 C3                CLR     C
+0007 EF                MOV     A,R7
+0008 940A              SUBB    A,#0AH
+000A EE                MOV     A,R6
+000B 9400              SUBB    A,#00H
+000D 5029              JNC     ?C0043
+                                           ; SOURCE LINE # 322
+                                           ; SOURCE LINE # 323
+000F C285              CLR     SCL
+                                           ; SOURCE LINE # 324
+;---- Variable 'i' assigned to Register 'R4/R5' ----
+0011 E4                CLR     A
+0012 FD                MOV     R5,A
+0013 FC                MOV     R4,A
+0014         ?C0044:
+C51 COMPILER V9.51   SMBUS                                                                 06/26/2015 13:32:25 PAGE 17  
+
+0014 0D                INC     R5
+0015 BD0001            CJNE    R5,#00H,?C0055
+0018 0C                INC     R4
+0019         ?C0055:
+0019 ED                MOV     A,R5
+001A F4                CPL     A
+001B 4C                ORL     A,R4
+001C 70F6              JNZ     ?C0044
+001E         ?C0045:
+                                           ; SOURCE LINE # 325
+001E D285              SETB    SCL
+0020         ?C0047:
+                                           ; SOURCE LINE # 326
+0020 3085FD            JNB     SCL,?C0047
+0023         ?C0048:
+                                           ; SOURCE LINE # 327
+0023 E4                CLR     A
+0024 FC                MOV     R4,A
+0025 FD                MOV     R5,A
+0026         ?C0049:
+0026 0D                INC     R5
+0027 BD0001            CJNE    R5,#00H,?C0056
+002A 0C                INC     R4
+002B         ?C0056:
+002B ED                MOV     A,R5
+002C 640A              XRL     A,#0AH
+002E 4C                ORL     A,R4
+002F 70F5              JNZ     ?C0049
+0031         ?C0050:
+                                           ; SOURCE LINE # 328
+0031 0F                INC     R7
+0032 BF0001            CJNE    R7,#00H,?C0057
+0035 0E                INC     R6
+0036         ?C0057:
+                                           ; SOURCE LINE # 329
+0036 80CB              SJMP    ?C0042
+0038         ?C0043:
+                                           ; SOURCE LINE # 330
+0038 EF                MOV     A,R7
+0039 640A              XRL     A,#0AH
+003B 4E                ORL     A,R6
+003C 7005              JNZ     ?C0052
+003E FE                MOV     R6,A
+003F 7F01              MOV     R7,#01H
+0041 8003              SJMP    ?C0053
+0043         ?C0052:
+0043 E4                CLR     A
+0044 FE                MOV     R6,A
+0045 FF                MOV     R7,A
+0046         ?C0053:
+                                           ; SOURCE LINE # 331
+                                           ; SOURCE LINE # 332
+0046         ?C0054:
+0046 22                RET     
+             ; FUNCTION clearSDA (END)
+
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    758    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =      9      12
+C51 COMPILER V9.51   SMBUS                                                                 06/26/2015 13:32:25 PAGE 18  
+
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      8       1
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
